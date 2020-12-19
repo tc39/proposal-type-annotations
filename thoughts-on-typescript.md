@@ -7,32 +7,18 @@
 ```ts
 const a: number;
 
-function foo(a: number) {
+function foo(a: number = 1, b: number): number {
 
 }
 ```
 
-What comes after the `:` is a _type_, so:
-
-```txt
-: <type>...
-```
-
-* function return value:
+### Optional parameters
 
 ```ts
-function foo(a: number) {
+function foo(a?: number) {
 
 }
 ```
-
-What comes after the `:` is a _type_, so:
-
-```txt
-: <type>...
-```
-
-In the above two, how do I know when the _type_ ends and the JavasScript code continues
 
 ### Destructuring
 
@@ -205,7 +191,7 @@ abstract class Foo {
 ### Generic Functions
 
 ```ts
-function foo<T>(foo: T): T
+function foo<T>(foo: T): T {}
 ```
 
 ### Generic Classes
