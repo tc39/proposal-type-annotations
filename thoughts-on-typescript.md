@@ -202,7 +202,7 @@ class Foo<T> {
 }
 ```
 
-### Typegaurds
+### Typeguards
 
 ```ts
 function foo(x: number): x is number {
