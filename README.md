@@ -275,18 +275,26 @@ is ignored by the runtime and is not considered as part of the runtime parameter
 
 > Note that this does not break compatibility, since `this` is not allowed as a parameter name.
 
+### Function overloads
+
+If a function has some type signature, but no body, the Java runtime will ignore it
+and treat it as a declaration for function overloading purpose:
+
+```ts
+function foo(x: number): number
+function foo(x: string): string {
+  if (typeof x is number) {
+    return x + 1
+  } else {
+    return x + "!"
+  }
+}
+```
+
 ### `.d.ts` and `libdef` Files
 
 These files have no use in JavaScript, and while the typecheckers can test them, they
 are ignored by JavaScript.
-
-### Where TypeScript is not compatible and cannot be compatible with this proposal
-
-* enum
-* namespace
-* overloads
-* null typegaurd
-* declarations
 
 ## Other ideas
 
@@ -303,15 +311,89 @@ This solves the problem that is currently in TypeScript and Flow where you canno
 type individual destructor variables, but must type the whole object, which makes for a very
 unwieldy look.
 
-### Adding traits via `%`
+### Removing the need for `implements` by just replacing it with `:`
 
-Addinng `%trait` to anything.
+If we define that a class can also have type annotations, this proposal would like to suggest
+an alternative way to define `implements`
+
+```ts
+class PointClass implements Point {
+
+}
+```
+
+One would write:
+
+```ts
+class PointClass: Point {
+
+}
+```
+
+This would remove the need for another keyword from the language.
+
+### Adding traits via `type(...)` or a sigil
+
+There are various places in the proposal that add type _traits_ into the language.
+Examples are `public`, `abstract`, `readonly`. Instead of defining these explicitly, we
+could add a "type as comments" way to add them, without needing to define what those traits are.
+
+One way could be via a `type(...)` construct, thus:
+
+```ts
+type(abstract) class Point {
+  type(readonly) x: number
+  type(readonly) y: number
+}
+```
+
+A vigil would also make sense, assuming `type` is too verbose:
+
+```ts
+%abstract class Point {
+  %readonly x: number
+  %readonly y: number
+}
+```
+
+The last option would be to add them as part of the type information, using a well-known sigil:
+
+```ts
+class Point: #abstract {
+  x: number#readonly
+  y: number#readonly
+
+  move(): Point#(override,abstract)
+}
+```
 
 ### Types for imported variables
+
+There is one additional place where variables are declared and yet do not have a place for a
+type signature: in import statements. So this proposal would like to add the ability to have
+a type signature there, even if this is not supported by the current typecheckers.
 
 ```js
 import {foo: number} from 'abc'
 ```
+
+### Where TypeScript is not compatible and cannot be compatible with this proposal
+
+Three constructs in TypeScript have no parallel in this proposal.
+
+* [Enums](https://www.typescriptlang.org/docs/handbook/enums.html). This
+  construct actually _generates_ JavaScript code and thus is out of scope for a proposal
+  that just tries to add type annotations that are ignored by the runtime.
+
+* [Null typeguards](https://www.typescriptlang.org/docs/handbook/advanced-types.html#nullable-types).
+  In TypeScript, one can write `x!.foo` to specify that even if `x` is nullable. This construct
+  is syntactic sugar for `(x as NonNullable<typeof x>`). This constuct is not part of a
+  function or class definition, and is deep in the definition of expresions in JavaScript, and so
+  is difficult to define.
+* [Declarations](https://www.typescriptlang.org/docs/handbook/declaration-files/by-example.html).
+  In TypeScript one can "declare" the existence of a function or class using
+  `declare function foo();`. As this is used mainly in `.d.ts` files, which can be ignored
+  by JavaScript, we can ignore this construct.
 
 ## FAQ
 
@@ -335,7 +417,7 @@ The final construct that is not supported is declarations. Since those are usual
 `.d.ts` files, which can be read by TypeScript and are ignored by JavaScript, this should not
 be a real problem.
 
-* Do all Flow programs pass?
+### Do all Flow programs pass?
 
 Flow is very similar to TypeScript, and so all type constructs are OK, with
 a similar caveat whereby some types need to be wrapped in parentheses to be compatible with
@@ -374,6 +456,13 @@ While these languages _compile_ to JavaScript, and have static typing, they are 
 JavaScript, and thus are not relevant to this proposal.
 
 But these languages could theoretically use this proposal to tack _their type system_ on JavaScript.
+
+### What about `.d.ts` files and "libdef" files?
+
+`.d.ts` and "libdef" files are used by TypeScript and Flow respectively, as a kind of "header" file
+that describes the signature of a package. This proposal can safely ignore them as it
+does not need to interpret the semantics of the type information inside them. Of couse,
+TypeScript and Flow can continue reading and interpreting these files as they have done in the past.
 
 ## Prior Art
 
