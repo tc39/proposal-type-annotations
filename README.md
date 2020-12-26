@@ -317,7 +317,6 @@ unwieldy look. Without this `::`, the definition would look like this:
 const {x, y}: {x: number, y: number} = point
 ```
 
-
 ### Removing the need for `implements` by just replacing it with `:`
 
 If we define that a class can also have type annotations, this proposal would like to suggest
