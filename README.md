@@ -387,7 +387,7 @@ No. TypeScript can continue to be TypeScript, with no compatibility impact or ch
 
 Developers may still want to use TypeScript syntax for other reasons:
 
-* Use of certain syntax features which are not supported in JavaScript (e.g., `enum`, concise field definitions)
+* Use of certain syntax features which are not supported in JavaScript (e.g., `enum`, parameter properties)
 * Compatibility with legacy code bases which may run into certain syntax edge cases that are handled differently
 * Non-standard extensions/reinterpretations of JavaScript (e.g., legacy decorators, Set semantics for fields)
 
@@ -396,6 +396,12 @@ the goal of this proposal is that the modifications would be slight. Ideally, on
 them automatically. Hopefully, the effort would be small, and the promise of having TypeScript code that
 does not need transpilation would be a big motivation. But the developers could decide
 to stick with TypeScript transpilation and enjoy the full power of TypeScript.
+
+### How should tools work with JavaScript type syntax?
+
+Given the fact that some TypeScript features are [out of scope](#out-of-scope-features-which-generate-code), and that standard JavaScript will not evolve as fast as TypeScript or support its variety of configurations, there will continue to be an advantage for many tools to support TypeScript in its fuller form, beyond what is potentially standardized as JavaScript.
+
+One pattern we see today, for the integration of TypeScript support into JavaScript tools, is a separation of TS syntax into an optional plugin or mode. This pattern can create friction for adoption. This proposal may reduce the cost of adopting types in JavaScript by forming a standard, versionless, always-on common base for type syntax. Full TypeScript support can be remain an opt-in mode on top of that. 
 
 ### What about compatibililty with ReasonML, PureScript, and other statically typed languages that compile to JavaScript?
 
