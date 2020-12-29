@@ -2,7 +2,7 @@
 
 This proposal aims to enable developers to add type annotations to their JavaScript code,
 allowing those annotations to be checked by a type checker that is _external to JavaScript_.
-At runtime, the JavaScript engine would ignore them, treating the types as comments.
+At runtime, the JavaScript engine ignores them, treating the types as comments.
 
 The aim of this proposal is to enable developers to run programs written in TypeScript,
 Flow, Hegel, and other static typing supersets of JavaScript without any need for
@@ -79,25 +79,25 @@ the type itself incorporates a `,`.
 
 This proposal suggests a few simple rules that define where the type ends:
 
-1. Any JS identifier is accepted.
+1. Any JavaScript identifier is accepted.
 1. A prefix or postfix `?` is allowed.
-1. If an open parenthess is encountered before the identifier or after it, then
+1. If an open parenthesis is encountered before the identifier or after it, then
    it is balance-matched until it's close is found, which defines the end of the type.
 
-A "parentesis" here can be one of: `(...)`, `[...]`, `{...}`, or `<...>`.
+A "parenthesis" here can be one of: `(...)`, `[...]`, `{...}`, or `<...>`.
 
 Example of types that are allowed:
 
 * Simple "identifier" style: `number`, `Foo`, `string`
 * Adding `?`: `number?`, `?number`, `Foo?`
-* Adding parentheses after identifier: `string[]`, `Foo<T>`, `Foo<T extends ReturnType<Bar>>`
-* Starting with parentheses: `{x: number, y: number}`, `{|x: number, y: number|}`
+* Adding parentheses after an identifier: `string[]`, `Foo<T>`, `Foo<T extends ReturnType<Bar>>`
+* Starting with parentheses: `{x: number, y: number}`, `{|x: number, y: number|}`, `(() => number)`
 
 We're still considering how/whether the syntax could accommodate these cases without enclosing parentheses:
 
 * Illegal characters in identifier: `number!`, `string | number`, `string & number`,
   `(x: number) => string`
-* Multiple parenthsis in sequence: `<T>(arg: T) => T`
+* Multiple parentheses in sequence: `<T>(arg: T) => T`
 * Unmatched parentheses: `Foo<T condition T < 5>`
 * type operators: `typeof s`
 * [Template literal types](https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html):
@@ -180,7 +180,7 @@ interface PointInterface {x: number, y: number}
 
 class Point implements PointInterface {
   x: number
-  y?: number
+  y: number
 
   move(dx: number, dy: number) {this.x += dx; this.y += dy}
 }
@@ -314,12 +314,12 @@ TC39 has a tradition of programming language design which favors local, sound ch
 
 This proposal is a balancing act: trying to be as TypeScript compatible as possible while still allowing other type systems, and also not impeding the evolution of JavaScript's syntax too much. Standardizing TS details or 100% compatibility with TS are non-goals.
 
-While this proposal leans forward to be close to TypeScript, TypeScript may need to also lean forward to accomodate this proposal, by being open to the existence of style of code which stays within the expanded JS syntax. This style is more flexible and terse than the current JSDoc mode, but less complete than the full TypeScript language.
+While this proposal leans forward to be close to TypeScript, TypeScript may need to also lean forward to accomodate this proposal, by being open to the existence of style of code that stays within the expanded JS syntax. This style is more flexible and terse than the current JSDoc mode, but less complete than the full TypeScript language.
 
 TypeScript would continue to exist alongside JS's slightly more restricted syntax: no existing TS codebases would need to change, but not all TypeScript code would run directly in JS engines, if it lives outside the subset.
 
 ### Should TypeScript be standardized in TC39?
-  
+
 TypeScript has been continuing to advance quickly. Both its grammar and typing rules continue to evolve, to the benefit of users, and tying this evolution to TC39 risks holding that benefit back. For example, TypeScript upgrades frequently require users to fix typing issues because the rules change, and this is often considered "worth it" because real bugs are found. However, standards aren't typically done with this version upgrade path; a move to standardization would require more conservatism. The goal here is to enable wider deployment of systems like TypeScript in diverse environments, not obstruct TS's evolution.
 
 ### Should TypeScript be sanctioned as JS's official type system?
@@ -341,13 +341,14 @@ Although it is possible to define types in existing JavaScript comments, as Clos
 
 ### Doesn't all JS development do transpilation anyway? Will it really help to remove the type-desugaring step?
 
-The JavaScript ecosystem has been moving to more standard and lightweight things. Although the transition is long, this journey has incremental benefits as individual steps move along, which we're also seeing in the modules world as welll. There are several environments where JS code may be run where it is difficult/impractical to add a build step (some kinds of configuration files/scripting, Node.js). The more things we can shift towards standards and native JS engine execution, the more interoperable and composible the JS ecosystem will be.
+The JavaScript ecosystem has been moving to more standard and lightweight things. Although the transition is long, this journey has incremental benefits as individual steps move along, which we're also seeing in the modules world as well. There are several environments where JS code may be run where it is difficult/impractical to add a build step (some kinds of configuration files/scripting, Node.js). The more things we can shift towards standards and native JS engine execution, the more interoperable and composable the JS ecosystem will be.
 
 ### Can types be available via runtime reflection like [TypeScript's emitDecoratorMetadata](https://www.typescriptlang.org/tsconfig#emitDecoratorMetadata)?
 
 The proposal here differs significantly from Python's types, as the types in this proposal are entirely ignored, not evaluated as expressions or accessible at runtime as metadata. This difference is largely motivated by the existing community precedent, where JS type systems do not tend to use JS expression grammar for their types, so it is not possible to evaluate them as such.
 
-At most, we could expose the types as strings, but it's not clear what anyone could do with those or how they should be exposed. This proposal leaves the types entirely ignored, however.
+At most, we could expose the types as strings, but it's not clear what anyone could do with those or how they should be exposed. This proposal does not try and expose the types as metadata, and only specifies that they are ignored by
+the JS runtime.
 
 ### Does this proposal make all TypeScript programs valid JavaScript?
 
@@ -382,17 +383,19 @@ TypeScript and Flow can continue reading and interpreting these files as they ha
 
 ### Does this proposal mean that TypeScript developers would have to modify their codebases?
 
-No. TypeScript can continue to be TypeScript, with no compatibility impact or changes to code bases. This proposal would give developers the *option* to restrict themselves to a particular subset of TypeScript which would run as JavaScript without transpilation.
+No. TypeScript can continue to be TypeScript, with no compatibility impact or changes to code bases. This proposal would give developers the _option_ to restrict themselves to a particular subset of TypeScript which would run as JavaScript without transpilation.
 
-Developers may still want to use TypeScript syntax for a few reasons, for example:
-- Use of certain syntax features which are not supported in JavaScript (e.g., `const enum`, concise field definitions)
-- Compatibility with legacy code bases which may run into certain syntax edge cases that are handled differently
-- Non-standard extensions/reinterpretations of JavaScript (e.g., legacy decorators, Set semantics for fields)
+Developers may still want to use TypeScript syntax for other reasons:
 
-If developers decide to adopt an existing TypeScript code base to standard JavaScript under this proposal,
-the goal is that the modifications would be slight. Ideally, one could write a codemod that does
-them automatically. Hopefully, the effort would be small, while the promise of having TypeScript code that
-does not need transpilation is a big motivation. But there would be no forcing function
+* Use of certain syntax features which are not supported in JavaScript (e.g., `enum`, concise field definitions)
+* Compatibility with legacy code bases which may run into certain syntax edge cases that are handled differently
+* Non-standard extensions/reinterpretations of JavaScript (e.g., legacy decorators, Set semantics for fields)
+
+If developers decide to migrate an existing TypeScript code base to standard JavaScript under this proposal,
+the goal of this proposal is that the modifications would be slight. Ideally, one could write a codemod that does
+them automatically. Hopefully, the effort would be small, and the promise of having TypeScript code that
+does not need transpilation would be a big motivation. But the developers could decide
+to stick with TypeScript transpilation and enjoy the full power of TypeScript.
 
 ### What about compatibililty with ReasonML, PureScript, and other statically typed languages that compile to JavaScript?
 
