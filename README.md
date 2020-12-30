@@ -221,6 +221,39 @@ like `abstract` before a class, are ignored.
 
 > Note: It may feel a bit scary that all of the "guarantees" of `private`, `readonly`, etc are lost, but as with types, TypeScript does not provide strong guarantees anyway. When not using a type checker, it would be best to apply a linter to avoid misunderstandings about these features being meaningful.
 
+#### Arbitrariness of class "traits"
+
+There are many type constructs for `class`. These constructs, like `abstract`, `protected`,
+and `public`, describe the traits of the class and its member methods and properties. This proposal
+chose these constructs and their location in the syntax not because they make sense for type systems in general, but for the sole purpose of TypeScript compatibility. As such, they seem arbitrary, both in location
+and in the keywords chosen.
+
+We are exploring different ways to enable type systems to describe the traits of the class
+and its memebers, ways that are less obstrusive to the JavaScript syntax, and are conducive
+to other extensions besides the ones defined by TypeScript. Some ideas are:
+
+* A sigil that can be added to these "traits" to specify that they are traits to be ignored by
+  JavaScript. Example:
+
+```ts
+class Point {
+  %public x: number
+}
+```
+
+* Comments that are added before the member to specify the traits. Example:
+
+```ts
+class Point {
+  //@traits public readonly
+  x: number
+}
+```
+
+The above ideas try to strike a balance between not impeding too much on JavaScript
+syntax, enabling TypeScript and other type checkers to define any traits they want in the future,
+while breaking as little compatibility as possible with TypeScript.
+
 ### Typecasting
 
 A new operator, `as`, is defined, which takes as a left operand an expression,
