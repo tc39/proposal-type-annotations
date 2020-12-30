@@ -306,6 +306,9 @@ function baz();
 
 Declarations are ignored by the JS engine.
 
+> Note that we may drop the need for the `declare` keyword, given that most uses of `declare`
+  are in `.d.ts` files that are ignored anyway by the JavaScript runtime.
+
 #### Example: function overloads
 
 If a function has some kind of type signature, but no body, this proposal would treat it as a declaration, leading the engine to ignore the declaration.
