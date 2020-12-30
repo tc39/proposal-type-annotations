@@ -390,7 +390,18 @@ Although it is possible to define types in existing JavaScript comments, as Clos
 
 ### Doesn't all JS development do transpilation anyway? Will it really help to remove the type-desugaring step?
 
-The JavaScript ecosystem has been moving to more standard and lightweight things. Although the transition is long, this journey has incremental benefits as individual steps move along, which we're also seeing in the modules world as well. There are several environments where JS code may be run where it is difficult/impractical to add a build step (some kinds of configuration files/scripting, Node.js). The more things we can shift towards standards and native JS engine execution, the more interoperable and composable the JS ecosystem will be.
+The JavaScript ecosystem has been slowly moving back to a transpilation-less future. The sunsetting
+of IE11 and the rise of evergreen browsers that implement the latest JavaScript standard
+means that developers can once again run standard JavaScritp code without transpilation. The advent
+of native ES modules in the browser and in Node.js also means that, at least in development, the ecosystem
+is working its way to a future where even bundling is not necessary,
+at least during development. Node.js developers in particular, have never been used to transpilation, and are todaytorn between
+the ease of development that is brought by no transpilation, and the ease of development
+that languages like TypeScript bring.
+
+Implementing this proposal means that we can add type systems to this list of "things that don't need
+transpilation anymore" and bring us closer to a world where transpilation is optional and not
+a necessity.
 
 ### Can types be available via runtime reflection like [TypeScript's emitDecoratorMetadata](https://www.typescriptlang.org/tsconfig#emitDecoratorMetadata)?
 
@@ -450,7 +461,7 @@ to stick with TypeScript transpilation and enjoy the full power of TypeScript.
 
 Given the fact that some TypeScript features are [out of scope](#out-of-scope-features-which-generate-code), and that standard JavaScript will not evolve as fast as TypeScript or support its variety of configurations, there will continue to be an advantage for many tools to support TypeScript in its fuller form, beyond what is potentially standardized as JavaScript.
 
-One pattern we see today, for the integration of TypeScript support into JavaScript tools, is a separation of TS syntax into an optional plugin or mode. This pattern can create friction for adoption. This proposal may reduce the cost of adopting types in JavaScript by forming a standard, versionless, always-on common base for type syntax. Full TypeScript support can be remain an opt-in mode on top of that. 
+One pattern we see today, for the integration of TypeScript support into JavaScript tools, is a separation of TS syntax into an optional plugin or mode. This pattern can create friction for adoption. This proposal may reduce the cost of adopting types in JavaScript by forming a standard, versionless, always-on common base for type syntax. Full TypeScript support can be remain an opt-in mode on top of that.
 
 ### What about compatibililty with ReasonML, PureScript, and other statically typed languages that compile to JavaScript?
 
