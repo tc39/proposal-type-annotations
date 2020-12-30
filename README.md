@@ -70,6 +70,16 @@ The same syntax works for variable declarations:
 const a: number = 4
 ```
 
+## Optionality of parameters
+
+A parameter name may be embellished with a postfix `?`. This signifies optionality in TypeScript and Flow. Example:
+
+```ts
+function split(str: string, separator?: string) {
+
+}
+```
+
 ### How to define where the type annotation begins and ends
 
 How does the JavaScript parser know where a type annotation begins? In the above example,
