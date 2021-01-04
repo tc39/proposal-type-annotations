@@ -165,13 +165,10 @@ import type { someType2 } from 'some-package-with-type'
 ```
 
 A `type` before the identifier defines it as a type that can and should be ignored by
-the JavaScript runtime and not be imported. A `type` immediately after the `import` means that all
-identifiera are treated as `type`, and the whole import is ignored by the JS runtime.
+the JavaScript runtime and not be imported. A `type` immediately after `import` means that each
+identifier is treated as `type`, so the meaning is instead `import 'some-package-with-type'`.
 
 > Note that the first form is not currently supported by TypeScript but is supported by Flow and Hegel.
-Also note that for the second form, TypeScript allows you to preserve the import itself using
-the `importsNotUsedAsValues` flag, but the default for the flag is the same as the one describe
-here: ignoring the whole import.
 
 ### Classes
 
