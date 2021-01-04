@@ -4,13 +4,13 @@ This proposal aims to enable developers to add type annotations to their JavaScr
 allowing those annotations to be checked by a type checker that is _external to JavaScript_.
 At runtime, the JavaScript engine ignores them, treating the types as comments.
 
-The aim of this proposal is to enable developers to run programs written in TypeScript,
-Flow, Hegel, and other static typing supersets of JavaScript without any need for
+The aim of this proposal is to enable developers to run programs written in [TypeScript](https://www.typescriptlang.org/),
+[Flow](https://flow.org/), [Hegel](https://hegel.js.org/), and other static typing supersets of JavaScript without any need for
 transpilation, if they stick within a certain reasonably large subset of the language.
 
 ## Status
 
-by Gil Tayer and Daniel Ehrenberg
+by Gil Tayar and Daniel Ehrenberg
 
 Stage 0
 
@@ -19,7 +19,7 @@ Not yet presented to TC39, but actively being developed in collaboration with co
 ## Synopsis
 
 This proposal aims to add typing annotation to JavaScript, not by defining a type
-system and type syntax, but rather by allowing type annotations to be included in the code
+system, but rather by allowing type annotations to be included in the code
 while being ignored by the JavaScript runtime. These annotations can be type checked by tools such
 as TypeScript, ESlint, Flow, or Hegel, yet have the code run without any transpilation necessary.
 
@@ -31,7 +31,7 @@ See more about the motivation in [the FAQ](#faq).
 
 ## Proposal
 
-The following proposal is a _strawman_ proposal. Please treat it as such. It is more about the
+The following proposal is a _strawperson_ proposal. Please treat it as such. It is more about the
 spirit of ignoring type constructs in the code, than it is about the specific syntax. Having
 said that, care was taken to be both TypeScript/Flow/Hegel compatible, yet also be true
 to the spirit of JavaScript.
@@ -47,7 +47,7 @@ function foo(a : (this<is><x, y>TYPE!), b: thisIsAlso) {
 ```
 
 Please note that the types do not have to conform to the TypeScript (or any other) type system.
-It is only when the _TypeScript_ type checker checks the source code that errors are
+It is only when the _TypeScript_ (or other) type checker checks the source code that errors are
 emitted if the types are incorrect or have bad syntax.
 
 A function can also declare a return type using `:` after the parentheses:
@@ -124,7 +124,7 @@ parentheses in these contexts today:
 
 > Note that this is a place where compatibility with _existing_ TypeScript code
   may not beprovided. But that code can be easily fixed, probably even via a codemod, to conform to
-  the new way of declaring a type, by wrapping the difficult-to-parse types with a `(...)`.
+  the restricted way of declaring a type, by wrapping the difficult-to-parse types with a `(...)`.
 
 ### Types and interfaces
 
@@ -208,52 +208,6 @@ class Point {
   move(dx, dy) {this.x += dx; this.y += dy}
 ```
 
-A class can also have the `abstract` trait added to it:
-
-```ts
-abstract class Point {}
-```
-
-TypeScript allows traits like `private`, `protected`, `public` on methods and instance variables,
-`readonly` on instance variables, and `abstract` on methods. TypeScript also permits fields
-to be created with `declare`, and fields and methods may be declared `override`. All of these keywords,
-like `abstract` before a class, are ignored.
-
-> Note: It may feel a bit scary that all of the "guarantees" of `private`, `readonly`, etc are lost, but as with types, TypeScript does not provide strong guarantees anyway. When not using a type checker, it would be best to apply a linter to avoid misunderstandings about these features being meaningful.
-
-#### Arbitrariness of class "traits"
-
-There are many type constructs for `class`. These constructs, like `abstract`, `protected`,
-and `public`, describe the traits of the class and its member methods and properties. This proposal
-chose these constructs and their location in the syntax not because they make sense for type systems in general, but for the sole purpose of TypeScript compatibility. As such, they seem arbitrary, both in location
-and in the keywords chosen.
-
-We are exploring different ways to enable type systems to describe the traits of the class
-and its memebers, ways that are less obstrusive to the JavaScript syntax, and are conducive
-to other extensions besides the ones defined by TypeScript. Some ideas are:
-
-* A sigil that can be added to these "traits" to specify that they are traits to be ignored by
-  JavaScript. Example:
-
-```ts
-class Point {
-  %public x: number
-}
-```
-
-* Comments that are added before the member to specify the traits. Example:
-
-```ts
-class Point {
-  //@traits public readonly
-  x: number
-}
-```
-
-The above ideas try to strike a balance between not impeding too much on JavaScript
-syntax, enabling TypeScript and other type checkers to define any traits they want in the future,
-while breaking as little compatibility as possible with TypeScript.
-
 ### Typecasting
 
 A new operator, `as`, is defined, which takes as a left operand an expression,
@@ -317,7 +271,7 @@ This form may be used for [TypeScript function overloading](https://www.typescri
 ```ts
 function foo(x: number): number
 function foo(x: string): string {
-  if (typeof x is number) {
+  if (typeof x === number) {
     return x + 1
   } else {
     return x + "!"
@@ -327,7 +281,62 @@ function foo(x: string): string {
 
 Note that this means that no variable binding or destructuring will happen as a result of the first line.
 
-### Null typeguards
+### Up for debate
+
+A couple pieces of syntax would fit cleanly in with the "types as comments" model, but may feel like a bit of overreach. We think that this proposal could work with or without these pieces of syntax, and present various alternative options below.
+
+#### Keywords in and around classes
+
+Several keywords in TypeScript and other type systems are used outside of a type context:
+
+- `abstract` classes and methods
+- `private`, `protected` and `public` placement of fields and methods
+- `readonly` fields
+- `override` fields and methods
+
+As an example, this proposal could support the following syntax:
+
+```ts
+class Point {
+  public readonly x: number
+}
+```
+
+If these are permitted as part of this proposal, the natural semantics would be to ignore them all, treating the above class as `class Point { x }`. As with types, the soft "guarantees" that these keywords provide are checked by the type checker. There would likely need to be slightly different syntax, e.g., to prohibit newlines after the new contextual keywords.
+
+However, intuitively, it might feel strange to include this arbitrary set of keywords and permit them to be used "incorrectly". Also, more keywords are added over time (e.g., recently, `override`)--it may be "easier" to add these keywords than other parts of type syntax.
+
+Another possibility, rather than parsing and ignoring these keywords, would be to to permit them in classes with some other comment-like syntax, such as:
+- [In the type checker] Applying a special terse comment syntax of a format interpreted by the type checker
+
+```ts
+class Point {
+  ///public readonly
+  x: number
+}
+```
+
+- [In the type checker] Putting the placement in the type location
+
+```ts
+class Point {
+  x: public readonly number
+}
+```
+
+- [In this proposal] Creating a new comment syntax which exists just for this sort of keyword, e.g., set off by a particular sigil, so that a magic comment syntax is not required
+
+```ts
+class Point {
+  %public %readonly x: number
+}
+```
+
+The above ideas try to strike a balance between not impeding too much on JavaScript
+syntax, enabling TypeScript and other type checkers to define any traits they want in the future,
+while breaking as little compatibility as possible with TypeScript. We're open to any of the four solutions presented here, or other ideas people may have.
+
+#### Null typeguards
 
 In TypeScript, one can write `x!.foo` to specify that `x` cannot be null,
 even if its type specifies that it can be. This is known as a [null typeguard](https://www.typescriptlang.org/docs/handbook/advanced-types.html#nullable-types).
@@ -352,16 +361,16 @@ It's a bit late to ask that question. In practice, JavaScript already does have 
 
 ### Why not define a type system for JS in TC39 instead?
 
+TC39 has a tradition of programming language design which favors local, sound checks. By contrast, TypeScript's model--which has been highly successful for JS developers--is around non-local, unsound checks. TypeScript-style systems are expensive and unnecessary to check at application startup, whereas TC39 defines the semantics that are run by JS engines.
+
 This proposal recognizes that trying to add a full type system to JavaScript is a multi-year
 effort that has a high probability of failure due to the enormity of the task, and also
 recognizes that the community has evolved type systems that it is already happy with. Specifically,
 the emerging de-facto standard for a JavaScript type system is TypeScript.
 
-TC39 has a tradition of programming language design which favors local, sound checks. By contrast, TypeScript's model--which has been highly successful for JS developers--is around non-local, unsound checks. TypeScript-style systems are expensive and unnecessary to check at application startup, whereas TC39 defines the semantics that are run by JS engines.
-
 ### How does this proposal relate to TypeScript?
 
-This proposal is a balancing act: trying to be as TypeScript compatible as possible while still allowing other type systems, and also not impeding the evolution of JavaScript's syntax too much. Standardizing TS details or 100% compatibility with TS are non-goals.
+This proposal is a balancing act: trying to be as TypeScript compatible as possible while still allowing other type systems, and also not impeding the evolution of JavaScript's syntax too much. Standardizing all TS details or 100% compatibility with TS are non-goals.
 
 While this proposal leans forward to be close to TypeScript, TypeScript may need to also lean forward to accomodate this proposal, by being open to the existence of style of code that stays within the expanded JS syntax. This style is more flexible and terse than the current JSDoc mode, but less complete than the full TypeScript language.
 
@@ -369,7 +378,7 @@ TypeScript would continue to exist alongside JS's slightly more restricted synta
 
 ### Should TypeScript be standardized in TC39?
 
-TypeScript has been continuing to advance quickly. Both its grammar and typing rules continue to evolve, to the benefit of users, and tying this evolution to TC39 risks holding that benefit back. For example, TypeScript upgrades frequently require users to fix typing issues because the rules change, and this is often considered "worth it" because real bugs are found. However, standards aren't typically done with this version upgrade path; a move to standardization would require more conservatism. The goal here is to enable wider deployment of systems like TypeScript in diverse environments, not obstruct TS's evolution.
+TypeScript has been continuing to advance quickly. Both its grammar and typing rules continue to evolve, to the benefit of users. Tying this evolution to TC39 risks holding that benefit back. For example, TypeScript upgrades frequently require users to fix typing issues because the rules change, and this is often considered "worth it" because real bugs are found. However, standards aren't typically done with this version upgrade path; a move to standardization would require more conservatism. The goal here is to enable wider deployment of systems like TypeScript in diverse environments, not obstruct TS's evolution.
 
 ### Should TypeScript be sanctioned as JS's official type system?
 
@@ -382,7 +391,7 @@ experimentation with future type systems.
 
 ### Why not unofficially build TS checking and transpilation into various systems?
 
-A number of systems, such as ts-node and deno, have tried this. Apart from startup performance issues, a common problem is compatibility across versions and modes, in type checking semantics, grammar, and transpilation output. This proposal would not subsume the needs for all of those features, but it would provide one compatible syntax and semantics to unify around for many needs.
+A number of systems, such as [ts-node](https://github.com/TypeStrong/ts-node) and [deno](https://deno.land/manual/getting_started/typescript), have tried this. Apart from startup performance issues, a common problem is compatibility across versions and modes, in type checking semantics, grammar, and transpilation output. This proposal would not subsume the needs for all of those features, but it would provide one compatible syntax and semantics to unify around for many needs.
 
 ### Why not stick to existing JS comment syntax?
 
@@ -392,16 +401,16 @@ Although it is possible to define types in existing JavaScript comments, as Clos
 
 The JavaScript ecosystem has been slowly moving back to a transpilation-less future. The sunsetting
 of IE11 and the rise of evergreen browsers that implement the latest JavaScript standard
-means that developers can once again run standard JavaScritp code without transpilation. The advent
+means that developers can once again run standard JavaScript code without transpilation. The advent
 of native ES modules in the browser and in Node.js also means that, at least in development, the ecosystem
 is working its way to a future where even bundling is not necessary,
-at least during development. Node.js developers in particular, have never been used to transpilation, and are todaytorn between
+at least during development. Node.js developers in particular, have never been used to transpilation, and are today torn between
 the ease of development that is brought by no transpilation, and the ease of development
 that languages like TypeScript bring.
 
 Implementing this proposal means that we can add type systems to this list of "things that don't need
 transpilation anymore" and bring us closer to a world where transpilation is optional and not
-a necessity.
+a necessity.t
 
 ### Can types be available via runtime reflection like [TypeScript's emitDecoratorMetadata](https://www.typescriptlang.org/tsconfig#emitDecoratorMetadata)?
 
@@ -416,12 +425,12 @@ Most constructs in TypeScript are compatible, but not all,
 and most of those that do not pass can be converted via simple codemod changes
 that can make them both TypeScript compatible _and_ compatible with this proposal.
 
-See the [out of scope](#out-of-scope-features-which-generate-code) for more information.
+See the ["up for debate"](#up-for-debate) and ["out of scope"](#out-of-scope-features-which-generate-code) sections for more information.
 
 ### Does this proposal make all Flow programs valid JavaScript?
 
 Flow is very similar to TypeScript, and so most type constructs are OK, with
-a similar caveat whereby some types need to be wrapped in parentheses to be compatible with
+a similar caveat whereby some types might need to be wrapped in parentheses to be compatible with
 this proposal.
 
 Two constructs that do not conform to this proposal are typecasting (e.g. `(x: number)`) and `opaque`
