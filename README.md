@@ -41,6 +41,8 @@ Unifying the authoring language and the execution language has many benefits - p
 - Singular Asset Management: No need to generate, store and manage generated code
   - One concept ("the code") rather than two (source + generated)
   - No risk of inconsistency (generated code not reflecting current source code)
+  - Single mental model for referencing files in import specifiers
+    - Side-steps the design decision of whether source files should import source files vs importing generated files
 - Source code locations (line/column numbers) are preserved
 - Sourcemaps are not required
   - No need to generate, store and deploy sourcemaps
