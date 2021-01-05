@@ -27,6 +27,36 @@ What those type annotations mean is emphatically _not_ defined by this proposal.
 defines in what places type annotations _can_ be added to, and defines how the JavaScript parser
 can know where the type annotations start and where they end in the code so that it can ignore them.
 
+## Motivation
+
+The primary goal of this proposal is to allow developers to gain the benefits of using an ergonomic static type system without
+the costs that are incurred when authoring code in a language dialect that is not valid JavaScript syntax.
+
+Unifying the authoring language and the execution language has many benefits - particularly during development.
+
+- Simplicity:  No build step is required
+  - Selecting and learning a toolchain becomes optional
+  - Learning and managing build configuration becomes optional
+  - Operating a toolchain becomes optional - no need to remember to press "build" before execution
+- Singular Asset Management: No need to generate, store and manage generated code
+  - One concept ("the code") rather than two (source + generated)
+  - No risk of inconsistency (generated code not reflecting current source code)
+- Source code locations (line/column numbers) are preserved
+- Sourcemaps are not required
+  - No need to generate, store and deploy sourcemaps
+  - No need to configure consumption of sourcemaps in the debugger
+- Improved interactive debug experience
+  - You can freely use original source code snippets in the REPL/console and the debugger
+- Potential for improved debug information
+  - The debugger now has access to more information, e.g. showing the type strings
+- Faster time-to-execution
+  - It is likely that native engine-based on-the-fly parsing will be faster than running a separate build tool transforming the code prior to execution.
+
+If the developer chooses, they have the option to carry these benefits into productions as well, at the cost of increased code size and increased load times.  It can be thought of as shipping code to production that retains code comments.
+
+The simplicity of tool-free language-level support for this widely-used syntax reduces the barrier-to-entry for new developers learning today's JavaScript.
+It helps make using statically typed code more accessible.
+
 See more about the motivation in [the FAQ](#faq).
 
 ## Proposal
@@ -123,7 +153,7 @@ parentheses in these contexts today:
 * ``(`${EmailLocaleIDs | FooterLocaleIDs}_id`)``
 
 > Note that this is a place where compatibility with _existing_ TypeScript code
-  may not beprovided. But that code can be easily fixed, probably even via a codemod, to conform to
+  might not be provided. But that code can be easily fixed, probably even via a codemod, to conform to
   the restricted way of declaring a type, by wrapping the difficult-to-parse types with a `(...)`.
 
 ### Types and interfaces
@@ -143,8 +173,9 @@ type Foo = number
 interface Point {x: number, y: Number}
 ```
 
-> Note that in TypeScript, interfaces can define only "object" types. This is a constraint in
+> Note that in TypeScript, interfaces can define only "object literal" types. This is a constraint in
   TypeScript and not a constraint for JavaScript in this proposal.
+  Therefore the following syntax would be valid JavaScript syntax: `interface Point number`
 
 ### Importing and exporting types
 
@@ -156,23 +187,32 @@ export type Foo = number
 
 The JavaScript runtime should ignore this export.
 
-The runtime must understand which imports are types to see which ones
-need to be ignored. We propose the following to help the runtime ignore the import:
+```ts
+import type { someType } from 'some-package-with-type'
+```
+
+A `type` immediately after `import` means that each identifier is treated as `type`, so this entire line
+is ignored by JavaScript.
+
+For mixed imports containing both types and values, the runtime must understand which imports need to be ignored.
+We propose the following to help the runtime selectively ignore type-only identifiers:
 
 ```ts
 import {someFunction, type someType} from 'some-package-with-type'
-import type { someType2 } from 'some-package-with-type'
 ```
 
-A `type` before the identifier defines it as a type that can and should be ignored by
-the JavaScript runtime and not be imported. A `type` immediately after `import` means that each
-identifier is treated as `type`, so the meaning is instead `import 'some-package-with-type'`.
+A `type` immediately before the identifier defines it as type-only that can and should be ignored by
+the JavaScript runtime and not be imported.  So this line is treated as the following JavaScript:
 
-> Note that the first form is not currently supported by TypeScript but is supported by Flow and Hegel.
+```ts
+import {someFunction/*, type someType*/} from 'some-package-with-type'
+```
+
+> Note that this second per-identifier form is not currently supported by TypeScript but is supported by Flow and Hegel.
 
 ### Classes
 
-Class methods and instance variables can be annotated just like functions and variables:
+Class fields and methods can be annotated just like functions and variables:
 
 ```ts
 class Point {
@@ -205,6 +245,15 @@ class Point {
   move(dx, dy) {this.x += dx; this.y += dy}
 ```
 
+Static and type-only class element declarations can equally be supported.
+
+```ts
+class Point {
+  static count: number;
+  declare field: string;
+}
+```
+
 ### Typecasting
 
 A new operator, `as`, is defined, which takes as a left operand an expression,
@@ -221,6 +270,7 @@ and end with a `>`:
 
 ```ts
 type Foo<T> = T[]
+interface Bar<T> { x: T }
 ```
 
 Same goes for functions and classes (but not for variables and parameters):
@@ -259,8 +309,9 @@ Declarations are ignored by the JS engine.
 
 > Note that we may drop the need for the `declare` keyword, given that most uses of `declare`
   are in `.d.ts` files that are ignored anyway by the JavaScript runtime.
+  However, `declare` is needed within class declarations too so it currently remains in this proposal.
 
-#### Example: function overloads
+#### Example: Function overloads
 
 If a function has some kind of type signature, but no body, this proposal would treat it as a declaration, leading the engine to ignore the declaration.
 This form may be used for [TypeScript function overloading](https://www.typescriptlang.org/docs/handbook/functions.html#overloads). Example:
@@ -392,7 +443,7 @@ A number of systems, such as [ts-node](https://github.com/TypeStrong/ts-node) an
 
 ### Why not stick to existing JS comment syntax?
 
-Although it is possible to define types in existing JavaScript comments, as Closure and TypeScript's JSDoc mode do, this syntax is much more verbose and unergonomic. One might speculate that the syntactic overhead of JSDoc could be one of the forces that has led towards a migration from Closure Compiler to TypeScript, despite Closure's significant head-start.
+Although it is possible to define types in existing JavaScript comments, as Closure and TypeScript's JSDoc mode do, this syntax is much more verbose and unergonomic. One might speculate that the syntactic overhead of JSDoc could be one of the forces that has led towards a migration from Closure Compiler to TypeScript, despite Closure Compiler's significant head-start.
 
 ### Doesn't all JS development do transpilation anyway? Will it really help to remove the type-desugaring step?
 
@@ -400,14 +451,14 @@ The JavaScript ecosystem has been slowly moving back to a transpilation-less fut
 of IE11 and the rise of evergreen browsers that implement the latest JavaScript standard
 means that developers can once again run standard JavaScript code without transpilation. The advent
 of native ES modules in the browser and in Node.js also means that, at least in development, the ecosystem
-is working its way to a future where even bundling is not necessary,
-at least during development. Node.js developers in particular, have never been used to transpilation, and are today torn between
+is working its way to a future where even bundling is not necessary.
+Node.js developers in particular, have historically avoided transpilation, and are today torn between
 the ease of development that is brought by no transpilation, and the ease of development
 that languages like TypeScript bring.
 
 Implementing this proposal means that we can add type systems to this list of "things that don't need
 transpilation anymore" and bring us closer to a world where transpilation is optional and not
-a necessity.t
+a necessity.
 
 ### Can types be available via runtime reflection like [TypeScript's emitDecoratorMetadata](https://www.typescriptlang.org/tsconfig#emitDecoratorMetadata)?
 
@@ -444,22 +495,22 @@ but otherwise they're the same.
 
 `.d.ts` and "libdef" files are used by TypeScript and Flow respectively, as a kind of "header" file
 that describes the signature of a package. This proposal can safely ignore them as it
-does not need to interpret the semantics of the type information inside them. Of couse,
+does not need to interpret the semantics of the type information inside them. Of course,
 TypeScript and Flow can continue reading and interpreting these files as they have done in the past.
 
 ### Does this proposal mean that TypeScript developers would have to modify their codebases?
 
-No. TypeScript can continue to be TypeScript, with no compatibility impact or changes to code bases. This proposal would give developers the _option_ to restrict themselves to a particular subset of TypeScript which would run as JavaScript without transpilation.
+No. TypeScript can continue to be TypeScript, with no compatibility impact or changes to codebases. This proposal would give developers the _option_ to restrict themselves to a particular subset of TypeScript which would run as JavaScript without transpilation.
 
 Developers may still want to use TypeScript syntax for other reasons:
 
 * Use of certain syntax features which are not supported in JavaScript (e.g., `enum`, parameter properties)
-* Compatibility with legacy code bases which may run into certain syntax edge cases that are handled differently
+* Compatibility with existing code bases which may run into certain syntax edge cases that are handled differently
 * Non-standard extensions/reinterpretations of JavaScript (e.g., legacy decorators, Set semantics for fields)
 
-If developers decide to migrate an existing TypeScript code base to standard JavaScript under this proposal,
-the goal of this proposal is that the modifications would be slight. Ideally, one could write a codemod that does
-them automatically. Hopefully, the effort would be small, and the promise of having TypeScript code that
+If developers decide to migrate an existing TypeScript codebase to JavaScript syntax under this proposal,
+the goal of this proposal is that the modifications would be slight. Ideally, one could write a codemod that handles it
+automatically. Hopefully, the effort would be small, and the promise of having TypeScript code that
 does not need transpilation would be a big motivation. But the developers could decide
 to stick with TypeScript transpilation and enjoy the full power of TypeScript.
 
