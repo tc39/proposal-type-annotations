@@ -128,29 +128,29 @@ A "parenthesis" here can be one of: `(...)`, `[...]`, `{...}`, or `<...>`.
 
 Example of types that are allowed:
 
-* Simple "identifier" style: `number`, `Foo`, `string`
-* Adding `?`: `number?`, `?number`, `Foo?`
-* Adding parentheses after an identifier: `string[]`, `Foo<T>`, `Foo<T extends ReturnType<Bar>>`
-* Starting with parentheses: `{x: number, y: number}`, `{|x: number, y: number|}`, `(() => number)`
+- Simple "identifier" style: `number`, `Foo`, `string`
+- Adding `?`: `number?`, `?number`, `Foo?`
+- Adding parentheses after an identifier: `string[]`, `Foo<T>`, `Foo<T extends ReturnType<Bar>>`
+- Starting with parentheses: `{x: number, y: number}`, `{|x: number, y: number|}`, `(() => number)`
 
 We're still considering how/whether the syntax could accommodate these cases without enclosing parentheses:
 
-* Illegal characters in identifier: `number!`, `string | number`, `string & number`,
+- Illegal characters in identifier: `number!`, `string | number`, `string & number`,
   `(x: number) => string`
-* Multiple parentheses in sequence: `<T>(arg: T) => T`
-* Unmatched parentheses: `Foo<T condition T < 5>`
-* type operators: `typeof s`
-* [Template literal types](https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html):
+- Multiple parentheses in sequence: `<T>(arg: T) => T`
+- Unmatched parentheses: `Foo<T condition T < 5>`
+- type operators: `typeof s`
+- [Template literal types](https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html):
   `` `${EmailLocaleIDs | FooterLocaleIDs}_id` ``
 
 The above could be made legal by wrapping with `(...)`. Note that TypeScript, Flow, and Hegel all permit
 parentheses in these contexts today:
 
-* `(number!)`, `(string | number)`, `(string & number)`, `((x: number) => string)`
-* `(<T>(arg: T) => T)`
-* `(Foo<T condition T < 5>)`
-* `(typeof s)`
-* ``(`${EmailLocaleIDs | FooterLocaleIDs}_id`)``
+- `(number!)`, `(string | number)`, `(string & number)`, `((x: number) => string)`
+- `(<T>(arg: T) => T)`
+- `(Foo<T condition T < 5>)`
+- `(typeof s)`
+- ``(`${EmailLocaleIDs | FooterLocaleIDs}_id`)``
 
 > Note that this is a place where compatibility with _existing_ TypeScript code
   might not be provided. But that code can be easily fixed, probably even via a codemod, to conform to
@@ -395,9 +395,9 @@ should be included (as it feels somehow "deep" in the expression), but it would 
 
 Some constructs in TypeScript are not supported by this proposal because they have runtime semantics, generating JavaScript code rather than simply being stripped out and ignored. These constructs are not supported by this proposal, but could be added by a separate TC39 proposal.
 
-* [Enums](https://www.typescriptlang.org/docs/handbook/enums.html)
-* [Namespaces](https://www.typescriptlang.org/docs/handbook/namespaces.html)
-* [Parameter properties](https://www.typescriptlang.org/docs/handbook/classes.html#parameter-properties)
+- [Enums](https://www.typescriptlang.org/docs/handbook/enums.html)
+- [Namespaces](https://www.typescriptlang.org/docs/handbook/namespaces.html)
+- [Parameter properties](https://www.typescriptlang.org/docs/handbook/classes.html#parameter-properties)
 
 All three of these features have workable equivalents in JavaScript, which could be transitioned to with the appropriate codemod.
 
@@ -504,9 +504,9 @@ No. TypeScript can continue to be TypeScript, with no compatibility impact or ch
 
 Developers may still want to use TypeScript syntax for other reasons:
 
-* Use of certain syntax features which are not supported in JavaScript (e.g., `enum`, parameter properties)
-* Compatibility with existing code bases which may run into certain syntax edge cases that are handled differently
-* Non-standard extensions/reinterpretations of JavaScript (e.g., legacy decorators, Set semantics for fields)
+- Use of certain syntax features which are not supported in JavaScript (e.g., `enum`, parameter properties)
+- Compatibility with existing code bases which may run into certain syntax edge cases that are handled differently
+- Non-standard extensions/reinterpretations of JavaScript (e.g., legacy decorators, Set semantics for fields)
 
 If developers decide to migrate an existing TypeScript codebase to JavaScript syntax under this proposal,
 the goal of this proposal is that the modifications would be slight. Ideally, one could write a codemod that handles it
@@ -564,11 +564,11 @@ TC39 has previously discussed [guards](https://web.archive.org/web/2014121407591
 
 ## References
 
-* [TypeScript Reference](https://www.typescriptlang.org/docs/handbook/intro.html)
-* [Hegel Documentation](https://hegel.js.org/docs)
-* [Flow documentation](https://flow.org/en/docs/)
-* [Python spec for "types as comments"](https://www.python.org/dev/peps/pep-3107/)
-* [Python followup spec that defined a standard type system](https://www.python.org/dev/peps/pep-0484/#abstractart)
-* [Ruby 3 announcement, including a Ruby type system](https://www.ruby-lang.org/en/news/2020/12/25/ruby-3-0-0-released/)
-* [Clojure Spec, the Clojure type system](https://clojure.org/guides/spec)
-* [Github, State of the Octoverse, where TypeScript is the 4th most popular language](https://octoverse.github.com/)
+- [TypeScript Reference](https://www.typescriptlang.org/docs/handbook/intro.html)
+- [Hegel Documentation](https://hegel.js.org/docs)
+- [Flow documentation](https://flow.org/en/docs/)
+- [Python spec for "types as comments"](https://www.python.org/dev/peps/pep-3107/)
+- [Python followup spec that defined a standard type system](https://www.python.org/dev/peps/pep-0484/#abstractart)
+- [Ruby 3 announcement, including a Ruby type system](https://www.ruby-lang.org/en/news/2020/12/25/ruby-3-0-0-released/)
+- [Clojure Spec, the Clojure type system](https://clojure.org/guides/spec)
+- [Github, State of the Octoverse, where TypeScript is the 4th most popular language](https://octoverse.github.com/)
