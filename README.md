@@ -247,7 +247,7 @@ class Point {
   move(dx, dy) {this.x += dx; this.y += dy}
 ```
 
-Static and type-only class element declarations can equally be supported.
+Static and type-only class element declarations (see [Declarations](#declarations)) can equally be supported.
 
 ```ts
 class Point {
@@ -294,7 +294,7 @@ is ignored by the runtime and is not considered as part of the runtime parameter
 
 ### Declarations
 
-`.d.ts` and `libdef` files no use in JavaScript, and while the type checkers can test them, they
+`.d.ts` and `libdef` files have no use in JavaScript, and while the type checkers can test them, they
 are ignored by JavaScript. However, it is valid to use these declarations inline in a JavaScript file,
 as is sometimes useful: `declare` can be followed by a function or class declaration,
 similar to [declarations in TypeScript](https://www.typescriptlang.org/docs/handbook/declaration-files/by-example.html).
