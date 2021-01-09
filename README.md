@@ -26,7 +26,7 @@ In some situations, the TypeScript erasure step is the only meaningful compilati
 for developers.
 
 For example, the Deno runtime (a competitor to Node.js, written by the original
-creator Node.js) uses TypeScript as its primary source language. Since Deno works with an up-to-date
+creator of Node.js) uses TypeScript as its primary source language. Since Deno works with an up-to-date
 version of the v8 JavaScript engine, erasing TypeScript types is the only meaningful compilation
 step for Deno. If they didn't need to erase TypeScript types, Deno developers could use `.ts` files
 directly.
