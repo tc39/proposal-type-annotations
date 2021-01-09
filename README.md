@@ -8,6 +8,102 @@ The aim of this proposal is to enable developers to run programs written in [Typ
 [Flow](https://flow.org/), [Hegel](https://hegel.js.org/), and other static typing supersets of JavaScript without any need for
 transpilation, if they stick within a certain reasonably large subset of the language.
 
+## Motivation
+
+TypeScript is a gradually typed superset of JavaScript. TypeScript's type syntax is used by
+development tooling, and does not add runtime semantics<sup>1</sup>.
+
+In practice, this means that "transpiling" TypeScript to standards-compliant JavaScript amounts to
+erasing the TypeScript types.
+
+Developers who can target modern browsers or recent versions of Node.js, this step is frequently the
+only step that is needed to go from a TypeScript codebase to a JavaScript codebase that runs in
+their target environment. Developers who need to support older environments can erase the TypeScript
+types first and then pass the resulting code to a transpiler (such as Babel) that knows how to
+down-level standards-compliant JavaScript to their target environment.
+
+In some situations, the TypeScript erasure step is the only meaningful compilation step remaining
+for developers.
+
+For example, the Deno runtime (a competitor to Node.js, written by the original
+creator Node.js) uses TypeScript as its primary source language. Since Deno works with an up-to-date
+version of the v8 JavaScript engine, erasing TypeScript types is the only meaningful compilation
+step for Deno. If they didn't need to erase TypeScript types, Deno developers could use `.ts` files
+directly.
+
+Another example is the Snowpack development-time web server. Snowpack takes advantage of the fact
+that modern browser supports JavaScript modules to serve source files with substantially less
+processing than other development-time servers (which translate source files to userspace module
+runtimes). When using Snowpack with modern JavaScript, no additional source translation is required
+to serve development files to the browser. When using Snowpack with TypeScript, TypeScript types
+must first be erased before the files can be served.
+
+In short, while build tools have been nearly mandatory for web app development since the ES2015 era,
+developers are increasingly able to write and execute standards-compliant JavaScript as-is, with no
+build step. This is because of the stability of modern, standards-compliant JavaScript combined with
+the availability of JavaScript modules in web browsers and Node.js.
+
+While build tools are not terribly difficult to write and use, they are a difficult barrier to entry
+for many developers. This is why the TypeScript team invested in an alternate syntax for TypeScript
+that can be written as JavaScript comments. **This syntax is extremely popular**, even though
+TypeScript ships out of the box with a high-quality build tool, and even though there are a number
+of ergonomic build tools such as webpack, parcel, and the previously mentioned Snowpack.
+
+Here's an example of the documentation-based syntax from the TypeScript documentation:
+
+```js
+// Parameters may be declared in a variety of syntactic forms
+/**
+ * @param {string}  p1 - A string param.
+ * @param {string=} p2 - An optional param (Closure syntax)
+ * @param {string} [p3] - Another optional param (JSDoc syntax).
+ * @param {string} [p4="test"] - An optional param with a default value
+ * @return {string} This is the result
+ */
+function stringsStringStrings(p1, p2, p3, p4) {
+  // TODO
+}
+```
+
+And here's the equivalent TypeScript syntax:
+
+```ts
+function stringsStringStrings(p1: string, p2?: string, p3?: string, p4 = "test"): string {
+  // TODO
+}
+```
+
+In addition to substantially worse ergonomics, the comment-based syntax is a significant subset of
+the features supported in TypeScript, in part because it's difficult to ergonomically map every
+feature of a language with integrated types onto a comment-based representation. Using the
+comment-based syntax means that the documentation is much harder to use, and substantially
+complicates asking questions (or reviewing previous questions) on online support forums such as
+StackOverflow.
+
+Nevertheless, the comment-based syntax remains popular, and the need was significant enough for the
+TypeScript team to invest in it.
+
+For the above reasons, the goal of this proposal is to allow a very large subset of the TypeScript
+syntax to appear as-is in JavaScript source files, interpreted as comments.
+
+To summarize:
+
+- TypeScript's syntax<sup>1</sup> has no runtime semantics, so from the perspective of evaluation,
+  TypeScript types are semantically equivalent to comments.
+- As modern JavaScript has stabilized, and JavaScript modules have become more widely available,
+  JavaScript developers are beginning to be able to write and evaluate code without a build step.
+  This trend is just beginning, but it will continue over the next few years.
+- The need to write and evaluate JavaScript code without a build step is already so important that
+  TypeScript invested in an alternative syntax that uses JavaScript comments. This syntax is
+  popular, even though it's substantially less pleasant to author, and even though it only supports
+  a subset of TypeScript's semantics.
+- This proposal aims to allow a very large subset of the TypeScript syntax to be interpreted as
+  JavaScript comments. This would improve the lives of users who are currently using the
+  comment-based dialect of TypeScript. It would also allow many future TypeScript developers to
+  avoid the need for a build step, as their JavaScript peers are increasingly able to do.
+
+<sup>1</sup> With a small number of exceptions which this proposal explores below.
+
 ## Status
 
 by Gil Tayar and Daniel Ehrenberg
