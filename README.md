@@ -377,6 +377,42 @@ class FooClass<T> {}
 
 Generics are ignored by the JavaScript runtime.
 
+#### Generic arrow functions
+
+In TypeScript, a generic arrow function is written thus:
+
+```ts
+const bar = <T>(t: T) => t
+```
+
+This construct, similarly to [null typeguards](#null-typeguards), occurs in the middle of
+an expression (anywhere an arrow function can appear). Because of this, it
+may be difficult to define how to parse "out" the types without understanding the
+type system's semantics. We are deferring discussion on this construct until we better understand
+how the JavaScript parser will parse and ignore the types. Interestingly,
+TypeScript with React (TSX) does not parse the above as a generic arrow function, but
+rather as a JSX element, and the recommended
+workaround to force the parser to understand that the angle brackets are generics and not JSX is:
+
+```ts
+const bar = <T,>(t: T) => t
+```
+
+#### Generic invocations
+
+In TypeScript, one can define what the type parameterr of a function or a class is, explicitly:
+
+```ts
+add<number>(4, 5)
+new Point<bigint>(4, 5)
+```
+
+This construct, similarly to [null typeguards](#null-typeguards), occurs in the middle of
+an expression. Because of this, it
+may be difficult to define how to parse "out" the types without understanding the
+type system's semantics. We are deferring discussion on this construct until we better understand
+how the JavaScript parser will parse and ignore the types.
+
 ### `this` parameter
 
 A function can have a parameter `this` as the first parameter, and this parameter (and its type)
@@ -450,6 +486,7 @@ If these are permitted as part of this proposal, the natural semantics would be 
 However, intuitively, it might feel strange to include this arbitrary set of keywords and permit them to be used "incorrectly". Also, more keywords are added over time (e.g., recently, `override`)--it may be "easier" to add these keywords than other parts of type syntax.
 
 Another possibility, rather than parsing and ignoring these keywords, would be to to permit them in classes with some other comment-like syntax, such as:
+
 - [In the type checker] Applying a special terse comment syntax of a format interpreted by the type checker
 
 ```ts
