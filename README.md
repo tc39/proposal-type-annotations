@@ -620,6 +620,15 @@ One pattern we see today, for the integration of TypeScript support into JavaScr
 While these languages _compile_ to JavaScript, and have static typing, they are not supersets of
 JavaScript, and thus are not relevant to this proposal.
 
+### Will the ability to deploy typed source code directly result in bloated applications?
+
+Returning to a world where code does not strictly need to be compiled prior to being used in production means that developers may end up deploying more code than is necessary.
+Hence larger payloads over-the-wire for remotely served apps, and more text to parse at load time.
+
+However this situation already exists.
+Today, many users omit a build step and ship large amounts of comments and other extraneous information, e.g. unminified code.
+It remains a best practice to perform an ahead-of-time optimization step on code destined for production if the use-case is performance-sensitive.
+
 ## Prior Art
 
 ### Other languages that implemented the "types as comments" idea
