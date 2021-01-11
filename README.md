@@ -16,25 +16,22 @@ development tooling, and does not add runtime semantics<sup>1</sup>.
 In practice, this means that "transpiling" TypeScript to standards-compliant JavaScript amounts to
 erasing the TypeScript types.
 
-Developers who can target modern browsers or recent versions of Node.js, this step is frequently the
+For developers who can target modern browsers or recent versions of Node.js, this is often the
 only step that is needed to go from a TypeScript codebase to a JavaScript codebase that runs in
 their target environment. Developers who need to support older environments can erase the TypeScript
 types first and then pass the resulting code to a transpiler (such as Babel) that knows how to
 down-level standards-compliant JavaScript to their target environment.
 
-In some situations, the TypeScript erasure step is the only meaningful compilation step remaining
-for developers.
-
 For example, the Deno runtime (a competitor to Node.js, written by the original
 creator of Node.js) uses TypeScript as its primary source language. Since Deno works with an up-to-date
-version of the v8 JavaScript engine, erasing TypeScript types is the only meaningful compilation
-step for Deno. If they didn't need to erase TypeScript types, Deno developers could use `.ts` files
+version of the V8 JavaScript engine, erasing TypeScript types is the only meaningful compilation
+step for Deno. If they didn't need to erase TypeScript types, the Deno runtime could use `.ts` files
 directly.
 
 Another example is the Snowpack development-time web server. Snowpack takes advantage of the fact
 that modern browser supports JavaScript modules to serve source files with substantially less
 processing than other development-time servers (which translate source files to userspace module
-runtimes). When using Snowpack with modern JavaScript, no additional source translation is required
+runtimes). When using Snowpack with JavaScript, no additional source translation is required
 to serve development files to the browser. When using Snowpack with TypeScript, TypeScript types
 must first be erased before the files can be served.
 
@@ -47,7 +44,7 @@ While build tools are not terribly difficult to write and use, they are a diffic
 for many developers. This is why the TypeScript team invested in an alternate syntax for TypeScript
 that can be written as JavaScript comments. **This syntax is extremely popular**, even though
 TypeScript ships out of the box with a high-quality build tool, and even though there are a number
-of ergonomic build tools such as webpack, parcel, and the previously mentioned Snowpack.
+of ergonomic build tools such as webpack, Parcel, and the previously mentioned Snowpack.
 
 Here's an example of the documentation-based syntax from the TypeScript documentation:
 
@@ -73,8 +70,8 @@ function stringsStringStrings(p1: string, p2?: string, p3?: string, p4 = "test")
 }
 ```
 
-In addition to substantially worse ergonomics, the comment-based syntax is a significant subset of
-the features supported in TypeScript, in part because it's difficult to ergonomically map every
+In addition to substantially worse ergonomics, the comment-based syntax is a significantly reduced subset of
+the full feature set supported in TypeScript, in part because it's difficult to ergonomically map every
 feature of a language with integrated types onto a comment-based representation. Using the
 comment-based syntax means that the documentation is much harder to use, and substantially
 complicates asking questions (or reviewing previous questions) on online support forums such as
