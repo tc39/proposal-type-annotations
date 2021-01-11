@@ -16,19 +16,19 @@ development tooling, and does not add runtime semantics<sup>1</sup>.
 In practice, this means that "transpiling" TypeScript to standards-compliant JavaScript amounts to
 erasing the TypeScript types.
 
+### Deploying modern JavaScript natively
+
 For developers who can target modern browsers or recent versions of Node.js, this is often the
 only step that is needed to go from a TypeScript codebase to a JavaScript codebase that runs in
 their target environment. Developers who need to support older environments can erase the TypeScript
 types first and then pass the resulting code to a transpiler (such as Babel) that knows how to
-down-level standards-compliant JavaScript to their target environment.
-
-For example, the Deno runtime (a competitor to Node.js, written by the original
+down-level standards-compliant JavaScript to their target environment. For example:
+- *The Deno runtime* (a competitor to Node.js, written by the original
 creator of Node.js) uses TypeScript as its primary source language. Since Deno works with an up-to-date
 version of the V8 JavaScript engine, erasing TypeScript types is the only meaningful compilation
 step for Deno. If they didn't need to erase TypeScript types, the Deno runtime could use `.ts` files
 directly.
-
-Another example is the Snowpack development-time web server. Snowpack takes advantage of the fact
+- *The Snowpack development-time web server*. Snowpack takes advantage of the fact
 that modern browser supports JavaScript modules to serve source files with substantially less
 processing than other development-time servers (which translate source files to userspace module
 runtimes). When using Snowpack with JavaScript, no additional source translation is required
@@ -39,6 +39,8 @@ In short, while build tools have been nearly mandatory for web app development s
 developers are increasingly able to write and execute standards-compliant JavaScript as-is, with no
 build step. This is because of the stability of modern, standards-compliant JavaScript combined with
 the availability of JavaScript modules in web browsers and Node.js.
+
+### Improving the usability of types written in comments
 
 While build tools are not terribly difficult to write and use, they are a difficult barrier to entry
 for many developers. This is why the TypeScript team invested in an alternate syntax for TypeScript
@@ -83,7 +85,7 @@ TypeScript team to invest in it.
 For the above reasons, the goal of this proposal is to allow a very large subset of the TypeScript
 syntax to appear as-is in JavaScript source files, interpreted as comments.
 
-To summarize:
+**To summarize**:
 
 - TypeScript's syntax<sup>1</sup> has no runtime semantics, so from the perspective of evaluation,
   TypeScript types are semantically equivalent to comments.
@@ -99,15 +101,15 @@ To summarize:
   comment-based dialect of TypeScript. It would also allow many future TypeScript developers to
   avoid the need for a build step, as their JavaScript peers are increasingly able to do.
 
-<sup>1</sup> With a small number of exceptions which this proposal explores below.
+<sup>1</sup> With a small number of exceptions, see the ["out of scope"](#out-of-scope-features-which-generate-code) section for more information.
 
 ## Status
 
-by Gil Tayar and Daniel Ehrenberg
+by Gil Tayar and a number of contributors, see [history](https://github.com/giltayar/types-as-comments-proposal/commits/master).
 
 Stage 0
 
-Not yet presented to TC39, but actively being developed in collaboration with committee members.
+Not yet presented to TC39. TS team are currently working on a grammar spec that may affect this proposal, so we are waiting for that before developing this proposal much further.
 
 ## Synopsis
 
@@ -120,7 +122,7 @@ What those type annotations mean is emphatically _not_ defined by this proposal.
 defines in what places type annotations _can_ be added to, and defines how the JavaScript parser
 can know where the type annotations start and where they end in the code so that it can ignore them.
 
-## Motivation
+## Developer experience benefits
 
 The primary goal of this proposal is to allow developers to gain the benefits of using an ergonomic static type system without
 the costs that are incurred when authoring code in a language dialect that is not valid JavaScript syntax.
@@ -163,7 +165,7 @@ to the spirit of JavaScript.
 
 ### Incorporating types into functions and variable declarations
 
-In a function, certain tokens (defined in the next section) after `:` and before the `,` or `)` of a parameter declaration are regarded as a type. Example:
+In a function, certain tokens (discussed in the next section) after `:` and before the `,` or `)` of a parameter declaration are regarded as a type. Example:
 
 ```ts
 function foo(a : (this<is><x, y>TYPE!), b: thisIsAlso) {
@@ -212,14 +214,11 @@ as we defined, the `:` is used to indicate that a type begins. But how does it k
 ends? In the above case, `(this<is><x, y>TYPE!)`, we can't just search for the comma, because
 the type itself incorporates a `,`.
 
-This proposal suggests a few simple rules that define where the type ends:
+It's a bit unclear how to define this. Intuitively, it could be reasonable to parse tokens within matching parentheses and brackets (including `(...)`, `[...]`, `{...}`, or `<...>`), with the type ending when brackets are closed, but also permitting certain tokens to continue until a newline (if outside of a parenthized region).
 
-1. Any JavaScript identifier is accepted.
-1. A prefix or postfix `?` is allowed.
-1. If an open parenthesis is encountered before the identifier or after it, then
-   it is balance-matched until it's close is found, which defines the end of the type.
-
-A "parenthesis" here can be one of: `(...)`, `[...]`, `{...}`, or `<...>`.
+Some more complexity comes in in cases such as:
+- How incompatible would this scheme be, given that it may prohibit newlines or require parentheses in certain cases?
+- How do we avoid ambiguity with JSX, which uses `<...>` in a decidedly different way?
 
 Example of types that are allowed:
 
@@ -270,7 +269,8 @@ interface Point {x: number, y: Number}
 
 > Note that in TypeScript, interfaces can define only "object literal" types. This is a constraint in
   TypeScript and not a constraint for JavaScript in this proposal.
-  Therefore the following syntax would be valid JavaScript syntax: `interface Point number`
+  Therefore the following syntax would be valid JavaScript syntax: `interface Point number`. We could also
+  decide to make interfaces more limited and similar to TypeScript.
 
 ### Importing and exporting types
 
@@ -389,8 +389,9 @@ This construct, similarly to [null typeguards](#null-typeguards), occurs in the 
 an expression (anywhere an arrow function can appear). Because of this, it
 may be difficult to define how to parse "out" the types without understanding the
 type system's semantics. We are deferring discussion on this construct until we better understand
-how the JavaScript parser will parse and ignore the types. Interestingly,
-TypeScript with React (TSX) does not parse the above as a generic arrow function, but
+how the JavaScript parser will parse and ignore the types.
+
+Interestingly, TypeScript with JSX (TSX) does not parse the above as a generic arrow function, but
 rather as a JSX element, and the recommended
 workaround to force the parser to understand that the angle brackets are generics and not JSX is:
 
@@ -398,20 +399,18 @@ workaround to force the parser to understand that the angle brackets are generic
 const bar = <T,>(t: T) => t
 ```
 
+It will be important to think more deeply about how this proposal should resolve this sort of ambiguity and not be in conflict with JSX.
+
 #### Generic invocations
 
-In TypeScript, one can define what the type parameterr of a function or a class is, explicitly:
+In TypeScript, one can define what the type parameter of a function or a class is, explicitly:
 
 ```ts
 add<number>(4, 5)
 new Point<bigint>(4, 5)
 ```
 
-This construct, similarly to [null typeguards](#null-typeguards), occurs in the middle of
-an expression. Because of this, it
-may be difficult to define how to parse "out" the types without understanding the
-type system's semantics. We are deferring discussion on this construct until we better understand
-how the JavaScript parser will parse and ignore the types.
+The generic parameter here would be ignored by the JavaScript runtime.
 
 ### `this` parameter
 
