@@ -10,11 +10,13 @@ transpilation, if they stick within a certain reasonably large subset of the lan
 
 ## Motivation
 
-TypeScript is a gradually typed superset of JavaScript. TypeScript's type syntax is used by
+TypeScript is a gradually typed superset of JavaScript.
+At the time of writing, it's the most popular of the static typing supersets of JavaScript currently in use.
+TypeScript's type syntax is used by
 development tooling, and does not add runtime semantics<sup>1</sup>.
+The TypeScript syntax is similar to that of other static typing supersets such as Flow and Hegel.
 
-In practice, this means that "transpiling" TypeScript to standards-compliant JavaScript amounts to
-erasing the TypeScript types.
+In practice, this means that "transpiling" statically typed JavaScript to standards-compliant JavaScript amounts to only erasing the types.
 
 ### Deploying modern JavaScript natively
 
@@ -89,6 +91,7 @@ syntax to appear as-is in JavaScript source files, interpreted as comments.
 
 - TypeScript's syntax<sup>1</sup> has no runtime semantics, so from the perspective of evaluation,
   TypeScript types are semantically equivalent to comments.
+  The same goes for other static typing tools.
 - As modern JavaScript has stabilized, and JavaScript modules have become more widely available,
   JavaScript developers are beginning to be able to write and evaluate code without a build step.
   This trend is just beginning, but it will continue over the next few years.
@@ -96,9 +99,10 @@ syntax to appear as-is in JavaScript source files, interpreted as comments.
   TypeScript invested in an alternative syntax that uses JavaScript comments. This syntax is
   popular, even though it's substantially less pleasant to author, and even though it only supports
   a subset of TypeScript's semantics.
-- This proposal aims to allow a very large subset of the TypeScript syntax to be interpreted as
-  JavaScript comments. This would improve the lives of users who are currently using the
-  comment-based dialect of TypeScript. It would also allow many future TypeScript developers to
+- This proposal aims to allow a very large subset of the TypeScript syntax, as well as that of other static typing tools, to be interpreted as
+  JavaScript comments.
+  This would improve the lives of users who are currently using the
+  comment-based dialect of TypeScript. It would also allow many future developers of statically typed code to
   avoid the need for a build step, as their JavaScript peers are increasingly able to do.
 
 <sup>1</sup> With a small number of exceptions, see the ["out of scope"](#out-of-scope-features-which-generate-code) section for more information.
