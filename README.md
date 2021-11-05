@@ -533,6 +533,7 @@ Some constructs in TypeScript are not supported by this proposal because they ha
 - [Enums](https://www.typescriptlang.org/docs/handbook/enums.html)
 - [Namespaces](https://www.typescriptlang.org/docs/handbook/namespaces.html)
 - [Parameter properties](https://www.typescriptlang.org/docs/handbook/classes.html#parameter-properties)
+- [JSX](https://www.typescriptlang.org/docs/handbook/jsx.html)
 
 All three of these features have workable equivalents in JavaScript, which could be transitioned to with the appropriate codemod.
 
