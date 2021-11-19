@@ -90,7 +90,6 @@ export const Entry = (props) => {
     </div>
 }
 
-
 /** A websocket connection to the dev server which triggers a reload */
 export const DevWebSocket = () => {
     if (!process.env.SITE_DEV) {

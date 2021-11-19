@@ -1,0 +1,31 @@
+# Deploys the microsite in the ./site folder to 
+# the GitHub pages branch on this repo.
+
+name: Update GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Build Site
+        run: |
+          cd site
+          npm install
+          npm build
+          cp -r assets out
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site/out

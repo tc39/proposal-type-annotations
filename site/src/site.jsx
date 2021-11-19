@@ -11,8 +11,6 @@ const Page = () => <html lang="en">
         <meta name="description" content="Reserve a space for static type syntax inside the ECMAScript language. JavaScript engines would treat type syntax as comments" />
         <meta property="og:title" content="TC39 Proposal: Types as Comments" />
         <meta property="og:type" content="article" />
-        <meta property="og:url" content="<!---TBD-->" />
-        <meta property="og:image" content="https://shikijs.github.io/twoslash/img/ograph.png" />
         <meta property="og:image:type" content="image/png" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
@@ -173,7 +171,7 @@ const Page = () => <html lang="en">
         </Entry>
 
         <Entry title="Does this proposal favour TypeScript?">
-          <p>The proposal aims to allow TypeScript/Flow-like syntax inside JavaScript, and is strongly influenced by syntax which is common to both language extensions, and leaves the door open for new syntax extensions which haven’t been anticipated yet.</p>
+          <p>The proposal aims to allow TypeScript/Flow-like syntax inside JavaScript, and is strongly influenced by syntax which is common to both language extensions, and leaves the door open for new syntax extensions which haven't been anticipated yet.</p>
           <p>In a way it favours TypeScript as it is the most popular type-system, but nearly all of the proposed syntax spaces would benefit Flow users too.</p>
         </Entry>
 
