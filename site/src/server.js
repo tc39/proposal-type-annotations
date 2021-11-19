@@ -53,7 +53,10 @@ watch("./src", async () => {
 });
 
 // Ensure there's an output folder to put generated files
-if (!existsSync("out")) mkdirSync("out")
+if (!existsSync("out")) {
+  mkdirSync("out")
+}
+
 
 // Trigger a build anyway
 build()

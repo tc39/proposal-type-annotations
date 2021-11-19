@@ -2,21 +2,6 @@
 import React from "react"
 import {setupForFile, transformAttributesToHTML} from "remark-shiki-twoslash"
 
-let twoslash
-
-/** @param {import("shiki-twoslash").UserConfigSettings} config  */
-export const setupShikiTwoslash = async (config) => {
-    twoslash = await setupForFile(config)
-}
-
-/** @param {{ name: string, body: string }} props  */
-export const TwoThirdsHeading = (props) => (
-     <div className="two-thirds">
-        <div className="one"><p>{props.name}</p></div>
-        <p className="two">{props.body}</p>
-    </div>  
-)
-
 /** @param {{ title: string, subtitle: string }} props  */
 export const Header = (props) => {
     return <div id='site-header'>
@@ -42,30 +27,60 @@ export const TC39Logo = () => (
 
 /** @param {{ children: any }} props  */
 export const Split = (props) => (
-    <div className='split'>{props.children}</div>
+    <div className='section split'>{props.children}</div>
 )
 
 /** @param {{ children: any }} props  */
 export const SplitReverse = (props) => (
-    <div className='split reverse'>{props.children}</div>
+    <div className='section split reverse'>{props.children}</div>
 )
 
-/** @param {{ lang: string, children: any }} props  */
+/** @param {{ name: string, body: string }} props  */
+export const TwoThirdsHeading = (props) => (
+    <div className="section two-thirds">
+       <div className="one"><h4>{props.name}</h4></div>
+       <p className="two">{props.body}</p>
+   </div>  
+)
+
+/** @param {{ children: any }} props  */
+export const CenterOneColumn = (props) => (
+    <div className="section  one-column-center">
+        {props.children}
+   </div>  
+)
+
+// Twoslash is a code markup language, described at https://shikijs.github.io/twoslash/
+// It re-uses the vscode tooling for rendering code samples, and then uses the TypeScript
+// compiler APIs to make richer code samples.
+
+let twoslash
+
+/** @param {import("shiki-twoslash").UserConfigSettings} config  */
+export const setupShikiTwoslash = async (config) => {
+    twoslash = await setupForFile(config)
+}
+
+/** @param {{ lang: string, title?: string, emoji?: string, emojiName?: string, children: any }} props  */
 export const Code = (props) => {
     if (typeof props.children !== "string") throw new Error("Code components need to be strings, not more components.")
 
+    const Prefix = props.title ? () => <h4 className="code-title">{props.title}</h4> : () => null
+    const Suffix = props.emoji ? () => <span className="emoji" role="img" aria-label={props.emojiName}>{props.emoji}</span> : () => null
     const code =  dedentString(props.children)
 
     const html = transformAttributesToHTML(code, props.lang, twoslash.highlighters, twoslash.settings)
-    return <div dangerouslySetInnerHTML={{ __html: html }}></div>
+    return <div className="code-sample">
+        <Prefix />
+        <div dangerouslySetInnerHTML={{ __html: html }}></div>
+        <Suffix />
+    </div>
 }
-
 
 /** @param {{ children: any }} props  */
 export const FAQ = (props) => {
-    return <div className="faq">{props.children}</div>
+    return <div className="section  faq">{props.children}</div>
 }
-
 
 /** @param {{ title:string, children: any }} props  */
 export const Entry = (props) => {
@@ -82,7 +97,7 @@ export const DevWebSocket = () => {
         return null
     }
 
-    const js = `
+    const js = `    
 // Listen for messages telling us to reload
 const socket = new WebSocket('ws://localhost:8080');
 socket.addEventListener('message', function (event) {

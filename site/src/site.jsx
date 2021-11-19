@@ -2,10 +2,11 @@
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import {writeFileSync} from "fs"
-import {DevWebSocket, Entry, FAQ, Header, setupShikiTwoslash, Split, SplitReverse, Code, TwoThirdsHeading} from "./components.jsx"
+import {DevWebSocket, Entry, FAQ, Header, setupShikiTwoslash, Split, SplitReverse, Code, TwoThirdsHeading, CenterOneColumn} from "./components.jsx"
 
 const Page = () => <html lang="en">
     <head>
+        <meta charSet="utf-8"/>
         <title>TC39 Proposal: Types as Comments</title>
         <meta name="description" content="Reserve a space for static type syntax inside the ECMAScript language. JavaScript engines would treat type syntax as comments" />
         <meta property="og:title" content="TC39 Proposal: Types as Comments" />
@@ -17,34 +18,33 @@ const Page = () => <html lang="en">
         <meta property="og:image:height" content="630" />
         <meta name="twitter:site" content="@tc39" />
         <meta name="twitter:creator" content="@tc39" />
-        <meta name="theme-color" content="#fcf3d9" />
-        <meta name="msapplication-TileColor" content="#fcf3d9" />
+        <meta name="theme-color" content="#fc7c00" />
+        <meta name="msapplication-TileColor" content="#fc7c00" />
         <style id="style" />
         <DevWebSocket/>
       </head>
     <body>
 
-      <Header title="Types // as Comments" subtitle='ECMAScript - 202X'/>
+      <Header title="Types // as Comments" subtitle='ECMAScript Proposal'/>
       <hr />
       <TwoThirdsHeading name="Goal" body="Reserve a space for static type syntax inside the ECMAScript language. JavaScript engines would treat type syntax as comments."/>
 
       <Split>
         <div>
-          <h4>Before</h4>
-          <Code lang='ts twoslash'>{`
+          <Code title="Before" lang='ts twoslash' emoji='💥' emojiName="explosion emoji to indicate the code failed">{`
             const message: string = "Hello, types"
             console.log(message)
             // @error: SyntaxError: Unexpected token ':'. const declared variable 'message' must have an initializer.`}
           </Code>
         </div>
         <div>
-          <h4>After</h4>
-          <Code lang='ts twoslash'>{`
+          <Code title="After" lang='ts twoslash' emoji='✅' emojiName='tick to indicate it passed'>{`
             const message: string = "Hello, types"
             console.log(message)`}
           </Code>
         </div>
       </Split>
+
 
       <p>The Types as Comments proposal aims to simplify working in a modern JavaScript codebase. With Types as Comments, JavaScript developers can potentially remove a build phase from their apps, keep typed-JavaScript codebases aligned with JavaScript and opens the door for different static type systems in JavaScript.</p>
 
@@ -80,43 +80,41 @@ const Page = () => <html lang="en">
         </div>
       </Split>
 
-      <div>
+      <CenterOneColumn>
         <p><em>To the JavaScript runtime, the above code would look like this:</em></p>
         <div className="highlight-remove">
           <Code lang="ts twoslash">{`
-            const message: string = "Hello, types"
-            //           ^^^^^^^^
+            const message         = "Hello, types"
 
             /* Echo the message */
             console.log(message)
             // @log: Hello, types`}
           </Code>
         </div>
-      </div>
+      </CenterOneColumn>
 
       <SplitReverse>
-        <Code lang="ts twoslash">{`
-          const input: { name: string } = { 
-            name: "Zagreus"
-          }
-
-          console.log(input.name)`}
-        </Code>
         <div>
           <p>The underlying implementation would need to be a more complex than that, for example it to handle object literal syntax the parser would keep track of open and close braces.</p>
         </div>
-      </SplitReverse>
-
-      <SplitReverse>
-        <Code lang="ts twoslash">{`
-          const input: ({ name: string })  = { 
-            name: "Zagreus"
-          }
-          
-          console.log(input.name)`}
-        </Code>
         <div>
-          <p>For more complex to parse type syntax, the definition can be wrapped with parens to indicate the start and end point.</p>
+          <Code lang="ts twoslash">{`
+            const input: { name: string } = { 
+              name: "Zagreus"
+            }
+
+            console.log(input.name)
+            // @log: Hello, Zagreus`}
+          </Code>
+
+          <Code lang="ts twoslash">{`
+            const input: ({ name: string })  = { 
+              name: "Zagreus"
+            }
+            
+            console.log(input.name)
+            // @log: Hello, Zagreus`}
+          </Code>
         </div>
       </SplitReverse>
 
@@ -144,27 +142,24 @@ const Page = () => <html lang="en">
             <li>Use one parsing strategy</li>
           </ul>
         </article>
+
+        <article>
+          <h4>Engine Maintainers</h4>
+          <p>Browser engines do not pay a performance cost in ahead-of-time type checking at runtime. </p>
+          <p>Engine maintainer do not need to keep up to date with static type syntax changes over time in each type systems..</p>
+        </article>
       </Split>
 
       <h2>Frequently Asked Questions</h2>
       <aside>There is a comprehensive FAQ in the proposal itself, but these Q&amp;As I expect cover most JS users questions.</aside>
 
       <FAQ>
-        <Entry title="I'm new, what are these terms?">
-          <p>JavaScript is a language which does not provide a way to declare the input/outputs of your code. For example in JavaScript a let variable can be set to a string, number, object or more. </p>
-          <p>JavaScript extensions like TypeScript and Flow exist to add new syntax which have a way to declare 'this let variable can only be a string.'</p>
-          <p>The value in adding these extra definitions is that tooling can make better assumptions about how your code works and doesn't. That tooling can live in your IDE, or be a command-line app.</p>
-          <p>The process of verifying these assumptions is called type checking, and for JavaScript there are different type checkers with different trade-offs about how JavaScript code can be validated.</p>
-          <p>Prior to this proposal, you needed a tool like Babel or TypeScript to remove those definitions, after this proposal you do not need a build tool to remove them. </p>
-          <p>Removing this step can help simplify working in JavaScript projects to the point where you may not need any build tooling at all.</p>
-        </Entry>
-
         <Entry title="What type syntax is proposed?">
           <p>Type definitions on functions and variable declarations, import/exporting types, class field and methods, generics, function overloads, typecasting via as X, this parameters and more.</p>
         </Entry>
 
         <Entry title="Will JavaScript engines do type checking?">
-          <p>No, the goal is to let projects like TypeScript, Flow and others provide the type system. JavaScript would have a defined set of areas for their syntax to live.</p>
+          <p>No, the goal is to let projects like TypeScript, Flow and others provide the type system. JavaScript would have a defined set of areas for their syntax to exists.</p>
         </Entry>
 
         <Entry title="Will this grow JavaScript bundle sizes?">
@@ -182,6 +177,10 @@ const Page = () => <html lang="en">
           <p>In a way it favours TypeScript as it is the most popular type-system, but nearly all of the proposed syntax spaces would benefit Flow users too.</p>
         </Entry>
 
+        <Entry title="Is there prior art?">
+          <p>This proposal acts very similar to how Python implemented support for opt-in type checking. Ruby is quite similar too.</p>
+        </Entry>  
+
         <Entry title="How does this affect runtime error messaging?">
           <p>JavaScript today throws <code>SyntaxError</code> messages when it has evaluated invalid syntax. This will still be the same today, except for invalid code inside the areas designated for Types as Comments.</p>
           <Code lang="ts twoslash">{`// @noErrors
@@ -196,15 +195,20 @@ const Page = () => <html lang="en">
           <p>Which would run perfectly fine in a JavaScript engine supporting this proposal, but fail in TypeScript or Flow. The proposal leaves type space errors to the IDE and type checker to declare the code inside the types are invalid, not the JavaScript runtime.</p>
         </Entry>
 
-        <Entry title="Is there prior art?">
-          <p>This proposal acts very similar to how Python implemented support for opt-in type checking. Ruby is quite similar too.</p>
+         <Entry title="I'm new, what are these terms?">
+          <p>JavaScript is a language which does not provide a way to declare the input/outputs of your code. For example in JavaScript a let variable can be set to a string, number, object or more. </p>
+          <p>JavaScript extensions like TypeScript and Flow exist to add new syntax which have a way to declare 'this let variable can only be a string.'</p>
+          <p>The value in adding these extra definitions is that tooling can make better assumptions about how your code works and doesn't. That tooling can live in your IDE, or be a command-line app.</p>
+          <p>The process of verifying these assumptions is called type checking, and for JavaScript there are different type checkers with different trade-offs about how JavaScript code can be validated.</p>
+          <p>Prior to this proposal, you needed a tool like Babel or TypeScript to remove those definitions, after this proposal you do not need a build tool to remove them. </p>
+          <p>Removing this step can help simplify working in JavaScript projects to the point where you may not need any build tooling at all.</p>
         </Entry>
       </FAQ>
 
       <h2>Frequently Asked Questions</h2>
       <FAQ>
         <Entry title="Is this just TypeScript in JavaScript?">
-          <p>No, not all of today’s TypeScript syntax would be supported by this proposal. This is similar to how Babel support for TypeScript does not support all of the existing TypeScript syntax. </p>
+          <p>No, not all of today's TypeScript syntax would be supported by this proposal. This is similar to how Babel support for TypeScript does not support all of the existing TypeScript syntax. </p>
           <p>For example enums, namespaces and class parameter properties are unlikely to be supported.</p>
         </Entry>
 
@@ -213,8 +217,8 @@ const Page = () => <html lang="en">
           <p>This means you can migrate your code incrementally as .ts files before converting them to .js files.</p>
         </Entry>
 
-        <Entry title="Do I _need_ to migrate?">
-          <p>No, TypeScript has backwards compatability guarantees which means you can continue to use .ts and .tsx files for TypeScript.</p>
+        <Entry title="Do I <em>need</em> to migrate?">
+          <p>No, TypeScript has backwards compatibility guarantees which means you can continue to use .ts and .tsx files for TypeScript.</p>
         </Entry>
 
         <Entry title="How does this differ from JSDoc support?">

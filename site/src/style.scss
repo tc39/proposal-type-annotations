@@ -19,17 +19,22 @@ html {
 body {
   max-width: 880px;
   margin: 4rem auto;
-  font-size: 20px;
-  line-height: 30px;
+  font-size: 16px;
+  line-height: 22px;
   font-family: $serif;
 
   @media (max-width: $one-col-width-min) {
-    margin: 0.5rem;
+    margin: 1rem;
   }
 }
 
-p {
-  font-size: 1.1rem;
+.section {
+  margin-bottom: 2rem;  
+}
+
+code {
+  font-size: 0.8rem;
+  line-height: 1.2rem;
 }
 
 hr {
@@ -40,6 +45,7 @@ hr {
 
 // Splits the content into two, unless on a tiny horizontal screen
 // and then use one column
+
 .split {
   display: flex;
   width: 100%;
@@ -51,6 +57,10 @@ hr {
   > div {
     flex: 1;
     width: 50%;
+  }
+
+  > article {
+    flex: 1;
   }
 
   @media (max-width: $one-col-width-min) {
@@ -75,19 +85,34 @@ hr {
 }
 
 .two-thirds {
-  display: flex;
   font: $sans;
-
-  .one {
-    width: 30%;
-    display: flex;
-    align-items: center;
-    justify-content: right;
+  
+  p {
+    font-size: 1.2rem;
+    line-height: 1.8rem;
   }
+  
+  @media (min-width: $one-col-width-min) {
+    display: flex;
+    .one {
+      margin-left: 10%;
+      width: 20%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-  .two {
-    width: 60%;
-    
+    .two {
+      width: 55%;
+      margin-right: 15%;
+    }
+  }
+}
+
+.one-column-center {
+  @media (min-width: $one-col-width-min) {
+    width: 50%;
+    margin: 0 auto    ;
   }
 }
 
@@ -113,6 +138,7 @@ aside {
 }
 
 h1 {
+  padding-top: 4px;
   font-size: 1rem;
 }
 
@@ -145,6 +171,9 @@ p > code {
 
   @media (max-width: $one-col-width-min) {
     width: 100%;
+    > div {
+      margin-bottom: 4rem;
+    }
   }
 
   @media (min-width: $one-col-width-min) {
@@ -158,6 +187,7 @@ p > code {
 
     > div {
       width: calc(50% - 40px);
+      margin-bottom: 2rem;
     }
   }
 }
@@ -203,6 +233,20 @@ a.button {
   }
 }
 
+.code-sample {
+  position: relative;
+
+  h4.code-title {
+    margin-bottom: -8px;
+    text-align: left;
+  }
+
+  .emoji {
+    position: absolute;
+    bottom: -8px;
+    right: 0px;
+  }
+}
 
 /*  Start of Shiki Twoslash CSS:
 
@@ -317,7 +361,6 @@ pre .code-container:hover a {
 }
 
 pre code {
-  font-size: 15px;
   font-family: "JetBrains Mono", Menlo, Monaco, Consolas, Courier New, monospace;
   white-space: pre;
   -webkit-overflow-scrolling: touch;
