@@ -276,38 +276,103 @@ interface Point {x: number, y: Number}
   Therefore the following syntax would be valid JavaScript syntax: `interface Point number`. We could also
   decide to make interfaces more limited and similar to TypeScript.
 
-### Importing and exporting types
+### Modules:  Importing and Exporting Types
 
-One can export types and interfaces, using `export`:
+#### Import Statements
 
-```ts
-export type Foo = number
-```
+##### Type-only Import Statements
 
-The JavaScript runtime should ignore this export.
-
-```ts
-import type { someType } from 'some-package-with-type'
-```
-
-A `type` immediately after `import` means that each identifier is treated as `type`, so this entire line
-is ignored by JavaScript.
-
-For mixed imports containing both types and values, the runtime must understand which imports need to be ignored.
-We propose the following to help the runtime selectively ignore type-only identifiers:
+The `type` keyword immediately after `import` means this is a ***type-only import*** that is entirely
+ignored by JavaScript.
 
 ```ts
-import {someFunction, type someType} from 'some-package-with-type'
+import type { someType } from 'module'
 ```
 
-A `type` immediately before the identifier defines it as type-only that can and should be ignored by
-the JavaScript runtime and not be imported.  So this line is treated as the following JavaScript:
+Aliasing type bindings using `as` is possible.
+This is similar to aliasing imported value bindings.
 
 ```ts
-import {someFunction/*, type someType*/} from 'some-package-with-type'
+import type { someType as alias } from 'module'
 ```
 
-> Note that this second per-identifier form is not currently supported by TypeScript but is supported by Flow and Hegel.
+##### Type-only bindings for Import Statements
+
+For mixed imports containing both type and value bindings, the user can express which bindings are type-only and must be erased by prefixing them with `type`.
+
+```ts
+import { someValue, type someType, someOtherValue } from 'module'
+```
+
+...is treated as the following JavaScript...
+
+```ts
+import { someValue               , someOtherValue } from 'module'
+```
+
+The erasure is restricted to the binding clause.
+Meaning such imports are retained even if all bindings are declared type-only.
+
+```ts
+import { type someType as aliasType } from 'module'
+```
+
+...is treated as the following JavaScript...
+
+```ts
+import {                            } from 'module'
+```
+
+#### Export Statements
+
+##### Exporting Type Declarations
+
+One can export `type` and `interface` declarations, using `export` and the JavaScript runtime will fully erase them.
+
+```ts
+export type myType = number  
+export interface myInterface {}
+```
+
+##### Type-only Export Statements
+
+Just like values, the export site of a type can be independent of the type declaration.
+This is a ***type-only export*** that is entirely erased.
+
+```ts
+type myType = number  
+interface myInterface {}
+
+export type { myType, myInterface }
+```
+
+Just like type imports, type exports supporting aliasing too.
+
+```ts
+type myType = number
+
+export type { myType as aliasType }
+```
+
+##### Type-only bindings for Export Statements
+
+Just like imports, type-only bindings can be used to erase individual export bindings.
+
+```ts
+type myType = number
+var myValue;
+
+export { myValue, type myType, myValue, type myType as aliasType } // EOF
+```
+
+...is treated as the following JavaScript...
+
+```ts
+
+var myValue;
+
+export { myValue,              myValue                           } // EOF
+```
 
 ### Classes
 
