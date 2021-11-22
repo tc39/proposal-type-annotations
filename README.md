@@ -105,7 +105,7 @@ syntax to appear as-is in JavaScript source files, interpreted as comments.
   comment-based dialect of TypeScript. It would also allow many future developers of statically typed code to
   avoid the need for a build step, as their JavaScript peers are increasingly able to do.
 
-<sup>1</sup> With a small number of exceptions, see the ["out of scope"](#out-of-scope-features-which-generate-code) section for more information.
+<sup>1</sup> With a small number of exceptions, see the ["out of scope"](#intentional-omissions) section for more information.
 
 ## Status
 
@@ -526,16 +526,28 @@ even if its type specifies that it can be. This is known as a [null typeguard](h
 This construct is syntactic sugar for `(x as NonNullable<typeof x>)`. It's debatable whether this syntax
 should be included (as it feels somehow "deep" in the expression), but it would be straightforward to ignore a `!` and treat the expression as `x.foo`.
 
-## Out of scope: Features which generate code
+## Intentional Omissions
+
+We consider the following items explicitly excluded from the scope of this proposal.
+
+### Omitted: TypeScript features that generate code
 
 Some constructs in TypeScript are not supported by this proposal because they have runtime semantics, generating JavaScript code rather than simply being stripped out and ignored. These constructs are not supported by this proposal, but could be added by a separate TC39 proposal.
 
 - [Enums](https://www.typescriptlang.org/docs/handbook/enums.html)
 - [Namespaces](https://www.typescriptlang.org/docs/handbook/namespaces.html)
 - [Parameter properties](https://www.typescriptlang.org/docs/handbook/classes.html#parameter-properties)
-- [JSX](https://www.typescriptlang.org/docs/handbook/jsx.html)
 
 All three of these features have workable equivalents in JavaScript, which could be transitioned to with the appropriate codemod.
+
+### Omitted: JSX
+
+[JSX](https://facebook.github.io/jsx/) is a XML-like syntax extension to JavaScript that is designed to be transformed by a pre-processor into valid JavaScript. It was originally popularized by [the Reach ecosystem](https://reactjs.org/docs/introducing-jsx.html) and now various compilers that support type-checking of JavaScript also support transforming JSX. Some users may hope that the JSX transform could also be directly supported by ECMAScript, to expand the set of use-cases that can be handled without a build step.
+
+We do **not** consider JSX to be in scope of this proposal because:
+
+- JSX is an orthogonal feature unrelated to optional static types. This proposal does not affect the viability of introducing JSX into ECMAScript via an independent proposal.
+- JSX syntax expands into meaningful JavaScript code when transformed. This proposal is only concerned with syntax erasure.
 
 ## FAQ
 
@@ -609,7 +621,7 @@ Most constructs in TypeScript are compatible, but not all,
 and most of those that do not pass can be converted via simple codemod changes
 that can make them both TypeScript compatible _and_ compatible with this proposal.
 
-See the ["up for debate"](#up-for-debate) and ["out of scope"](#out-of-scope-features-which-generate-code) sections for more information.
+See the ["up for debate"](#up-for-debate) and ["Intentional Omissions"](#intentional-omissions) sections for more information.
 
 ### Does this proposal make all Flow programs valid JavaScript?
 
@@ -652,7 +664,7 @@ to stick with TypeScript transpilation and enjoy the full power of TypeScript.
 
 ### How should tools work with JavaScript type syntax?
 
-Given the fact that some TypeScript features are [out of scope](#out-of-scope-features-which-generate-code), and that standard JavaScript will not evolve as fast as TypeScript or support its variety of configurations, there will continue to be an advantage for many tools to support TypeScript in its fuller form, beyond what is potentially standardized as JavaScript.
+Given the fact that some TypeScript features are [out of scope](#intentional-omissions), and that standard JavaScript will not evolve as fast as TypeScript or support its variety of configurations, there will continue to be an advantage for many tools to support TypeScript in its fuller form, beyond what is potentially standardized as JavaScript.
 
 One pattern we see today, for the integration of TypeScript support into JavaScript tools, is a separation of TS syntax into an optional plugin or mode. This pattern can create friction for adoption. This proposal may reduce the cost of adopting types in JavaScript by forming a standard, versionless, always-on common base for type syntax. Full TypeScript support can be remain an opt-in mode on top of that.
 
