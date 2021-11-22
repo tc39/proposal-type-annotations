@@ -25,8 +25,7 @@ only step that is needed to go from a TypeScript codebase to a JavaScript codeba
 their target environment. Developers who need to support older environments can erase the TypeScript
 types first and then pass the resulting code to a transpiler (such as Babel) that knows how to
 down-level standards-compliant JavaScript to their target environment. For example:
-- *The Deno runtime* (a competitor to Node.js, written by the original
-creator of Node.js) uses TypeScript as its primary source language. Since Deno works with an up-to-date
+- *The Deno runtime* uses TypeScript as its primary source language. Since Deno works with an up-to-date
 version of the V8 JavaScript engine, erasing TypeScript types is the only meaningful compilation
 step for Deno. If they didn't need to erase TypeScript types, the Deno runtime could use `.ts` files
 directly.
