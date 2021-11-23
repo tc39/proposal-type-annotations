@@ -20,7 +20,7 @@ In practice, this means that "transpiling" statically typed JavaScript to standa
 
 ### Community Demand
 
-_Static Typing_ was the most requested language feature in the _State of JS_ survey published in January 2021.
+_Static Typing_ was the most requested language feature in [the _State of JS_ survey](https://2020.stateofjs.com/en-US/opinions/missing_from_js/) published in January 2021.
 
 ![missing-features-js](https://user-images.githubusercontent.com/6939381/143012138-96b93204-c456-4ab5-bb63-2648187ab8a7.png)
 
