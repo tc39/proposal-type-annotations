@@ -73,8 +73,8 @@ const Page = () => <html lang="en">
           </Code>
         <div>
           <p>For the simplest case, the same idea could be applied to a parser which implements Type as Comments. </p>
-          <p>If the parser has just parsed an identifier like 'message' and the next character is a colon, then treat the colon and the next word of characters ('string') as a comment.</p>
-          <p>Once the parser hits the '='s then stop treating the code as comments and continue to create runtime code.</p>
+          <p>If the parser has just parsed an identifier like 'message' and the next character is a colon(<code>:</code>), then treat the colon(<code>:</code>) and the next word of characters ('string') as a comment.</p>
+          <p>Once the parser hits the <code>=</code>'s then stop treating the code as comments and continue to create runtime code.</p>
         </div>
       </Split>
 
