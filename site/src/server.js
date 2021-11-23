@@ -38,9 +38,14 @@ const build = async () => {
 if (process.env.SITE_DEV) {
   const server = createServer(function (req, res) {
     const filepath =  req.url === "/" ? "index.html" : req.url
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(readFileSync(join("out", filepath), "utf8"));
-    res.end();
+    if (existsSync(join("out", filepath))) {
+      res.writeHead(200, {'Content-Type': 'text/html'});
+      res.write(readFileSync(join("out", filepath), "utf8"));
+      res.end();
+    } else {
+      res.writeHead(404)
+      res.end()
+    }
   }).listen(8080);
   
   // Create a websocket, and file watcher so that pressing save in the index

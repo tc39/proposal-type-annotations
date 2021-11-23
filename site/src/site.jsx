@@ -14,6 +14,8 @@ const Page = () => <html lang="en">
         <meta property="og:image:type" content="image/png" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
+        <meta property="og:image" content="./assets/og-image" />
+        <link rel="icon" type="image/png"  href="./assets/favicon.pnsg" />
         <meta name="twitter:site" content="@tc39" />
         <meta name="twitter:creator" content="@tc39" />
         <meta name="theme-color" content="#fc7c00" />
@@ -203,7 +205,7 @@ const Page = () => <html lang="en">
         </Entry>
       </FAQ>
 
-      <h2>Frequently Asked Questions</h2>
+      <h2>TypeScript Frequently Asked Questions</h2>
       <FAQ>
         <Entry title="Is this just TypeScript in JavaScript?">
           <p>No, not all of today's TypeScript syntax would be supported by this proposal. This is similar to how Babel support for TypeScript does not support all of the existing TypeScript syntax. </p>
