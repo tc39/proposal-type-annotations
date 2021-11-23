@@ -162,19 +162,23 @@ const Page = () => <html lang="en">
           <p>No, the goal is to let projects like TypeScript, Flow and others provide the type system. JavaScript would have a defined set of areas for their syntax to exists.</p>
         </Entry>
 
+        <Entry title="Will adding types slow down my JavaScript programs?">
+          <p>Like any new JavaScript feature, it would have performance trade-offs but the performance changes to JavaScript code would be is comparable to the performance hit in writing a comment in your code. Basically, no.</p>
+        </Entry>
+
         <Entry title="Will this grow JavaScript bundle sizes?">
           <p>It could, but if you are already bundling then you would have the types removed during that bundling process. Negating the issue for most apps where bundle size is an concern.</p>
           <p>JavaScript files without a build-step would have more characters as a result of adding types syntax. This is the same trade-off as adding comments to the files.</p>
         </Entry>
 
         <Entry title="How does this differ from JSDoc support?">
-          <p>Today JavaScript users use JSDoc syntax with TypeScript tooling from in order to create a type-system in JavaScript code without a build step. </p>
-          <p>The syntax for JSDoc support is intentionally more verbose than type syntax, and is less ergonomic for complex typing. With this proposal, you can get JSDoc-like 'works without build tools' without the constraint of specially formatted comments.</p>
+          <p>Today JavaScript users use JSDoc syntax with tooling in order to create a type-system in JavaScript code without a build step. </p>
+          <p>The syntax for JSDoc support is intentionally more verbose than type syntax, and is less ergonomic for complex typing as it is a documentation format. With this proposal, you can get JSDoc-like 'works without build tools' without the constraint of specially formatted comments.</p>
         </Entry>
 
         <Entry title="Does this proposal favour TypeScript?">
-          <p>The proposal aims to allow TypeScript/Flow-like syntax inside JavaScript, and is strongly influenced by syntax which is common to both language extensions, and leaves the door open for new syntax extensions which haven't been anticipated yet.</p>
-          <p>In a way it favours TypeScript as it is the most popular type-system, but nearly all of the proposed syntax spaces would benefit Flow users too.</p>
+          <p>The proposal favors TypeScript/Flow-like syntax inside JavaScript, and is strongly influenced by syntax which is common to both language extensions. The aim is to also leave the door open for new syntax extensions which haven't been anticipated yet.</p>
+          <p>That said, the language in this specification favours TypeScript as it is the most popular type-system, but nearly all of the proposed syntax spaces would benefit Flow users too.</p>
         </Entry>
 
         <Entry title="Is there prior art?">
@@ -217,7 +221,7 @@ const Page = () => <html lang="en">
           <p>This means you can migrate your code incrementally as .ts files before converting them to .js files.</p>
         </Entry>
 
-        <Entry title="Do I <em>need</em> to migrate?">
+        <Entry title="Do I need to migrate?">
           <p>No, TypeScript has backwards compatibility guarantees which means you can continue to use .ts and .tsx files for TypeScript.</p>
         </Entry>
 
@@ -231,17 +235,17 @@ const Page = () => <html lang="en">
       <h2>Links</h2>
       <aside>This page is a simpler overview of Types as Comments, to learn more about the proposal consult the GitHub repo.</aside>
       <Split>
-        <a className="button" href="https://github.com/orta/types-as-comments-minisite.git">
+        <a className="button" href="https://github.com/tc39/proposal-types-as-comments#motivations">
           <h5>Motivations</h5>
           <p>How does this proposal improve the JavaScript ecosystem as a whole?</p>
         </a>
 
-        <a className="button" href="https://github.com/orta/types-as-comments-minisite.git">
+        <a className="button" href="https://github.com/tc39/proposal-types-as-comments#proposal">
           <h5>Supported Syntax</h5>
           <p>From types definitions to class properties, see all the proposed supported type-level syntax.</p>
         </a>
 
-        <a className="button" href="https://github.com/orta/types-as-comments-minisite.git">
+        <a className="button" href="https://github.com/tc39/proposal-types-as-comments#FAQ">
           <h5>Frequently Asked Questions</h5>
           <p>How does this proposal relate to TypeScript or Flow support? and many other questions.</p>
         </a>
