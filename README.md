@@ -18,6 +18,12 @@ The TypeScript syntax is similar to that of other static typing supersets such a
 
 In practice, this means that "transpiling" statically typed JavaScript to standards-compliant JavaScript amounts to only erasing the types.
 
+### Community Demand
+
+_Static Typing_ was the most demanded feature in the _State of JS_ survey published in January 2021.
+
+![missing-features-js](https://user-images.githubusercontent.com/6939381/143012138-96b93204-c456-4ab5-bb63-2648187ab8a7.png)
+
 ### Deploying modern JavaScript natively
 
 For developers who can target modern browsers or recent versions of Node.js, this is often the
