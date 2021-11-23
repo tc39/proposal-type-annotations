@@ -542,7 +542,7 @@ All three of these features have workable equivalents in JavaScript, which could
 
 ### Omitted: JSX
 
-[JSX](https://facebook.github.io/jsx/) is a XML-like syntax extension to JavaScript that is designed to be transformed by a pre-processor into valid JavaScript. It was originally popularized by [the React ecosystem](https://reactjs.org/docs/introducing-jsx.html) and now various compilers that support type-checking of JavaScript also support transforming JSX. Some users may hope that the JSX transform could also be directly supported by ECMAScript, to expand the set of use-cases that can be handled without a build step.
+[JSX](https://facebook.github.io/jsx/) is an XML-like syntax extension to JavaScript that is designed to be transformed by a pre-processor into valid JavaScript. It was originally popularized by [the React ecosystem](https://reactjs.org/docs/introducing-jsx.html) and now various compilers that support type-checking of JavaScript also support transforming JSX. Some users may hope that the JSX transform could also be directly supported by ECMAScript, to expand the set of use-cases that can be handled without a build step.
 
 We do **not** consider JSX to be in scope of this proposal because:
 
