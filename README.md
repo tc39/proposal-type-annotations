@@ -182,7 +182,7 @@ function foo(a : (this<is><x, y>TYPE!), b: thisIsAlso) {
 }
 ```
 
-> The correctness of types or syntax errors is emitted when an external type checker is analysing the source code. Otherwise, at runtime, the JavaScript engine ignores them, treating the types as comments.
+> In the example above, the types do not conform to any type system, to show that they do not have to conform, given that at runtime, the JavaScript engine ignores them, treating the types as comments. The correctness of types or syntax errors is emitted when an _external type checker_ (such as TypeScript) is analysing the source code.
 
 A function can also declare a return type using `:` after the parentheses:
 
