@@ -127,17 +127,17 @@ const Page = () => <html lang="en">
           <p>Greatly reduces the need for source code transformation in modern JavaScript projects.</p>
           <p>Cleaner and more powerful syntax than JSDoc comments.</p>
           <p>Allows users of existing static type systems to migrate back towards source code alignment with JavaScript.</p>
-          <p>Copying and pasting just works.</p>
+          <p>Pasting typed code into the console just works.</p>
         </article>
 
         <article>
           <h4>Tool Makers</h4>
-          <p>Different type systems can be built  to work in the ignored syntax area.</p>
+          <p>New experimental type systems can be built using the ignored syntax space.</p>
           <p>Existing JavaScript tools can:</p>
           <ul>
             <li>Skip source-code changes</li>
             <li>Avoid duplicate transpiled files</li>
-            <li>Lessen the need for source maps</li>
+            <li>Reduce the need for sourcemaps</li>
             <li>Simplify file resolvers</li>
             <li>Use one parsing strategy</li>
           </ul>
@@ -145,8 +145,8 @@ const Page = () => <html lang="en">
 
         <article>
           <h4>Engine Maintainers</h4>
-          <p>Browser engines do not pay a performance cost in ahead-of-time type checking at runtime. </p>
-          <p>Engine maintainer do not need to keep up to date with static type syntax changes over time in each type systems..</p>
+          <p>Browser engines do not pay any type-checking cost at runtime. </p>
+          <p>Engine maintainers avoid the burden of parser upgrades as each type system evolves.</p>
         </article>
       </Split>
 
@@ -155,11 +155,11 @@ const Page = () => <html lang="en">
 
       <FAQ>
         <Entry title="What type syntax is proposed?">
-          <p>Type definitions on functions and variable declarations, import/exporting types, class field and methods, generics, function overloads, typecasting via as X, this parameters and more.</p>
+          <p>Type definitions on functions and variable declarations, import/exporting types, class field and methods, generics, function overloads,  `as X` type assertions, this parameters and more.</p>
         </Entry>
 
-        <Entry title="Will JavaScript engines do type checking?">
-          <p>No, the goal is to let projects like TypeScript, Flow and others provide the type system. JavaScript would have a defined set of areas for their syntax to exists.</p>
+        <Entry title="Will JavaScript engines perform type-checking?">
+          <p>No, the goal is to let projects like TypeScript, Flow and others provide the type system and check the code for type errors. JavaScript would only reserve a space in the JavaScript syntax for their type syntax to exist.</p>
         </Entry>
 
         <Entry title="Will adding types slow down my JavaScript programs?">
@@ -168,7 +168,7 @@ const Page = () => <html lang="en">
 
         <Entry title="Will this grow JavaScript bundle sizes?">
           <p>It could, but if you are already bundling then you would have the types removed during that bundling process. Negating the issue for most apps where bundle size is an concern.</p>
-          <p>JavaScript files without a build-step would have more characters as a result of adding types syntax. This is the same trade-off as adding comments to the files.</p>
+          <p>JavaScript files without a build-step would have more characters as a result of the types. This is the same trade-off as adding comments to files, and the same solutions apply, e.g. use a minifier.</p>
         </Entry>
 
         <Entry title="How does this differ from JSDoc support?">
@@ -182,7 +182,7 @@ const Page = () => <html lang="en">
         </Entry>
 
         <Entry title="Is there prior art?">
-          <p>This proposal acts very similar to how Python implemented support for opt-in type checking. Ruby is quite similar too.</p>
+          <p>Python similarly implements support for opt-in type-checking.  However this proposal has a stronger stance of relying solely on type erasure. Ruby is quite similar too.</p>
         </Entry>  
 
         <Entry title="How does this affect runtime error messaging?">
@@ -211,7 +211,7 @@ const Page = () => <html lang="en">
 
       <h2>TypeScript Frequently Asked Questions</h2>
       <FAQ>
-        <Entry title="Is this just TypeScript in JavaScript?">
+        <Entry title="Will all of TypeScript be supported by this proposal">
           <p>No, not all of today's TypeScript syntax would be supported by this proposal. This is similar to how Babel support for TypeScript does not support all of the existing TypeScript syntax. </p>
           <p>For example enums, namespaces and class parameter properties are unlikely to be supported.</p>
         </Entry>
@@ -226,7 +226,8 @@ const Page = () => <html lang="en">
         </Entry>
 
         <Entry title="How does this differ from JSDoc support?">
-          <p>I, orta, think it's probably worth migrating for long term software projects. Having your codebase aligned with JavaScript is an important de-risking strategy.</p>
+          <p>JSDoc tried to solve the same problem as this proposal by the type information actually inside comments! Given the constraints of not being able to change the JavaScript language, this was a good compromise between wanting the code to be regular JavaScript while still type checking it via the TypeScript checker.</p>
+          <p>This proposal has no such constraints, and thus does not need to compromise. This proposal allows you to have the cake ("It's just JavaScript") and eat it too ("I want to check the types"). You get all the benefits of TypeScript's JSDoc support, but without the awkward syntax.</p>
           <p>TypeScript isn't going anywhere, but when you have the choice of 'this code runs in any JavaScript engine' vs 'I need to use build tooling to run this code' - I think the features you lose from TypeScript to support running un-aided in JavaScript are worth the trade-off.</p>
           <p>You're obviously allowed your own opinion.</p><s></s>
         </Entry>
