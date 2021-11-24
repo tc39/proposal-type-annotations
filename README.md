@@ -182,9 +182,7 @@ function foo(a : (this<is><x, y>TYPE!), b: thisIsAlso) {
 }
 ```
 
-Please note that the types do not have to conform to the TypeScript (or any other) type system.
-It is only when the _TypeScript_ (or other) type checker checks the source code that errors are
-emitted if the types are incorrect or have bad syntax.
+> The correctness of types or syntax errors is emitted when an external type checker is analysing the source code. Otherwise, at runtime, the JavaScript engine ignores them, treating the types as comments.
 
 A function can also declare a return type using `:` after the parentheses:
 
