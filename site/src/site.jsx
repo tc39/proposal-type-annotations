@@ -46,7 +46,7 @@ const Page = () => <html lang="en">
       </Split>
 
 
-      <p>The Types as Comments proposal aims to simplify working in a modern JavaScript codebase. With Types as Comments, JavaScript developers can potentially remove a build phase from their apps, keep typed-JavaScript codebases aligned with JavaScript and opens the door for different static type systems in JavaScript.</p>
+      <p>The Types as Comments proposal aims to simplify working in a modern JavaScript codebase.  With Types as Comments, JavaScript developers can remove a build phase from their apps, keeping TypeScript and Flow codebases aligned with JavaScript. This proposal does not precisely specify a type syntax, which opens the door to other static type systems in JavaScript, such as Hegel.</p>
 
       <h2>How the proposal works</h2>
       <aside>Note that this is a simplification for the purposes of understanding the ideas behind Types as Comments.</aside>
