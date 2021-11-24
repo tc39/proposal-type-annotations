@@ -91,7 +91,7 @@ const Page = () => <html lang="en">
           <Code lang="ts twoslash">{`
             const message         = "Hello, types"
 
-            /* Echo the message */
+            
             console.log(message)
             // @log: Hello, types`}
           </Code>
