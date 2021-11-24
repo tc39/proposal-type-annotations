@@ -8,14 +8,15 @@ const Page = () => <html lang="en">
     <head>
         <meta charSet="utf-8"/>
         <title>TC39 Proposal: Types as Comments</title>
-        <meta name="description" content="Reserve a space for static type syntax inside the ECMAScript language. JavaScript engines would treat type syntax as comments" />
+        <meta name="description" content="Reserve a space for static type syntax inside the ECMAScript language. JavaScript engines would treat type syntax as comments." />
         <meta property="og:title" content="TC39 Proposal: Types as Comments" />
         <meta property="og:type" content="article" />
         <meta property="og:image:type" content="image/png" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
-        <meta property="og:image" content="./assets/og-image" />
-        <link rel="icon" type="image/png"  href="./assets/favicon.pnsg" />
+        {/* This needs changing on deploy */}
+        <meta property="og:image" content="https://confident-galileo-43471d.netlify.app/assets/og-image.png" />
+        <link rel="icon" type="image/png"  href="./assets/favicon.png" />
         <meta name="twitter:site" content="@tc39" />
         <meta name="twitter:creator" content="@tc39" />
         <meta name="theme-color" content="#fc7c00" />
@@ -25,14 +26,18 @@ const Page = () => <html lang="en">
       </head>
     <body>
 
-      <Header title="Types // as Comments" subtitle='ECMAScript Proposal'/>
+      <Header>
+        <h1>Types <em>// as Comments</em></h1>
+        <p>ECMAScript Proposal</p>
+      </Header>
+      
       <hr />
       <TwoThirdsHeading name="Goal" body="Reserve a space for static type syntax inside the ECMAScript language. JavaScript engines would treat type syntax as comments."/>
 
       <Split>
         <div>
           <Code title="Before" lang='ts twoslash' emoji='💥' emojiName="explosion emoji to indicate the code failed">{`
-            const message: string = "Hello, types"
+            const message: string = "<h2> types"
             console.log(message)
             // @error: SyntaxError: Unexpected token ':'. const declared variable 'message' must have an initializer.`}
           </Code>
@@ -49,7 +54,7 @@ const Page = () => <html lang="en">
       <p>The Types as Comments proposal aims to simplify working in a modern JavaScript codebase. With Types as Comments, JavaScript developers can potentially remove a build phase from their apps, keep typed-JavaScript codebases aligned with JavaScript and opens the door for different static type systems in JavaScript.</p>
 
       <h2>How the proposal works</h2>
-      <aside>Note that this is a simplification for the purposes of understanding the ideas behind Types as Comments.</aside>
+      <aside>Note: this is a simplification for the purposes of understanding the ideas behind Types as Comments.</aside>
 
       <Split>
         <Code lang="ts twoslash">{`
@@ -90,17 +95,19 @@ const Page = () => <html lang="en">
             console.log(message)
             // @log: Hello, types`}
           </Code>
+          <p>The underlying implementation would need to be a more complex than that, for example it to handle object literal syntax the parser would keep track of open and close braces.</p>
         </div>
       </CenterOneColumn>
 
-      <SplitReverse>
+      {/* <SplitReverse>
         <div>
           <p>The underlying implementation would need to be a more complex than that, for example it to handle object literal syntax the parser would keep track of open and close braces.</p>
         </div>
         <div>
-          <Code lang="ts twoslash">{`
-            const input: { name: string } = { 
-              name: "Zagreus"
+          <Code lang="ts twoslash">{`            
+            const input: { [key: string]: boolean | Horse } = { 
+              del: true,
+              rodney: false,
             }
 
             console.log(input.name)
@@ -116,7 +123,7 @@ const Page = () => <html lang="en">
             // @log: Hello, Zagreus`}
           </Code>
         </div>
-      </SplitReverse>
+      </SplitReverse> */}
 
 
       <h2>Who benefits?</h2>
@@ -163,7 +170,8 @@ const Page = () => <html lang="en">
         </Entry>
 
         <Entry title="Will adding types slow down my JavaScript programs?">
-          <p>Like any new JavaScript feature, it would have performance trade-offs but the performance changes to JavaScript code would be is comparable to the performance hit in writing a comment in your code. Basically, no.</p>
+          <p>Like any new JavaScript feature, it would have performance trade-offs but the performance changes to JavaScript code would be is comparable to the performance hit in writing a comment in your code.</p>
+          <p>Basically, no</p>
         </Entry>
 
         <Entry title="Will this grow JavaScript bundle sizes?">
@@ -185,12 +193,16 @@ const Page = () => <html lang="en">
           <p>Python similarly implements support for opt-in type-checking.  However this proposal has a stronger stance of relying solely on type erasure. Ruby is quite similar too.</p>
         </Entry>  
 
+        <Entry title="Will this slow down JavaScript's evolution?">
+          <p>JavaScript's backwards compatibility goals of never breaking old code means that this is something future JavaScript syntax improvements would need to take into account. It is unlikely to get in the way of most new syntax however, as it is a strictly specified gap in the language instead of code which runs.</p>
+        </Entry>  
+
         <Entry title="How does this affect runtime error messaging?">
           <p>JavaScript today throws <code>SyntaxError</code> messages when it has evaluated invalid syntax. This will still be the same today, except for invalid code inside the areas designated for Types as Comments.</p>
-          <Code lang="ts twoslash">{`// @noErrors
+          <Code lang="js twoslash">{`
             const mes sage: string = "Hello, types"
             // @error: SyntaxError: Unexpected token ':'. const declared variable 'message' must have an initializer.
-            `}
+// @noErrors`}
           </Code>
           <p>vs this 'error' in the types space:</p>
           <Code lang="ts">{`
@@ -209,7 +221,8 @@ const Page = () => <html lang="en">
         </Entry>
       </FAQ>
 
-      <h2>TypeScript Frequently Asked Questions</h2>
+      <h2>TypeScript Specific Frequently Asked Questions</h2>
+      <aside>Note: There is also <a href= "tbd.com">a TypeScript Blog Post</a> on the topic.</aside>
       <FAQ>
         <Entry title="Will all of TypeScript be supported by this proposal">
           <p>No, not all of today's TypeScript syntax would be supported by this proposal. This is similar to how Babel support for TypeScript does not support all of the existing TypeScript syntax. </p>
@@ -221,15 +234,13 @@ const Page = () => <html lang="en">
           <p>This means you can migrate your code incrementally as .ts files before converting them to .js files.</p>
         </Entry>
 
-        <Entry title="Do I need to migrate?">
-          <p>No, TypeScript has backwards compatibility guarantees which means you can continue to use .ts and .tsx files for TypeScript.</p>
-        </Entry>
-
         <Entry title="How does this differ from JSDoc support?">
           <p>JSDoc tried to solve the same problem as this proposal by the type information actually inside comments! Given the constraints of not being able to change the JavaScript language, this was a good compromise between wanting the code to be regular JavaScript while still type checking it via the TypeScript checker.</p>
           <p>This proposal has no such constraints, and thus does not need to compromise. This proposal allows you to have the cake ("It's just JavaScript") and eat it too ("I want to check the types"). You get all the benefits of TypeScript's JSDoc support, but without the awkward syntax.</p>
-          <p>TypeScript isn't going anywhere, but when you have the choice of 'this code runs in any JavaScript engine' vs 'I need to use build tooling to run this code' - I think the features you lose from TypeScript to support running un-aided in JavaScript are worth the trade-off.</p>
-          <p>You're obviously allowed your own opinion.</p><s></s>
+        </Entry>
+
+        <Entry title="Do I need to migrate?">
+          <p>No, TypeScript has backwards compatibility guarantees which means you can continue to use .ts and .tsx files for TypeScript.</p>
         </Entry>
       </FAQ>
 

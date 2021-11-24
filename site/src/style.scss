@@ -135,11 +135,18 @@ aside {
   margin: 0 auto;
   font-style: oblique;
   margin-bottom: 50px;
+
+  a {
+    color: black
+  }
 }
 
 h1 {
   padding-top: 4px;
   font-size: 1rem;
+  em {
+    color: #706b67;
+  }
 }
 
 h2::after {
@@ -156,6 +163,7 @@ h2::after {
   color: #d17924;
 
   text-align: center;
+  font-size: 1.2rem;
 }
 
 p > code {
@@ -217,13 +225,13 @@ a.button {
   color: black;
   background-color: #FC7C0020;
   text-decoration: none;
-  padding: 0 10px;
+  padding: 10px;
   margin-bottom:  20px;
   border-left: 2px solid #FC7C00;
   font-size: 1rem;
   h5 {
     font-size: 1.1rem;
-    margin: 0.3rem;
+    margin: 0.4rem 0 ;
   }
   p {
     margin: 0;
@@ -267,7 +275,7 @@ pre {
   color: black;
 
   /* Give it some space to breathe */
-  padding: 12px;
+  padding: 12px 0 ;
 
   /* All code samples get a grey border, twoslash ones get a different color */
   border-left: 1px solid #444;
@@ -332,20 +340,7 @@ pre.twoslash data-lsp:hover::before {
 pre .code-container {
   overflow: auto;
 }
-/* The try button */
-pre .code-container > a {
-  position: absolute;
-  right: 8px;
-  bottom: 8px;
-  border-radius: 4px;
-  border: 1px solid #719af4;
-  padding: 0 8px;
-  color: #719af4;
-  text-decoration: none;
-  opacity: 0;
-  transition-timing-function: ease;
-  transition: opacity 0.3s;
-}
+
 /* Respect no animations */
 @media (prefers-reduced-motion: reduce) {
   pre .code-container > a {
@@ -379,6 +374,12 @@ pre .query {
   color: #137998;
   display: inline-block;
 }
+
+.line {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
 
 /* In order to have the 'popped out' style design and to not break the layout
   /* we need to place a fake and un-selectable copy of the error which _isn't_ broken out
@@ -510,17 +511,18 @@ pre .logger svg {
 
 pre .logger.error-log {
   background-color: #fee;
-  border-left:2px solid #bf1818
+  color: #ff0b0b;
+  border-left: 1px solid #bf1818
 }
 
 pre .logger.warn-log {
   background-color: #ffe;
-  border-left:2px solid #eae662
+  border-left: 1px solid #eae662
 }
 
 pre .logger.log-log {
   background-color: #f3f3f3;
-  border-left:2px solid #f3f3f3
+  border-left: 1px solid #f3f3f3
 }
 
 pre .logger.log-log svg {

@@ -2,15 +2,14 @@
 import React from "react"
 import {setupForFile, transformAttributesToHTML} from "remark-shiki-twoslash"
 
-/** @param {{ title: string, subtitle: string }} props  */
+/** @param {{ children: any[] }} props  */
 export const Header = (props) => {
     return <div id='site-header'>
         <div id="logo">
             <TC39Logo />
         </div>
         <div>
-            <h1>{props.title}</h1>
-            <p>{props.subtitle}</p>
+            {props.children}
         </div>
     </div>
 }
