@@ -21,6 +21,7 @@ const Page = () => <html lang="en">
         <meta name="twitter:creator" content="@tc39" />
         <meta name="theme-color" content="#fc7c00" />
         <meta name="msapplication-TileColor" content="#fc7c00" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <style id="style" />
         <DevWebSocket/>
       </head>
