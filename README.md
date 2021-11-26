@@ -769,7 +769,7 @@ and are not part of it. See the [References section](#References) for more infor
 ### Languages that add type systems onto JavaScript
 
 TypeScript, Flow, and Hegel are languages that implement type systems above standard JavaScript.
-See the [references section](#References) for links to the documenation of these languages.
+See the [references section](#References) for links to the documentation of these languages.
 
 ### Ability to add type systems to JavaScript via comments
 
@@ -797,3 +797,4 @@ TC39 has previously discussed [guards](https://web.archive.org/web/2014121407591
 - [Ruby 3 announcement, including a Ruby type system](https://www.ruby-lang.org/en/news/2020/12/25/ruby-3-0-0-released/)
 - [Clojure Spec, the Clojure type system](https://clojure.org/guides/spec)
 - [Github, State of the Octoverse, where TypeScript is the 4th most popular language](https://octoverse.github.com/)
+- 
