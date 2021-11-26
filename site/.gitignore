@@ -1,0 +1,5 @@
+node_modules
+src/dist.js
+.cache
+out
+.DS_Store
