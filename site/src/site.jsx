@@ -66,8 +66,8 @@ const Page = () => <html lang="en">
           // @log: Hello, types`}
         </Code>
         <div>
-          <p>Today, a JavaScript parser knows that a backslash and a star (<code>/*</code>) indicates the start of a multi-line comment.</p>
-          <p>Which to the parser is roughly: <em>'from here in the text move onwards ignoring the characters until you find a star and then a backslash right after <code>*/</code>'</em>.</p>
+          <p>Today, a JavaScript engine knows that a backslash and a star (<code>/*</code>) indicates the start of a multi-line comment.</p>
+          <p>Which to the engine is roughly: <em>'from this point in the code move onwards ignoring the characters until you find a star with a backslash right after <code>*/</code>'  </em>.</p>
         </div>
       </Split>
 
@@ -80,14 +80,14 @@ const Page = () => <html lang="en">
           // @log: Hello, types`}
           </Code>
         <div>
-          <p>For the simplest case, the same idea could be applied to a parser which implements Type as Comments. </p>
-          <p>If the parser has just parsed an identifier like 'message' and the next character is a colon(<code>:</code>), then treat the colon(<code>:</code>) and the next word of characters ('string') as a comment.</p>
-          <p>Once the parser hits the <code>=</code>'s then stop treating the code as comments and continue to create runtime code.</p>
+          <p>For the simplest case, the same idea could be applied to an engine which implements Type as Comments. </p>
+          <p>If the engine has just seen an identifier like '<code>message</code>' and the next character is a colon (<code>:</code>), then treat the colon (<code>:</code>) and the next word of characters ('<code>: string</code>') as a comment.</p>
+          <p>Once the engine hits the <code>=</code>'s then stop treating the code as comments and continue to create runtime code.</p>
         </div>
       </Split>
 
       <CenterOneColumn>
-        <p><em>To the JavaScript runtime, the above code would look like this:</em></p>
+        <p><em>To the JavaScript runtime, the runtime code would look like this:</em></p>
         <div className="highlight-remove">
           <Code lang="ts twoslash">{`
             const message         = "Hello, types"
@@ -96,7 +96,8 @@ const Page = () => <html lang="en">
             console.log(message)
             // @log: Hello, types`}
           </Code>
-          <p>The underlying implementation would need to be a more complex than that, for example it to handle object literal syntax the parser would keep track of open and close braces.</p>
+          <p>The underlying implementation would need to be a more complex than that, for example to handle object literal syntax (<code>{`{ id: string }`}</code>) the engine would keep track of open and close braces.</p>
+          <p>The goal of the proposal is to provide a way to describe how to safely ignore type-like code inside the JavaScript language.</p>
         </div>
       </CenterOneColumn>
 

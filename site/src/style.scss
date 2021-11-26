@@ -30,6 +30,10 @@ body {
 
 .section {
   margin-bottom: 2rem;  
+
+  ul {
+    padding-left: 0.6rem;
+  }
 }
 
 code {
@@ -116,7 +120,6 @@ hr {
   }
 }
 
-// Sets the
 h1,
 h2,
 h3,
@@ -254,7 +257,7 @@ a.button {
     bottom: -8px;
     right: 0px;
   }
-}
+} 
 
 /*  Start of Shiki Twoslash CSS:
 
