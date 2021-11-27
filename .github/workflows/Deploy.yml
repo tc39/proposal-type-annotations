@@ -21,7 +21,7 @@ jobs:
         run: |
           cd site
           npm install
-          npm build
+          npm run build
           cp -r assets out
 
       - name: Deploy
