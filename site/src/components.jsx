@@ -60,20 +60,24 @@ export const setupShikiTwoslash = async (config) => {
     twoslash = await setupForFile(config)
 }
 
-/** @param {{ lang: string, title?: string, emoji?: string, emojiName?: string, children: any }} props  */
+/** @param {{ lang: string, title?: string, after?: string, emoji?: string, emojiName?: string, children: any }} props  */
 export const Code = (props) => {
     if (typeof props.children !== "string") throw new Error("Code components need to be strings, not more components.")
 
-    const Prefix = props.title ? () => <h4 className="code-title">{props.title}</h4> : () => null
+    const Title = props.title ? () => <h4 className="code-title">{props.title}</h4> : () => null
+    const Subtitle = props.after ? () => <p className="code-after">{props.after}</p> : () => null
     const Suffix = props.emoji ? () => <span className="emoji" role="img" aria-label={props.emojiName}>{props.emoji}</span> : () => null
     const code =  dedentString(props.children)
 
     const html = transformAttributesToHTML(code, props.lang, twoslash.highlighters, twoslash.settings)
-    return <div className="code-sample">
-        <Prefix />
-        <div dangerouslySetInnerHTML={{ __html: html }}></div>
-        <Suffix />
-    </div>
+    return (<>
+        <div className="code-sample">
+            <Title />
+            <div dangerouslySetInnerHTML={{ __html: html }}></div>
+            <Suffix />
+        </div>
+        <Subtitle />
+    </>)
 }
 
 /** @param {{ children: any }} props  */
