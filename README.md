@@ -285,7 +285,7 @@ interface Point {x: number, y: Number}
 
 ##### Type-only Import Statements
 
-The `type` keyword immediately after `import` means this is a ***type-only import*** that is entirely
+The `type` keyword immediately after `import` means this is a ***type-only import*** statement that is **entirely**
 ignored by JavaScript.
 
 ```ts
@@ -297,6 +297,13 @@ This is similar to aliasing imported value bindings.
 
 ```ts
 import type { someType as alias } from 'module'
+```
+
+The syntax permits both default and named imports to be extracted.
+Flow & Hegel permit this form today.
+
+```ts
+import type myDefault, { someType as alias } from 'module'
 ```
 
 ##### Type-only bindings for Import Statements
