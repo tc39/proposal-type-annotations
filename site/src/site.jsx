@@ -223,26 +223,26 @@ const Page = () => <html lang="en">
         </Entry>
       </FAQ>
 
-      <h2>TypeScript Specific Frequently Asked Questions</h2>
+      <h2>Frequently Asked Questions about TypeScript</h2>
       <aside>Note: There is also <a href= "tbd.com">a TypeScript Blog Post</a> on the topic.</aside>
       <FAQ>
-        <Entry title="Will all of TypeScript be supported by this proposal">
+        <Entry title="Will all of TypeScript be supported by this proposal?">
           <p>No, not all of today's TypeScript syntax would be supported by this proposal. This is similar to how Babel support for TypeScript does not support all of the existing TypeScript syntax. </p>
-          <p>For example enums, namespaces and class parameter properties are unlikely to be supported.</p>
+          <p>For example enums, namespaces and class parameter properties are unlikely to be supported.  Specifying type parameters at function callsites will require a slightly different syntax.</p>
         </Entry>
 
-        <Entry title="How could I convert my TypeScript codebase to Types as Comments JavaScript?">
-          <p>It's likely that TypeScript will have a tsconfig flag which indicates that you want your files to be given the additional constraints  imposed by Types as Comments. </p>
-          <p>This means you can migrate your code incrementally as .ts files before converting them to .js files.</p>
+        <Entry title="How would I convert my TypeScript codebase to JavaScript with Types as Comments?">
+          <p>It's likely that TypeScript will introduce a TSConfig flag which indicates that you want your files to be compatible with Types as Comments. </p>
+          <p>This would allow you to migrate your code incrementally as `.ts` files before converting them to `.js` files.</p>
         </Entry>
 
         <Entry title="How does this differ from JSDoc support?">
-          <p>JSDoc tried to solve the same problem as this proposal by the type information actually inside comments! Given the constraints of not being able to change the JavaScript language, this was a good compromise between wanting the code to be regular JavaScript while still type checking it via the TypeScript checker.</p>
-          <p>This proposal has no such constraints, and thus does not need to compromise. This proposal allows you to have the cake ("It's just JavaScript") and eat it too ("I want to check the types"). You get all the benefits of TypeScript's JSDoc support, but without the awkward syntax.</p>
+          <p>JSDoc solves the same problem as this proposal by putting the type information literally inside comments! Given the constraints of not being able to change the JavaScript language, this was a good compromise between wanting the code to be regular JavaScript while still type checking it via the TypeScript checker.</p>
+          <p>This proposal is about changing the JavaScript language to improve the syntax that can be used for types. This proposal allows you to have the cake ("It's just JavaScript") and eat it too ("I want to check the types"). You get all the benefits of TypeScript's JSDoc support, but without the awkward syntax.</p>
         </Entry>
 
         <Entry title="Do I need to migrate?">
-          <p>No, TypeScript has backwards compatibility guarantees which means you can continue to use .ts and .tsx files for TypeScript.</p>
+          <p>No. TypeScript has backwards compatibility guarantees which means that you can continue to use `.ts` and `.tsx` files for TypeScript.</p>
         </Entry>
       </FAQ>
 
