@@ -55,7 +55,7 @@ that can be written as JavaScript comments. **This syntax is extremely popular**
 TypeScript ships out of the box with a high-quality build tool, and even though there are a number
 of ergonomic build tools such as webpack, Parcel, and the previously mentioned Snowpack.
 
-Here's an example of the documentation-based syntax from [TypeScript's JSDoc Reference](https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html#param-and-returns):
+**Example JSDoc:** Here's an example of today's documentation-based syntax from [TypeScript's JSDoc Reference](https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html#param-and-returns).
 
 ```js
 // Parameters may be declared in a variety of syntactic forms
@@ -71,7 +71,7 @@ function stringsStringStrings(p1, p2, p3, p4) {
 }
 ```
 
-And here's the equivalent TypeScript syntax:
+**Example TypeScript:** And here's the equivalent TypeScript syntax enabled by this proposal.
 
 ```ts
 function stringsStringStrings(p1: string, p2?: string, p3?: string, p4 = "test"): string {
