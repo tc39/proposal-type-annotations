@@ -228,7 +228,7 @@ const Page = () => <html lang="en">
       <FAQ>
         <Entry title="Will all of TypeScript be supported by this proposal?">
           <p>No, not all of today's TypeScript syntax would be supported by this proposal. This is similar to how Babel support for TypeScript does not support all of the existing TypeScript syntax. </p>
-          <p>For example enums, namespaces and class parameter properties are unlikely to be supported.  Specifying type parameters at function callsites will require a slightly different syntax.</p>
+          <p>For example enums, namespaces and class parameter properties are unlikely to be supported.  In addition, specifying type parameters at function callsites will require a slightly different syntax.</p>
         </Entry>
 
         <Entry title="How would I convert my TypeScript codebase to JavaScript with Types as Comments?">
