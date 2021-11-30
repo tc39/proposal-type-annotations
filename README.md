@@ -475,14 +475,22 @@ It will be important to think more deeply about how this proposal should resolve
 
 #### Generic invocations
 
-In TypeScript, one can define what the type parameter of a function or a class is, explicitly:
+One can explicitly specify the type arguments of a function invocation or class instantiation.
 
 ```ts
 add<number>(4, 5)
 new Point<bigint>(4, 5)
 ```
 
-The generic parameter here would be ignored by the JavaScript runtime.
+The syntax used to achieve this today in [TypeScript](https://www.typescriptlang.org/docs/handbook/2/functions.html#specifying-type-arguments), [Flow](https://flow.org/en/docs/types/generics/#toc-supplying-type-arguments-to-callables) and [Hegel](https://hegel.js.org/docs/generic-types#generic-syntax) is already valid JavaScript and so cannot be used as-is.
+Therefore we propose using a `::` prefixed form.
+
+```ts
+add::<number>(4, 5)
+new Point::<bigint>(4, 5)
+```
+
+The type argument (`::<type>`) would be ignored by the JavaScript runtime.
 
 ### `this` parameter
 
