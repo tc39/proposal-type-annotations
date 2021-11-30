@@ -188,7 +188,7 @@ A function can also declare a return type using `:` after the parentheses:
 
 ```ts
 function foo(): number {
-
+  //..
 }
 ```
 
