@@ -180,7 +180,7 @@ The proposed grammar/syntax is inspired by the best practices used in type syste
 
 A set of rules(tokens) have to be defined to create a `grammar` that parsers/engines can easily understand/parse, to find and delimit `types` inserted in the code, treating the result as comments.
 
-The example bellow demonstrates how those delimeters works in practice using a `function` , [ read more about annotation type delimiters and allowed types](/syntax/grammar#annotation-type-delimiters-and-allowed-types).
+The example bellow demonstrates how those delimeters works in practice using a `function` , [ read more about annotation type delimiters and allowed types](/syntax/grammar.md#annotation-type-delimiters-and-allowed-types).
 
 ##### **Example:**
 At runtime `: number` and `: string` types are ignored and treated as comments
@@ -248,9 +248,9 @@ function split(str: string, separator?: string) {
 }
 ```
 ##### See also
-  * [Allowed types](/syntax/grammar#allowed-types)
-  * [Types under consideration](/syntax/grammar#types-under-consideration)
-  * [Annotation type delimiters](/syntax/grammar#annotation-type-delimiters-and-allowed-types)
+  * [Allowed types](/syntax/grammar.md#allowed-types)
+  * [Types under consideration](/syntax/grammar.md#types-under-consideration)
+  * [Annotation type delimiters](/syntax/grammar.md#annotation-type-delimiters-and-allowed-types)
 
 ### Types and Interfaces
 
@@ -364,9 +364,9 @@ class FooClass<T> {}
 > Generics are ignored by the JavaScript runtime.
 
 ##### See also
-  * [Generic arrow functions](/syntax/generics#generic-arrow-functions)
-  * [Generic invocations](/syntax/generics#invocations)
-  * [ `this` parameter](/syntax/generics#this-parameter)
+  * [Generic arrow functions](/syntax/generics.md#generic-arrow-functions)
+  * [Generic invocations](/syntax/generics.md#generic-invocations)
+  * [ `this` parameter](/syntax/generics.md#this-parameter)
 
 ### Declarations
 
