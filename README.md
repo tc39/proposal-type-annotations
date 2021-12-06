@@ -1,22 +1,21 @@
 # ECMAScript proposal: Types as Comments
 
-This proposal aims to enable developers to add type annotations to their JavaScript code,
+This proposal aims to enable developers to add type annotations to JavaScript code,
 allowing those annotations to be checked by a type checker that is _external to JavaScript_.
-At runtime, the JavaScript engine ignores them, treating the types as comments.
+At runtime, the JavaScript engine ignores them, treating the types as if they were like comments.
 
-The aim of this proposal is to enable developers to run programs written in [TypeScript](https://www.typescriptlang.org/),
-[Flow](https://flow.org/), [Hegel](https://hegel.js.org/), and other static typing supersets of JavaScript without any need for
-transpilation, if they stick within a certain reasonably large subset of the language.
+The aim of this proposal is to enable developers to write code that can be type-checked by a tool like
+[TypeScript](https://www.typescriptlang.org/), [Flow](https://flow.org/), or other static type checkers,
+without any compilation, that is largely compatible with these existing variants, but is largely guided by precedents established by TypeScript.
 
 ## Motivation
 
 TypeScript is a gradually typed superset of JavaScript.
 At the time of writing, it's the most popular of the static typing supersets of JavaScript currently in use.
-TypeScript's type syntax is used by
-development tooling, and does not add runtime semantics<sup>1</sup>.
-The TypeScript syntax is similar to that of other static typing supersets such as Flow and Hegel.
+TypeScript's type syntax is used by development tooling, and largely does not add runtime semantics<sup>1</sup>.
+Other systems like Flow also share much of the same syntax.
 
-In practice, this means that "transpiling" statically typed JavaScript to standards-compliant JavaScript amounts to only erasing the types.
+In practice, this means that compiling statically typed JavaScript in the form of TypeScript, Flow, etc. to plain JavaScript amounts to only erasing the types.
 
 ### Community Demand
 
@@ -24,41 +23,47 @@ _Static Typing_ was the most requested language feature in [the _State of JS_ su
 
 ![missing-features-js](https://user-images.githubusercontent.com/6939381/143012138-96b93204-c456-4ab5-bb63-2648187ab8a7.png)
 
-### Deploying modern JavaScript natively
+### JavaScript Compilation Over the Years <!-- Background -->
 
-For developers who can target modern browsers or recent versions of Node.js, this is often the
-only step that is needed to go from a TypeScript codebase to a JavaScript codebase that runs in
-their target environment. Developers who need to support older environments can erase the TypeScript
-types first and then pass the resulting code to a transpiler (such as Babel) that knows how to
-down-level standards-compliant JavaScript to their target environment. For example:
-- *The Deno runtime* uses TypeScript as its primary source language. Since Deno works with an up-to-date
-version of the V8 JavaScript engine, erasing TypeScript types is the only meaningful compilation
-step for Deno. If they didn't need to erase TypeScript types, the Deno runtime could use `.ts` files
-directly.
-- *The Snowpack development-time web server*. Snowpack takes advantage of the fact
-that modern browser supports JavaScript modules to serve source files with substantially less
-processing than other development-time servers (which translate source files to userspace module
-runtimes). When using Snowpack with JavaScript, no additional source translation is required
-to serve development files to the browser. When using Snowpack with TypeScript, TypeScript types
-must first be erased before the files can be served.
+<!-- Maybe, 2013, 2014, ... -->
+<!-- move this into the motivation section? Some top-level history of types. -->
+
+As evergreen browsers grow in popularity, the need for downlevel-compilation (a.k.a. "transpilation")
+is fading. Furthermore, developers on back-end runtimes such as Node.js have the opportunity to use
+very recent versions of JavaScript engines like V8 which typically offers many of the newest ECMAScript features.
+As a result, for many TypeScript users, the only necessary step between writing code and running it is to erase away type annotations.
+
+Today, developers have many tools at their disposal to do this, such as the TypeScript compiler, Babel, esbuild, and more.
+Language variants like TypeScript are blessed that developer tools have made it a first-class citizen for any build arrangement;
+however, the tools cannot bring back all of the conveniences of of writing directly in JavaScript.
+Being able to save a file and run it immediately is huge benefit using JavaScript, and existing tools require a watch process, or hooks, or a sufficiently fast compiler in between the runtime. 
+
+- ts-node and babel-node use TypeScript and Babel respectively to compile and run JavaScript on Node.js
+  without an explicit build step for developers. Since Node.js sticks close to the latest version of V8,
+  much of the time, the only thing they need to do is erase types.
+- Deno uses TypeScript as its primary source language. Since Deno works with an up-to-date <!-- TODO -->
+version of the V8 JavaScript engine, 
+- Modern bundler front-ends like Vite and Snowpack process TypeScript directly and remove type annotations as necessary.
 
 In short, while build tools have been nearly mandatory for web app development since the ES2015 era,
 developers are increasingly able to write and execute standards-compliant JavaScript as-is, with no
 build step. This is because of the stability of modern, standards-compliant JavaScript combined with
 the availability of JavaScript modules in web browsers and Node.js.
 
-### Improving the usability of types written in comments
+### Limits of JSDoc Type Annotations
 
-While build tools are not terribly difficult to write and use, they are a difficult barrier to entry
-for many developers. This is why the TypeScript team invested in an alternate syntax for TypeScript
-that can be written as JavaScript comments. **This syntax is extremely popular**, even though
-TypeScript ships out of the box with a high-quality build tool, and even though there are a number
-of ergonomic build tools such as webpack, Parcel, and the previously mentioned Snowpack.
+While build tools are not terribly difficult to use, they are yet another barrier to entry for many developers.
+This is in part why the TypeScript team invested in support for types in JSDoc comments.
+JSDoc comments had some existing precedence in the JavaScript community, and was leveraged by the Closure compiler.
 
-**Example JSDoc:** Here's an example of today's documentation-based syntax from [TypeScript's JSDoc Reference](https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html#param-and-returns).
+This comment convention is often in build scripts, small web apps, server-side apps, and elsewhere where
+the cost/benefit tradeoff of adding a build-tool is too high. Even when TypeScript doesn't provide type-checking
+diagnostics, the comment convention is still leveraged in editor functionality because TypeScript powers
+the JavaScript editing experience.
+
+Here's an example of the JSDoc-based type syntax from [TypeScript's JSDoc Reference](https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html#param-and-returns).
 
 ```js
-// Parameters may be declared in a variety of syntactic forms
 /**
  * @param {string}  p1 - A string param.
  * @param {string=} p2 - An optional param (Closure syntax)
@@ -71,7 +76,7 @@ function stringsStringStrings(p1, p2, p3, p4) {
 }
 ```
 
-**Example TypeScript:** And here's the equivalent TypeScript syntax enabled by this proposal.
+And here's the equivalent TypeScript syntax enabled by this proposal.
 
 ```ts
 function stringsStringStrings(p1: string, p2?: string, p3?: string, p4 = "test"): string {
@@ -79,22 +84,19 @@ function stringsStringStrings(p1: string, p2?: string, p3?: string, p4 = "test")
 }
 ```
 
-In addition to substantially worse ergonomics, the comment-based syntax is a significantly reduced subset of
-the full feature set supported in TypeScript, in part because it's difficult to ergonomically map every
-feature of a language with integrated types onto a comment-based representation. Using the
-comment-based syntax means that the documentation is much harder to use, and substantially
-complicates asking questions (or reviewing previous questions) on online support forums such as
-StackOverflow.
+It is clear that JSDoc comments are typically more verbose.
+On top of this, JSDoc comments only provide a subset of the feature set supported in TypeScript,
+in part because it's difficult to provide syntactic room onto a comment-based representation.
 
-Nevertheless, the comment-based syntax remains popular, and the need was significant enough for the
-TypeScript team to invest in it.
+Nevertheless, the JSDoc-based syntax remains useful, and the need for some form of type annotations in
+JavaScript was significant enough for the TypeScript team to invest in it.
 
 For the above reasons, the goal of this proposal is to allow a very large subset of the TypeScript
 syntax to appear as-is in JavaScript source files, interpreted as comments.
 
 **To summarize**:
 
-- TypeScript's syntax<sup>1</sup> has no runtime semantics, so from the perspective of evaluation,
+- TypeScript's syntax has no runtime semantics<sup>1</sup>, so from the perspective of evaluation,
   TypeScript types are semantically equivalent to comments.
   The same goes for other static typing tools.
 - As modern JavaScript has stabilized, and JavaScript modules have become more widely available,
@@ -104,8 +106,8 @@ syntax to appear as-is in JavaScript source files, interpreted as comments.
   TypeScript invested in an alternative syntax that uses JavaScript comments. This syntax is
   popular, even though it's substantially less pleasant to author, and even though it only supports
   a subset of TypeScript's semantics.
-- This proposal aims to allow a very large subset of the TypeScript syntax, as well as that of other static typing tools, to be interpreted as
-  JavaScript comments.
+- This proposal aims to allow a very large subset of the TypeScript syntax,
+  as well as that of other static typing tools, to be interpreted as JavaScript comments.
   This would improve the lives of users who are currently using the
   comment-based dialect of TypeScript. It would also allow many future developers of statically typed code to
   avoid the need for a build step, as their JavaScript peers are increasingly able to do.
