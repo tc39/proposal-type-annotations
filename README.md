@@ -494,6 +494,7 @@ new Point::<bigint>(4, 5)
 ```
 
 The type argument (`::<type>`) would be ignored by the JavaScript runtime.
+It would be natural for the non-ambiguous syntax to become first-class syntax in TypeScript as well.
 
 ### `this` parameter
 
