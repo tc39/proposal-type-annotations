@@ -475,17 +475,20 @@ It will be important to think more deeply about how this proposal should resolve
 
 #### Generic invocations
 
-One can explicitly specify the type arguments of a function invocation or class instantiation.
+One can explicitly specify the type arguments of a generic function invocation or generic class instantiation [in TypeScript.](https://www.typescriptlang.org/docs/handbook/2/functions.html#specifying-type-arguments)
 
 ```ts
+// TypeScript
 add<number>(4, 5)
 new Point<bigint>(4, 5)
 ```
 
-The syntax used to achieve this today in [TypeScript](https://www.typescriptlang.org/docs/handbook/2/functions.html#specifying-type-arguments), [Flow](https://flow.org/en/docs/types/generics/#toc-supplying-type-arguments-to-callables) and [Hegel](https://hegel.js.org/docs/generic-types#generic-syntax) is already valid JavaScript and so cannot be used as-is.
-Therefore we propose using a `::` prefixed form.
+The above syntax is already valid JavaScript that users may rely on, so we cannot use this syntax as-is.
+We expect some form of new syntax could be used to resolve this ambiguity.
+No specific solution is proposed at this point of time, but one example option is to use a syntactic prefix such as `::`
 
 ```ts
+// Types as Comments - example syntax solution
 add::<number>(4, 5)
 new Point::<bigint>(4, 5)
 ```
