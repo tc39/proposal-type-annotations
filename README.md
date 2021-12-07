@@ -8,6 +8,19 @@ The aim of this proposal is to enable developers to run programs written in [Typ
 [Flow](https://flow.org/), [Hegel](https://hegel.js.org/), and other static typing supersets of JavaScript without any need for
 transpilation, if they stick within a certain reasonably large subset of the language.
 
+## Status
+
+**Stage:** 0 (Not yet presented to TC39)
+
+**Authors:**
+- Gil Tayar
+- ...and a number of contributors, see [history](https://github.com/giltayar/proposal-types-as-comments/commits/master).
+
+**Champions:**
+- Daniel Rosenwasser (Microsoft)
+- Romulo Cintra (Igalia)
+- Rob Palmer (Bloomberg)
+
 ## Motivation
 
 TypeScript is a gradually typed superset of JavaScript.
@@ -111,14 +124,6 @@ syntax to appear as-is in JavaScript source files, interpreted as comments.
   avoid the need for a build step, as their JavaScript peers are increasingly able to do.
 
 <sup>1</sup> With a small number of exceptions, see the ["out of scope"](#intentional-omissions) section for more information.
-
-## Status
-
-by Gil Tayar and a number of contributors, see [history](https://github.com/giltayar/types-as-comments-proposal/commits/master).
-
-Stage 0
-
-Not yet presented to TC39. TS team are currently working on a grammar spec that may affect this proposal, so we are waiting for that before developing this proposal much further.
 
 ## Synopsis
 
