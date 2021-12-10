@@ -180,7 +180,7 @@ The proposed grammar/syntax is inspired by the best practices used in type syste
 
 A set of rules(tokens) have to be defined to create a `grammar` that parsers/engines can easily understand/parse, to find and delimit `types` inserted in the code, treating the result as comments.
 
-The example bellow demonstrates how those delimeters works in practice using a `function` , [ read more about annotation type delimiters and allowed types](/syntax/grammar.md#annotation-type-delimiters-and-allowed-types).
+The example bellow demonstrates how those delimeters works in practice using a `function`, [read more about annotation type delimiters and allowed types](/syntax/grammar.md#annotation-type-delimiters-and-allowed-types).
 
 ##### **Example:**
 At runtime `: number` and `: string` types are ignored and treated as comments
