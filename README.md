@@ -170,7 +170,7 @@ See more about the motivation in [the FAQ](#faq).
 > The following proposal is a _strawperson_ proposal. Please treat it as such. 
 
 This proposal is intended to provide a way to add type annotations to JavaScript code,
-allowing those annotations to be analysed and checked by a type checker that is _external to JavaScript_.
+allowing those annotations to be analyzed and checked by a type checker that is _external to JavaScript_.
 
 At runtime, the JavaScript engine ignores them, similarly to what happens with JavaScript comments.
 
