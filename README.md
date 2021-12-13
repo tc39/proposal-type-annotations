@@ -2,7 +2,7 @@
 
 This proposal aims to enable developers to add type annotations to JavaScript code,
 allowing those annotations to be checked by a type checker that is _external to JavaScript_.
-At runtime, the JavaScript engine ignores them, treating the types as if they were like comments.
+At runtime, the JavaScript engine ignores them, treating the types as if they were comments.
 
 The aim of this proposal is to enable developers to write code that can be type-checked by a tool like
 [TypeScript](https://www.typescriptlang.org/), [Flow](https://flow.org/), or other static type checkers,
@@ -29,21 +29,20 @@ _Static Typing_ was the most requested language feature in [the _State of JS_ su
 <!-- move this into the motivation section? Some top-level history of types. -->
 
 As evergreen browsers grow in popularity, the need for downlevel-compilation (a.k.a. "transpilation")
-is fading. Furthermore, developers on back-end runtimes such as Node.js have the opportunity to use
+is reducing. Furthermore, developers on back-end runtimes such as Node.js have the opportunity to use
 very recent versions of JavaScript engines like V8 which typically offers many of the newest ECMAScript features.
 As a result, for many TypeScript users, the only necessary step between writing code and running it is to erase away type annotations.
 
 Today, developers have many tools at their disposal to do this, such as the TypeScript compiler, Babel, esbuild, and more.
-Language variants like TypeScript are blessed that developer tools have made it a first-class citizen for any build arrangement;
-however, the tools cannot bring back all of the conveniences of of writing directly in JavaScript.
-Being able to save a file and run it immediately is huge benefit using JavaScript, and existing tools require a watch process, or hooks, or a sufficiently fast compiler in between the runtime. 
+Language variants like TypeScript are fortunate enough to enjoy first-class support from many build tools;
+however, the tools cannot bring back all of the conveniences of writing directly in JavaScript.
+Being able to save a file and run it immediately is huge benefit of using JavaScript, whereas existing tools require a watch process, or hooks, or a sufficiently fast compiler to handle it at runtime.
 
-- ts-node and babel-node use TypeScript and Babel respectively to compile and run JavaScript on Node.js
-  without an explicit build step for developers. Since Node.js sticks close to the latest version of V8,
-  much of the time, the only thing they need to do is erase types.
-- Deno uses TypeScript as its primary source language. Since Deno works with an up-to-date <!-- TODO -->
-version of the V8 JavaScript engine, 
-- Modern bundler front-ends like Vite and Snowpack process TypeScript directly and remove type annotations as necessary.
+- `ts-node` and `babel-node` use TypeScript and Babel respectively to compile code to JavaScript so that it runs on Node.js
+  without an explicit build step for developers. Since Node.js quickly integrates new versions of V8,
+  most of the time, the only thing they need to do is erase types.
+- Deno uses TypeScript as its primary source language. Deno works with an up-to-date version of the V8 JavaScript engine, and incorporates syntax erasure in native code to run TypeScript without an intermediate step.
+- Modern bundler front-ends like Vite process TypeScript directly and remove type annotations as necessary.
 
 In short, while build tools have been nearly mandatory for web app development since the ES2015 era,
 developers are increasingly able to write and execute standards-compliant JavaScript as-is, with no
@@ -53,13 +52,13 @@ the availability of JavaScript modules in web browsers and Node.js.
 ### Limits of JSDoc Type Annotations
 
 While build tools are not terribly difficult to use, they are yet another barrier to entry for many developers.
-This is in part why the TypeScript team invested in support for types in JSDoc comments.
-JSDoc comments had some existing precedence in the JavaScript community, and was leveraged by the Closure compiler.
+This is in part why the TypeScript team invested in support for expressing types in JSDoc comments.
+JSDoc comments had some existing precedence in the JavaScript community for documenting types, and these types were leveraged by the Closure compiler.
 
-This comment convention is often in build scripts, small web apps, server-side apps, and elsewhere where
+This comment convention is often found in build scripts, small web apps, server-side apps, and elsewhere where
 the cost/benefit tradeoff of adding a build-tool is too high. Even when TypeScript doesn't provide type-checking
 diagnostics, the comment convention is still leveraged in editor functionality because TypeScript powers
-the JavaScript editing experience.
+the underlying JavaScript editing experience.
 
 Here's an example of the JSDoc-based type syntax from [TypeScript's JSDoc Reference](https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html#param-and-returns).
 
@@ -84,9 +83,9 @@ function stringsStringStrings(p1: string, p2?: string, p3?: string, p4 = "test")
 }
 ```
 
-It is clear that JSDoc comments are typically more verbose.
+JSDoc comments are typically more verbose.
 On top of this, JSDoc comments only provide a subset of the feature set supported in TypeScript,
-in part because it's difficult to provide syntactic room onto a comment-based representation.
+in part because it's difficult to provide expressive syntax within a comment-based representation.
 
 Nevertheless, the JSDoc-based syntax remains useful, and the need for some form of type annotations in
 JavaScript was significant enough for the TypeScript team to invest in it.
