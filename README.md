@@ -395,14 +395,26 @@ It will be important to think more deeply about how this proposal should resolve
 
 #### Generic invocations
 
-In TypeScript, one can define what the type parameter of a function or a class is, explicitly:
+One can explicitly specify the type arguments of a generic function invocation or generic class instantiation [in TypeScript.](https://www.typescriptlang.org/docs/handbook/2/functions.html#specifying-type-arguments)
 
 ```ts
+// TypeScript
 add<number>(4, 5)
 new Point<bigint>(4, 5)
 ```
 
-> The generic parameter here would be ignored by the JavaScript runtime.
+The above syntax is already valid JavaScript that users may rely on, so we cannot use this syntax as-is.
+We expect some form of new syntax could be used to resolve this ambiguity.
+No specific solution is proposed at this point of time, but one example option is to use a syntactic prefix such as `::`
+
+```ts
+// Types as Comments - example syntax solution
+add::<number>(4, 5)
+new Point::<bigint>(4, 5)
+```
+
+The type argument (`::<type>`) would be ignored by the JavaScript runtime.
+It would be natural for the non-ambiguous syntax to become first-class syntax in TypeScript as well.
 
 ### `this` parameter
 
