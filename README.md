@@ -1,22 +1,34 @@
 # ECMAScript proposal: Types as Comments
 
-This proposal aims to enable developers to add type annotations to their JavaScript code,
+This proposal aims to enable developers to add type annotations to JavaScript code,
 allowing those annotations to be checked by a type checker that is _external to JavaScript_.
-At runtime, the JavaScript engine ignores them, treating the types as comments.
+At runtime, the JavaScript engine ignores them, treating the types as if they were comments.
 
-The aim of this proposal is to enable developers to run programs written in [TypeScript](https://www.typescriptlang.org/),
-[Flow](https://flow.org/), [Hegel](https://hegel.js.org/), and other static typing supersets of JavaScript without any need for
-transpilation, if they stick within a certain reasonably large subset of the language.
+The aim of this proposal is to enable developers to write code that can be type-checked by a tool like
+[TypeScript](https://www.typescriptlang.org/), [Flow](https://flow.org/), or other static type checkers,
+without any compilation, that is largely compatible with these existing variants, but is largely guided by precedents established by TypeScript.
+
+## Status
+
+**Stage:** 0 (Not yet presented to TC39)
+
+**Authors:**
+- Gil Tayar
+- ...and a number of contributors, see [history](https://github.com/giltayar/proposal-types-as-comments/commits/master).
+
+**Champions:**
+- Daniel Rosenwasser (Microsoft)
+- Romulo Cintra (Igalia)
+- Rob Palmer (Bloomberg)
 
 ## Motivation
 
 TypeScript is a gradually typed superset of JavaScript.
 At the time of writing, it's the most popular of the static typing supersets of JavaScript currently in use.
-TypeScript's type syntax is used by
-development tooling, and does not add runtime semantics<sup>1</sup>.
-The TypeScript syntax is similar to that of other static typing supersets such as Flow and Hegel.
+TypeScript's type syntax is used by development tooling, and largely does not add runtime semantics<sup>1</sup>.
+Other systems like Flow also share much of the same syntax.
 
-In practice, this means that "transpiling" statically typed JavaScript to standards-compliant JavaScript amounts to only erasing the types.
+In practice, this means that compiling statically typed JavaScript in the form of TypeScript, Flow, etc. to plain JavaScript amounts to only erasing the types.
 
 ### Community Demand
 
@@ -24,41 +36,46 @@ _Static Typing_ was the most requested language feature in [the _State of JS_ su
 
 ![missing-features-js](https://user-images.githubusercontent.com/6939381/143012138-96b93204-c456-4ab5-bb63-2648187ab8a7.png)
 
-### Deploying modern JavaScript natively
+### JavaScript Compilation Over the Years <!-- Background -->
 
-For developers who can target modern browsers or recent versions of Node.js, this is often the
-only step that is needed to go from a TypeScript codebase to a JavaScript codebase that runs in
-their target environment. Developers who need to support older environments can erase the TypeScript
-types first and then pass the resulting code to a transpiler (such as Babel) that knows how to
-down-level standards-compliant JavaScript to their target environment. For example:
-- *The Deno runtime* uses TypeScript as its primary source language. Since Deno works with an up-to-date
-version of the V8 JavaScript engine, erasing TypeScript types is the only meaningful compilation
-step for Deno. If they didn't need to erase TypeScript types, the Deno runtime could use `.ts` files
-directly.
-- *The Snowpack development-time web server*. Snowpack takes advantage of the fact
-that modern browser supports JavaScript modules to serve source files with substantially less
-processing than other development-time servers (which translate source files to userspace module
-runtimes). When using Snowpack with JavaScript, no additional source translation is required
-to serve development files to the browser. When using Snowpack with TypeScript, TypeScript types
-must first be erased before the files can be served.
+<!-- Maybe, 2013, 2014, ... -->
+<!-- move this into the motivation section? Some top-level history of types. -->
+
+As evergreen browsers grow in popularity, the need for downlevel-compilation (a.k.a. "transpilation")
+is reducing. Furthermore, developers on back-end runtimes such as Node.js have the opportunity to use
+very recent versions of JavaScript engines like V8 which typically offers many of the newest ECMAScript features.
+As a result, for many TypeScript users, the only necessary step between writing code and running it is to erase away type annotations.
+
+Today, developers have many tools at their disposal to do this, such as the TypeScript compiler, Babel, esbuild, and more.
+Language variants like TypeScript are fortunate enough to enjoy first-class support from many build tools;
+however, the tools cannot bring back all of the conveniences of writing directly in JavaScript.
+Being able to save a file and run it immediately is huge benefit of using JavaScript, whereas existing tools require a watch process, or hooks, or a sufficiently fast compiler to handle it at runtime.
+
+- `ts-node` and `babel-node` use TypeScript and Babel respectively to compile code to JavaScript so that it runs on Node.js
+  without an explicit build step for developers. Since Node.js quickly integrates new versions of V8,
+  most of the time, the only thing they need to do is erase types.
+- Deno uses TypeScript as its primary source language. Deno works with an up-to-date version of the V8 JavaScript engine, and incorporates syntax erasure in native code to run TypeScript without an intermediate step.
+- Modern bundler front-ends like Vite process TypeScript directly and remove type annotations as necessary.
 
 In short, while build tools have been nearly mandatory for web app development since the ES2015 era,
 developers are increasingly able to write and execute standards-compliant JavaScript as-is, with no
 build step. This is because of the stability of modern, standards-compliant JavaScript combined with
 the availability of JavaScript modules in web browsers and Node.js.
 
-### Improving the usability of types written in comments
+### Limits of JSDoc Type Annotations
 
-While build tools are not terribly difficult to write and use, they are a difficult barrier to entry
-for many developers. This is why the TypeScript team invested in an alternate syntax for TypeScript
-that can be written as JavaScript comments. **This syntax is extremely popular**, even though
-TypeScript ships out of the box with a high-quality build tool, and even though there are a number
-of ergonomic build tools such as webpack, Parcel, and the previously mentioned Snowpack.
+While build tools are not terribly difficult to use, they are yet another barrier to entry for many developers.
+This is in part why the TypeScript team invested in support for expressing types in JSDoc comments.
+JSDoc comments had some existing precedence in the JavaScript community for documenting types, and these types were leveraged by the Closure compiler.
 
-Here's an example of the documentation-based syntax from the TypeScript documentation:
+This comment convention is often found in build scripts, small web apps, server-side apps, and elsewhere where
+the cost/benefit tradeoff of adding a build-tool is too high. Even when TypeScript doesn't provide type-checking
+diagnostics, the comment convention is still leveraged in editor functionality because TypeScript powers
+the underlying JavaScript editing experience.
+
+Here's an example of the JSDoc-based type syntax from [TypeScript's JSDoc Reference](https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html#param-and-returns).
 
 ```js
-// Parameters may be declared in a variety of syntactic forms
 /**
  * @param {string}  p1 - A string param.
  * @param {string=} p2 - An optional param (Closure syntax)
@@ -71,7 +88,7 @@ function stringsStringStrings(p1, p2, p3, p4) {
 }
 ```
 
-And here's the equivalent TypeScript syntax:
+And here's the equivalent TypeScript syntax enabled by this proposal.
 
 ```ts
 function stringsStringStrings(p1: string, p2?: string, p3?: string, p4 = "test"): string {
@@ -79,22 +96,19 @@ function stringsStringStrings(p1: string, p2?: string, p3?: string, p4 = "test")
 }
 ```
 
-In addition to substantially worse ergonomics, the comment-based syntax is a significantly reduced subset of
-the full feature set supported in TypeScript, in part because it's difficult to ergonomically map every
-feature of a language with integrated types onto a comment-based representation. Using the
-comment-based syntax means that the documentation is much harder to use, and substantially
-complicates asking questions (or reviewing previous questions) on online support forums such as
-StackOverflow.
+JSDoc comments are typically more verbose.
+On top of this, JSDoc comments only provide a subset of the feature set supported in TypeScript,
+in part because it's difficult to provide expressive syntax within a comment-based representation.
 
-Nevertheless, the comment-based syntax remains popular, and the need was significant enough for the
-TypeScript team to invest in it.
+Nevertheless, the JSDoc-based syntax remains useful, and the need for some form of type annotations in
+JavaScript was significant enough for the TypeScript team to invest in it.
 
 For the above reasons, the goal of this proposal is to allow a very large subset of the TypeScript
 syntax to appear as-is in JavaScript source files, interpreted as comments.
 
 **To summarize**:
 
-- TypeScript's syntax<sup>1</sup> has no runtime semantics, so from the perspective of evaluation,
+- TypeScript's syntax has no runtime semantics<sup>1</sup>, so from the perspective of evaluation,
   TypeScript types are semantically equivalent to comments.
   The same goes for other static typing tools.
 - As modern JavaScript has stabilized, and JavaScript modules have become more widely available,
@@ -104,21 +118,13 @@ syntax to appear as-is in JavaScript source files, interpreted as comments.
   TypeScript invested in an alternative syntax that uses JavaScript comments. This syntax is
   popular, even though it's substantially less pleasant to author, and even though it only supports
   a subset of TypeScript's semantics.
-- This proposal aims to allow a very large subset of the TypeScript syntax, as well as that of other static typing tools, to be interpreted as
-  JavaScript comments.
+- This proposal aims to allow a very large subset of the TypeScript syntax,
+  as well as that of other static typing tools, to be interpreted as JavaScript comments.
   This would improve the lives of users who are currently using the
   comment-based dialect of TypeScript. It would also allow many future developers of statically typed code to
   avoid the need for a build step, as their JavaScript peers are increasingly able to do.
 
 <sup>1</sup> With a small number of exceptions, see the ["out of scope"](#intentional-omissions) section for more information.
-
-## Status
-
-by Gil Tayar and a number of contributors, see [history](https://github.com/giltayar/types-as-comments-proposal/commits/master).
-
-Stage 0
-
-Not yet presented to TC39. TS team are currently working on a grammar spec that may affect this proposal, so we are waiting for that before developing this proposal much further.
 
 ## Synopsis
 
@@ -167,97 +173,94 @@ See more about the motivation in [the FAQ](#faq).
 
 ## Proposal
 
-The following proposal is a _strawperson_ proposal. Please treat it as such. It is more about the
-spirit of ignoring type constructs in the code, than it is about the specific syntax. Having
-said that, care was taken to be both TypeScript/Flow/Hegel compatible, yet also be true
-to the spirit of JavaScript.
+> The following proposal is a _strawperson_ proposal. Please treat it as such. 
 
-### Incorporating types into functions and variable declarations
+This proposal is intended to provide a way to add type annotations to JavaScript code,
+allowing those annotations to be analyzed and checked by a type checker that is _external to JavaScript_.
 
-In a function, certain tokens (discussed in the next section) after `:` and before the `,` or `)` of a parameter declaration are regarded as a type. Example:
+At runtime, the JavaScript engine ignores them, similarly to what happens with JavaScript comments.
+
+The proposed syntax is inspired by the best practices used in type systems such as [TypeScript](https://www.typescriptlang.org/), among others; however, this proposal leaves enough room to accommodate alternative type systems as well.
+
+## How it works
+
+A set of rules(tokens) have to be defined to create a grammar that parsers/engines can easily understand/parse, to find and delimit types inserted in the code, treating the result as comments.
+
+The example bellow demonstrates how those delimeters works in practice using a `function`, [read more about annotation type delimiters and allowed types](/syntax/grammar.md#annotation-type-delimiters-and-allowed-types).
+
+##### **Example:**
+At runtime `: number` and `: string` types are ignored and treated as comments
+```ts
+function foo(a: number, b: string) {
+  //..
+}
+```
+> In a function, tokens after `:` and before the `,` or `)` of a parameter declaration are regarded as a type.
+
+## Syntax
+### Type annotations
+#### Functions and Variables 
+
+Syntax for variables and functions annotation:
 
 ```ts
-function foo(a : (this<is><x, y>TYPE!), b: thisIsAlso) {
+// variable declaration
+const a: number = 4
+```
+
+```ts
+// a function declaring a return type using `:` after the parentheses
+function foo(): number {
   //..
 }
 ```
 
-> In the example above, the types do not conform to any particular type system. This is to demonstrate that the JavaScript engine is not strictly constraining the type syntax.  Both the syntactic and semantic correctness of the types are determined by an _external type checker_ (such as TypeScript) analyzing the source code.
+```ts
+// arrow functions
+const foo = (a: number): string => "x" + a;
+```
 
-A function can also declare a return type using `:` after the parentheses:
+#### Classes
+
+Syntax for Class fields and methods annotation, it's the same used for functions and variables:
 
 ```ts
-function foo(): number {
+class Point {
+  x: number
+  y: number
 
+  move(dx: number, dy: number): void {x += dx; y += dy}
 }
 ```
 
-For arrow functions, a similar syntax:
-
 ```ts
-const foo = (a: number): string => 'x' + a
+// making use of `implements <type>` annotation
+interface PointInterface {x: number, y: number}
+
+class Point implements PointInterface {
+  x: number
+  y: number
+
+  move(dx: number, dy: number) {this.x += dx; this.y += dy}
+}
 ```
+#### Optional parameters
 
-The same syntax works for variable declarations:
-
-```ts
-const a: number = 4
-```
-
-## Optionality of parameters
-
-A parameter name may be embellished with a postfix `?`. This signifies optionality in TypeScript and Flow. Example:
+A parameter name may be embellished with a postfix `?`. This signifies optionality in TypeScript and Flow. 
 
 ```ts
 function split(str: string, separator?: string) {
 
 }
 ```
+##### See also
+  * [Allowed types](/syntax/grammar.md#allowed-types)
+  * [Types under consideration](/syntax/grammar.md#types-under-consideration)
+  * [Annotation type delimiters](/syntax/grammar.md#annotation-type-delimiters-and-allowed-types)
 
-### How to define where the type annotation begins and ends
+### Types and Interfaces
 
-How does the JavaScript parser know where a type annotation begins? In the above example,
-as we defined, the `:` is used to indicate that a type begins. But how does it know that it
-ends? In the above case, `(this<is><x, y>TYPE!)`, we can't just search for the comma, because
-the type itself incorporates a `,`.
-
-It's a bit unclear how to define this. Intuitively, it could be reasonable to parse tokens within matching parentheses and brackets (including `(...)`, `[...]`, `{...}`, or `<...>`), with the type ending when brackets are closed, but also permitting certain tokens to continue until a newline (if outside of a parenthized region).
-
-Some more complexity comes in in cases such as:
-- How incompatible would this scheme be, given that it may prohibit newlines or require parentheses in certain cases?
-- How do we avoid ambiguity with JSX, which uses `<...>` in a decidedly different way?
-
-Example of types that are allowed:
-
-- Simple "identifier" style: `number`, `Foo`, `string`
-- Adding `?`: `number?`, `?number`, `Foo?`
-- Adding parentheses after an identifier: `string[]`, `Foo<T>`, `Foo<T extends ReturnType<Bar>>`
-- Starting with parentheses: `{x: number, y: number}`, `{|x: number, y: number|}`, `(() => number)`
-
-We're still considering how/whether the syntax could accommodate these cases without enclosing parentheses:
-
-- Illegal characters in identifier: `number!`, `string | number`, `string & number`,
-  `(x: number) => string`
-- Multiple parentheses in sequence: `<T>(arg: T) => T`
-- Unmatched parentheses: `Foo<T condition T < 5>`
-- type operators: `typeof s`
-- [Template literal types](https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html):
-  `` `${EmailLocaleIDs | FooterLocaleIDs}_id` ``
-
-The above could be made legal by wrapping with `(...)`. Note that TypeScript, Flow, and Hegel all permit
-parentheses in these contexts today:
-
-- `(number!)`, `(string | number)`, `(string & number)`, `((x: number) => string)`
-- `(<T>(arg: T) => T)`
-- `(Foo<T condition T < 5>)`
-- `(typeof s)`
-- ``(`${EmailLocaleIDs | FooterLocaleIDs}_id`)``
-
-> Note that this is a place where compatibility with _existing_ TypeScript code
-  might not be provided. But that code can be easily fixed, probably even via a codemod, to conform to
-  the restricted way of declaring a type, by wrapping the difficult-to-parse types with a `(...)`.
-
-### Types and interfaces
+#### Usage
 
 Besides type annotations on variables and functions, new types can be added using the following
 constructs:
@@ -266,8 +269,7 @@ constructs:
 type <typeIdentifier> = <type>
 interface <typeIdentifier> <type>
 ```
-
-Example:
+##### **Example:**
 
 ```ts
 type Foo = number
@@ -279,148 +281,66 @@ interface Point {x: number, y: Number}
   Therefore the following syntax would be valid JavaScript syntax: `interface Point number`. We could also
   decide to make interfaces more limited and similar to TypeScript.
 
-### Modules:  Importing and Exporting Types
 
-#### Import Statements
+#### Importing and Exporting Types
 
-##### Type-only Import Statements
+##### Type-only Statements
 
-The `type` keyword immediately after `import` means this is a ***type-only import*** that is entirely
+The `type` keyword immediately after `import` or `export` means this is a ***type-only import/export*** that is entirely
 ignored by JavaScript.
-
+###### **Import**
 ```ts
-import type { someType } from 'module'
+// type-only import statement
+import type { someType } from 'module';
+
+// Aliasing type bindings using `as`.
+import type { someType as alias } from 'module';
 ```
 
-Aliasing type bindings using `as` is possible.
-This is similar to aliasing imported value bindings.
-
-```ts
-import type { someType as alias } from 'module'
-```
-
-##### Type-only bindings for Import Statements
-
-For mixed imports containing both type and value bindings, the user can express which bindings are type-only and must be erased by prefixing them with `type`.
-
-```ts
-import { someValue, type someType, someOtherValue } from 'module'
-```
-
-...is treated as the following JavaScript...
-
-```ts
-import { someValue               , someOtherValue } from 'module'
-```
-
-The erasure is restricted to the binding clause.
-Meaning such imports are retained even if all bindings are declared type-only.
-
-```ts
-import { type someType as aliasType } from 'module'
-```
-
-...is treated as the following JavaScript...
-
-```ts
-import {                            } from 'module'
-```
-
-#### Export Statements
-
-##### Exporting Type Declarations
-
-One can export `type` and `interface` declarations, using `export` and the JavaScript runtime will fully erase them.
-
-```ts
-export type myType = number  
-export interface myInterface {}
-```
-
-##### Type-only Export Statements
-
-Just like values, the export site of a type can be independent of the type declaration.
-This is a ***type-only export*** that is entirely erased.
+###### **Export**
 
 ```ts
 type myType = number  
 interface myInterface {}
 
+// type-only export statement
 export type { myType, myInterface }
-```
 
-Just like type imports, type exports supporting aliasing too.
-
-```ts
-type myType = number
-
+// Aliasing type bindings using `as`.
 export type { myType as aliasType }
 ```
 
-##### Type-only bindings for Export Statements
+##### Type-only bindings Statements
 
-Just like imports, type-only bindings can be used to erase individual export bindings.
+For mixed `imports` or `exports` containing both type and value bindings, the user can express which bindings are type-only by prefixing with `type` keyword.
+
+###### **Import**
+```ts
+import { someValue, type someType, someOtherValue } from 'module'
+
+// runtime treats as the following JavaScript... 
+import { someValue               , someOtherValue } from 'module'
+```
+or
+```ts
+import { type someType as aliasType } from 'module'
+
+// runtime treats as the following JavaScript... 
+import {                            } from 'module'
+```
+> The delimiters are restricted to the binding clause. Meaning such imports are retained even if all bindings are declared type-only.
+###### **Export**
 
 ```ts
 type myType = number
 var myValue;
 
-export { myValue, type myType, myValue, type myType as aliasType } // EOF
+export { myValue, type myType, myValue, type myType as aliasType }
+
+// runtime treats as the following JavaScript... 
+export { myValue,              myValue                           }
 ```
-
-...is treated as the following JavaScript...
-
-```ts
-
-var myValue;
-
-export { myValue,              myValue                           } // EOF
-```
-
-### Classes
-
-Class fields and methods can be annotated just like functions and variables:
-
-```ts
-class Point {
-  x: number
-  y: number
-
-  move(dx: number, dy: number): void {x += dx; y += dy}
-}
-```
-
-We can also add an `implements <type>` to it, which is ignored by JavaScript:
-
-```ts
-interface PointInterface {x: number, y: number}
-
-class Point implements PointInterface {
-  x: number
-  y: number
-
-  move(dx: number, dy: number) {this.x += dx; this.y += dy}
-}
-```
-
-The semantics would be equivalent to the following, omitting the ignored elements:
-
-```js
-class Point {
-  x
-  y
-  move(dx, dy) {this.x += dx; this.y += dy}
-```
-
-Static and type-only class element declarations (see [Declarations](#declarations)) can equally be supported.
-
-```ts
-class Point {
-  static count: number;
-  declare field: string;
-}
-```
-
+ 
 ### Typecasting
 
 A new operator, `as`, is defined, which takes as a left operand an expression,
@@ -447,7 +367,7 @@ function foo<T>() {}
 class FooClass<T> {}
 ```
 
-Generics are ignored by the JavaScript runtime.
+> Generics are ignored by the JavaScript runtime.
 
 #### Generic arrow functions
 
@@ -506,12 +426,12 @@ is ignored by the runtime and is not considered as part of the runtime parameter
 
 ### Declarations
 
-`.d.ts` and `libdef` files have no use in JavaScript, and while the type checkers can test them, they
-are ignored by JavaScript. However, it is valid to use these declarations inline in a JavaScript file,
-as is sometimes useful: `declare` can be followed by a function or class declaration,
-similar to [declarations in TypeScript](https://www.typescriptlang.org/docs/handbook/declaration-files/by-example.html).
-Functions do not need the `declare` keyword to be considered a declaration--any function without a body is
+`.d.ts` and `libdef` files have no use in JavaScript, and while the type checkers can test them, they are ignored by JavaScript. However, this proposal allows inline declarations.
+
+The `declare` keyword can be followed by a function or class declaration,
+similar to [declarations in TypeScript](https://www.typescriptlang.org/docs/handbook/declaration-files/by-example.html). Additionally, Functions do not need the `declare` keyword to be considered a declaration--any function, any function without a body is
 treated as such.
+
 
 ```ts
 declare class Foo { bar(x: number): void; }
@@ -525,7 +445,7 @@ Declarations are ignored by the JS engine.
   are in `.d.ts` files that are ignored anyway by the JavaScript runtime.
   However, `declare` is needed within class declarations too so it currently remains in this proposal.
 
-#### Example: Function overloads
+##### Function overloads
 
 If a function has some kind of type signature, but no body, this proposal would treat it as a declaration, leading the engine to ignore the declaration.
 This form may be used for [TypeScript function overloading](https://www.typescriptlang.org/docs/handbook/functions.html#overloads). Example:
@@ -541,9 +461,33 @@ function foo(x: string): string {
 }
 ```
 
-Note that this means that no variable binding or destructuring will happen as a result of the first line.
+> Note that this means that no variable binding or destructuring will happen as a result of the first line.
 
-### Up for debate
+## Intentional Omissions
+
+We consider the following items explicitly excluded from the scope of this proposal.
+
+### Omitted: TypeScript features that generate code
+
+Some constructs in TypeScript are not supported by this proposal because they have runtime semantics, generating JavaScript code rather than simply being stripped out and ignored. These constructs are not supported by this proposal, but could be added by a separate TC39 proposal.
+
+- [Enums](https://www.typescriptlang.org/docs/handbook/enums.html)
+- [Namespaces](https://www.typescriptlang.org/docs/handbook/namespaces.html)
+- [Parameter properties](https://www.typescriptlang.org/docs/handbook/classes.html#parameter-properties)
+
+All three of these features have workable equivalents in JavaScript, which could be transitioned to with the appropriate codemod.
+
+### Omitted: JSX
+
+[JSX](https://facebook.github.io/jsx/) is an XML-like syntax extension to JavaScript that is designed to be transformed by a pre-processor into valid JavaScript. It was originally popularized by [the React ecosystem](https://reactjs.org/docs/introducing-jsx.html) and now various compilers that support type-checking of JavaScript also support transforming JSX. Some users may hope that the JSX transform could also be directly supported by ECMAScript, to expand the set of use-cases that can be handled without a build step.
+
+We do **not** consider JSX to be in scope of this proposal because:
+
+- JSX is an orthogonal feature unrelated to optional static types. This proposal does not affect the viability of introducing JSX into ECMAScript via an independent proposal.
+- JSX syntax expands into meaningful JavaScript code when transformed. This proposal is only concerned with syntax erasure.
+
+
+## Up for debate
 
 A couple pieces of syntax would fit cleanly in with the "types as comments" model, but may feel like a bit of overreach. We think that this proposal could work with or without these pieces of syntax, and present various alternative options below.
 
@@ -606,36 +550,13 @@ even if its type specifies that it can be. This is known as a [null typeguard](h
 This construct is syntactic sugar for `(x as NonNullable<typeof x>)`. It's debatable whether this syntax
 should be included (as it feels somehow "deep" in the expression), but it would be straightforward to ignore a `!` and treat the expression as `x.foo`.
 
-## Intentional Omissions
-
-We consider the following items explicitly excluded from the scope of this proposal.
-
-### Omitted: TypeScript features that generate code
-
-Some constructs in TypeScript are not supported by this proposal because they have runtime semantics, generating JavaScript code rather than simply being stripped out and ignored. These constructs are not supported by this proposal, but could be added by a separate TC39 proposal.
-
-- [Enums](https://www.typescriptlang.org/docs/handbook/enums.html)
-- [Namespaces](https://www.typescriptlang.org/docs/handbook/namespaces.html)
-- [Parameter properties](https://www.typescriptlang.org/docs/handbook/classes.html#parameter-properties)
-
-All three of these features have workable equivalents in JavaScript, which could be transitioned to with the appropriate codemod.
-
-### Omitted: JSX
-
-[JSX](https://facebook.github.io/jsx/) is an XML-like syntax extension to JavaScript that is designed to be transformed by a pre-processor into valid JavaScript. It was originally popularized by [the React ecosystem](https://reactjs.org/docs/introducing-jsx.html) and now various compilers that support type-checking of JavaScript also support transforming JSX. Some users may hope that the JSX transform could also be directly supported by ECMAScript, to expand the set of use-cases that can be handled without a build step.
-
-We do **not** consider JSX to be in scope of this proposal because:
-
-- JSX is an orthogonal feature unrelated to optional static types. This proposal does not affect the viability of introducing JSX into ECMAScript via an independent proposal.
-- JSX syntax expands into meaningful JavaScript code when transformed. This proposal is only concerned with syntax erasure.
-
 ## FAQ
 
-### Does JavaScript need a type system?
+#### Does JavaScript need a type system?
 
 It's a bit late to ask that question. In practice, JavaScript already does have an optional type system: TypeScript. It's opt-in, but it's a major presence in the ecosystem, and seems to be present somewhere in just about any big-enough JS codebase (if you consider dependencies). The question is not whether JS should have types, but rather "how should JS work with types?" One valid answer is that the current ecosystem provides sufficient support, but this proposal claims certain advantages.
 
-### Why not define a type system for JS in TC39 instead?
+#### Why not define a type system for JS in TC39 instead?
 
 TC39 has a tradition of programming language design which favors local, sound checks. By contrast, TypeScript's model--which has been highly successful for JS developers--is around non-local, unsound checks. TypeScript-style systems are expensive and unnecessary to check at application startup, whereas TC39 defines the semantics that are run by JS engines.
 
@@ -644,7 +565,7 @@ effort that has a high probability of failure due to the enormity of the task, a
 recognizes that the community has evolved type systems that it is already happy with. Specifically,
 the emerging de-facto standard for a JavaScript type system is TypeScript.
 
-### How does this proposal relate to TypeScript?
+#### How does this proposal relate to TypeScript?
 
 This proposal is a balancing act: trying to be as TypeScript compatible as possible while still allowing other type systems, and also not impeding the evolution of JavaScript's syntax too much. Standardizing all TS details or 100% compatibility with TS are non-goals.
 
@@ -652,11 +573,11 @@ While this proposal leans forward to be close to TypeScript, TypeScript may need
 
 TypeScript would continue to exist alongside JS's slightly more restricted syntax: no existing TS codebases would need to change, but not all TypeScript code would run directly in JS engines, if it lives outside the subset.
 
-### Should TypeScript be standardized in TC39?
+#### Should TypeScript be standardized in TC39?
 
 TypeScript has been continuing to advance quickly. Both its grammar and typing rules continue to evolve, to the benefit of users. Tying this evolution to TC39 risks holding that benefit back. For example, TypeScript upgrades frequently require users to fix typing issues because the rules change, and this is often considered "worth it" because real bugs are found. However, standards aren't typically done with this version upgrade path; a move to standardization would require more conservatism. The goal here is to enable wider deployment of systems like TypeScript in diverse environments, not obstruct TS's evolution.
 
-### Should TypeScript be sanctioned as JS's official type system?
+#### Should TypeScript be sanctioned as JS's official type system?
 
 Other type checkers, such as Flow and Hegel may wish to use this proposal to enable developers to use their type checkers to check their code.
 Making this proposal be only about TypeScript can hamper this effort. "Competition" in this space
@@ -665,15 +586,15 @@ type system than the ones we have today, so that when JavaScript is ready to sta
 a better one, and not necessarily just a popular one, will exist. This will even allow
 experimentation with future type systems.
 
-### Why not unofficially build TS checking and transpilation into various systems?
+#### Why not unofficially build TS checking and transpilation into various systems?
 
 A number of systems, such as [ts-node](https://github.com/TypeStrong/ts-node) and [deno](https://deno.land/manual/getting_started/typescript), have tried this. Apart from startup performance issues, a common problem is compatibility across versions and modes, in type checking semantics, grammar, and transpilation output. This proposal would not subsume the needs for all of those features, but it would provide one compatible syntax and semantics to unify around for many needs.
 
-### Why not stick to existing JS comment syntax?
+#### Why not stick to existing JS comment syntax?
 
 Although it is possible to define types in existing JavaScript comments, as Closure and TypeScript's JSDoc mode do, this syntax is much more verbose and unergonomic. One might speculate that the syntactic overhead of JSDoc could be one of the forces that has led towards a migration from Closure Compiler to TypeScript, despite Closure Compiler's significant head-start.
 
-### Doesn't all JS development do transpilation anyway? Will it really help to remove the type-desugaring step?
+#### Doesn't all JS development do transpilation anyway? Will it really help to remove the type-desugaring step?
 
 The JavaScript ecosystem has been slowly moving back to a transpilation-less future. The sunsetting
 of IE11 and the rise of evergreen browsers that implement the latest JavaScript standard
@@ -688,14 +609,14 @@ Implementing this proposal means that we can add type systems to this list of "t
 transpilation anymore" and bring us closer to a world where transpilation is optional and not
 a necessity.
 
-### Can types be available via runtime reflection like [TypeScript's emitDecoratorMetadata](https://www.typescriptlang.org/tsconfig#emitDecoratorMetadata)?
+#### Can types be available via runtime reflection like [TypeScript's emitDecoratorMetadata](https://www.typescriptlang.org/tsconfig#emitDecoratorMetadata)?
 
 The proposal here differs significantly from Python's types, as the types in this proposal are entirely ignored, not evaluated as expressions or accessible at runtime as metadata. This difference is largely motivated by the existing community precedent, where JS type systems do not tend to use JS expression grammar for their types, so it is not possible to evaluate them as such.
 
 At most, we could expose the types as strings, but it's not clear what anyone could do with those or how they should be exposed. This proposal does not try and expose the types as metadata, and only specifies that they are ignored by
 the JS runtime.
 
-### Does this proposal make all TypeScript programs valid JavaScript?
+#### Does this proposal make all TypeScript programs valid JavaScript?
 
 Most constructs in TypeScript are compatible, but not all,
 and most of those that do not pass can be converted via simple codemod changes
@@ -703,7 +624,7 @@ that can make them both TypeScript compatible _and_ compatible with this proposa
 
 See the ["up for debate"](#up-for-debate) and ["Intentional Omissions"](#intentional-omissions) sections for more information.
 
-### Does this proposal make all Flow programs valid JavaScript?
+#### Does this proposal make all Flow programs valid JavaScript?
 
 Flow is very similar to TypeScript, and so most type constructs are OK, with
 a similar caveat whereby some types might need to be wrapped in parentheses to be compatible with
@@ -714,19 +635,19 @@ types `opaque type Meters = number`. Flow could consider modifying these in the 
 so that they conform to this proposal, e.g. adopt the `as` operator as an alternative to
 `(x: number)`, and `type Meters = (new number)`
 
-### Does this proposal make all Hegel programs valid JavaScript?
+#### Does this proposal make all Hegel programs valid JavaScript?
 
 Almost. Some types may need to be wrapped with parentheses to conform to this proposal's syntax limitations,
 but otherwise they're the same.
 
-### What about `.d.ts` files and "libdef" files?
+#### What about `.d.ts` files and "libdef" files?
 
 `.d.ts` and "libdef" files are used by TypeScript and Flow respectively, as a kind of "header" file
 that describes the signature of a package. This proposal can safely ignore them as it
 does not need to interpret the semantics of the type information inside them. Of course,
 TypeScript and Flow can continue reading and interpreting these files as they have done in the past.
 
-### Does this proposal mean that TypeScript developers would have to modify their codebases?
+#### Does this proposal mean that TypeScript developers would have to modify their codebases?
 
 No. TypeScript can continue to be TypeScript, with no compatibility impact or changes to codebases. This proposal would give developers the _option_ to restrict themselves to a particular subset of TypeScript which would run as JavaScript without transpilation.
 
@@ -742,18 +663,18 @@ automatically. Hopefully, the effort would be small, and the promise of having T
 does not need transpilation would be a big motivation. But the developers could decide
 to stick with TypeScript transpilation and enjoy the full power of TypeScript.
 
-### How should tools work with JavaScript type syntax?
+#### How should tools work with JavaScript type syntax?
 
 Given the fact that some TypeScript features are [out of scope](#intentional-omissions), and that standard JavaScript will not evolve as fast as TypeScript or support its variety of configurations, there will continue to be an advantage for many tools to support TypeScript in its fuller form, beyond what is potentially standardized as JavaScript.
 
 One pattern we see today, for the integration of TypeScript support into JavaScript tools, is a separation of TS syntax into an optional plugin or mode. This pattern can create friction for adoption. This proposal may reduce the cost of adopting types in JavaScript by forming a standard, versionless, always-on common base for type syntax. Full TypeScript support can be remain an opt-in mode on top of that.
 
-### What about compatibililty with ReasonML, PureScript, and other statically typed languages that compile to JavaScript?
+#### What about compatibililty with ReasonML, PureScript, and other statically typed languages that compile to JavaScript?
 
 While these languages _compile_ to JavaScript, and have static typing, they are not supersets of
 JavaScript, and thus are not relevant to this proposal.
 
-### Will the ability to deploy typed source code directly result in bloated applications?
+#### Will the ability to deploy typed source code directly result in bloated applications?
 
 Returning to a world where code does not strictly need to be compiled prior to being used in production means that developers may end up deploying more code than is necessary.
 Hence larger payloads over-the-wire for remotely served apps, and more text to parse at load time.
@@ -764,7 +685,7 @@ It remains a best practice to perform an ahead-of-time optimization step on code
 
 ## Prior Art
 
-### Other languages that implemented the "types as comments" idea
+#### Other languages that implemented the "types as comments" idea
 
 When Python decided to add a gradual type system to the language, it did it in two steps.
 First, a proposal for type annotations was added to the language, that enabled
@@ -778,12 +699,12 @@ The proposal here differs significantly from Python's types, as the types in thi
 Ruby, in v3,  has now also implemented RBS: type definitions that sit _beside_ the code
 and are not part of it. See the [References section](#References) for more information.
 
-### Languages that add type systems onto JavaScript
+#### Languages that add type systems onto JavaScript
 
 TypeScript, Flow, and Hegel are languages that implement type systems above standard JavaScript.
 See the [references section](#References) for links to the documentation of these languages.
 
-### Ability to add type systems to JavaScript via comments
+#### Ability to add type systems to JavaScript via comments
 
 Both TypeScript and Flow enable developers to write JavaScript code and incorporate
 types as comments that the JavaScript runtime ignores.
@@ -795,7 +716,7 @@ See the author's blog post on their positive experience with TypeScript's JSDoc 
 
 Closure Compiler's type checking works entirely via JSDoc comments ([docs](https://developers.google.com/closure/compiler/docs/js-for-compiler)). The Closure Compiler team has received many requests for an in-line type syntax, but was hesitant to do this without a standard.
 
-### Previous attempts in TC39
+#### Previous attempts in TC39
 
 TC39 has previously discussed [guards](https://web.archive.org/web/20141214075910/http://wiki.ecmascript.org/doku.php?id=strawman:guards), which form a new, stronger type system. It has also discussed [optional types](https://github.com/samuelgoto/proposal-optional-types), a plan which is more similar to this proposal, but framed differently.
 
@@ -809,4 +730,3 @@ TC39 has previously discussed [guards](https://web.archive.org/web/2014121407591
 - [Ruby 3 announcement, including a Ruby type system](https://www.ruby-lang.org/en/news/2020/12/25/ruby-3-0-0-released/)
 - [Clojure Spec, the Clojure type system](https://clojure.org/guides/spec)
 - [Github, State of the Octoverse, where TypeScript is the 4th most popular language](https://octoverse.github.com/)
-- 
