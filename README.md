@@ -178,7 +178,7 @@ The proposed syntax is inspired by the best practices used in type systems such 
 
 ## How it works
 
-A set of rules(tokens) have to be defined to create a `grammar` that parsers/engines can easily understand/parse, to find and delimit `types` inserted in the code, treating the result as comments.
+A set of rules(tokens) have to be defined to create a grammar that parsers/engines can easily understand/parse, to find and delimit types inserted in the code, treating the result as comments.
 
 The example bellow demonstrates how those delimeters works in practice using a `function`, [read more about annotation type delimiters and allowed types](/syntax/grammar.md#annotation-type-delimiters-and-allowed-types).
 
