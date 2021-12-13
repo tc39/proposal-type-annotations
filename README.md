@@ -174,7 +174,7 @@ allowing those annotations to be analyzed and checked by a type checker that is 
 
 At runtime, the JavaScript engine ignores them, similarly to what happens with JavaScript comments.
 
-The proposed grammar/syntax is inspired by the best practices used in type systems such as [TypeScript](https://www.typescriptlang.org/), among others, however the goal it's to accommodate types without restricting them to any particular type system.
+The proposed syntax is inspired by the best practices used in type systems such as [TypeScript](https://www.typescriptlang.org/), among others; however, this proposal leaves enough room to accommodate alternative type systems as well.
 
 ## How it works
 
