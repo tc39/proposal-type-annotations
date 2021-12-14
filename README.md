@@ -52,7 +52,7 @@ For type systems like TypeScript and Flow, it made sense to integrate a type era
 More recently, some bundlers have even started doing both.
 
 But over time, we anticipate there will be less need for developers to downlevel-compile.
-Evergreen browsers have become more of the norm, and on the back-end, Node.js uses very recent versions of V8.
+Evergreen browsers have become more of the norm, and on the back-end, Node.js and Deno use very recent versions of V8.
 Over time, for many TypeScript users, the only necessary step between writing code and running it will be to erase away type annotations.
 
 Build steps add another layer of concerns to writing code.
