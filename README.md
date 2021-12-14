@@ -55,6 +55,12 @@ But over time, we anticipate there will be less need for developers to downlevel
 Evergreen browsers have become more of the norm, and on the back-end, Node.js uses very recent versions of V8.
 Over time, for many TypeScript users, the only necessary step between writing code and running it will be to erase away type annotations.
 
+Build steps add another layer of concerns to writing code.
+For example, ensuring freshness of the build output, optimizing the speed of the build, and managing sourcemaps for debugging, are all concerns that JavaScript initially side-stepped.
+This simplicity made JavaScript much more approachable.
+
+This proposal will reduce the need to have a build step which can make some development set-ups much simpler.
+Users can simply run the code they wrote.
 ### Limits of JSDoc Type Annotations
 
 While build tools are not terribly difficult to use, they are yet another barrier to entry for many developers.
