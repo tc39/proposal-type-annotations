@@ -38,7 +38,7 @@ const Page = () => <html lang="en">
       <Split>
         <div>
           <Code title="Before" after="Runs with tools, crashes in a browser" lang='ts twoslash' emoji='💥' emojiName="explosion emoji to indicate the code failed">{`
-            const message: string = "<h2> types"
+            const message: string = "Hello, types"
             console.log(message)
             // @error: SyntaxError: Unexpected token ':'. const declared variable 'message' must have an initializer.`}
           </Code>
