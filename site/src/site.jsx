@@ -37,14 +37,14 @@ const Page = () => <html lang="en">
 
       <Split>
         <div>
-          <Code title="Before" lang='ts twoslash' emoji='💥' emojiName="explosion emoji to indicate the code failed">{`
-            const message: string = "<h2> types"
+          <Code title="Before" after="Runs with tools, crashes in a browser" lang='ts twoslash' emoji='💥' emojiName="explosion emoji to indicate the code failed">{`
+            const message: string = "Hello, types"
             console.log(message)
             // @error: SyntaxError: Unexpected token ':'. const declared variable 'message' must have an initializer.`}
           </Code>
         </div>
         <div>
-          <Code title="After" lang='ts twoslash' emoji='✅' emojiName='tick to indicate it passed'>{`
+          <Code title="After" after="Runs without tools, runs in a browser" lang='ts twoslash' emoji='✅' emojiName='tick to indicate it passed'>{`
             const message: string = "Hello, types"
             console.log(message)`}
           </Code>
@@ -177,7 +177,7 @@ const Page = () => <html lang="en">
         </Entry>
 
         <Entry title="Will this grow JavaScript bundle sizes?">
-          <p>It could, but if you are already bundling then you would have the types removed during that bundling process. Negating the issue for most apps where bundle size is an concern.</p>
+          <p>It could, but if you are already bundling then you would have the types removed during that bundling process. Negating the issue for most apps where bundle size is a concern.</p>
           <p>JavaScript files without a build-step would have more characters as a result of the types. This is the same trade-off as adding comments to files, and the same solutions apply, e.g. use a minifier.</p>
         </Entry>
 
@@ -200,17 +200,19 @@ const Page = () => <html lang="en">
         </Entry>  
 
         <Entry title="How does this affect runtime error messaging?">
-          <p>JavaScript today throws <code>SyntaxError</code> messages when it has evaluated invalid syntax. This will still be the same today, except for invalid code inside the areas designated for Types as Comments.</p>
+          <p>JavaScript today throws <code>SyntaxError</code> messages when it has evaluated invalid syntax. This will still be the same after the proposal, except for invalid code inside the areas designated for Types as Comments.</p>
+          <p>For example this typo in `message` would raise an error:</p>
           <Code lang="js twoslash">{`
             const mes sage: string = "Hello, types"
             // @error: SyntaxError: Unexpected token ':'. const declared variable 'message' must have an initializer.
 // @noErrors`}
           </Code>
-          <p>vs this 'error' in the types space:</p>
+          <p>Versus this 'error' in the types space (in TypeScript / Flow):</p>
           <Code lang="ts">{`
             const message: { abc=123 } = "Hello, types"`}
           </Code>
-          <p>Which would run perfectly fine in a JavaScript engine supporting this proposal, but fail in TypeScript or Flow. The proposal leaves type space errors to the IDE and type checker to declare the code inside the types are invalid, not the JavaScript runtime.</p>
+          <p>Which would run perfectly fine in a JavaScript engine supporting this proposal, but TypeScript or any other external type checker will catch those type errors. </p>
+          <p>The proposal leaves type space errors to the IDE and type checker to declare the code inside the types are invalid, not the JavaScript runtime.</p>
         </Entry>
 
          <Entry title="I'm new, what are these terms?">
