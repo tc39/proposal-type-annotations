@@ -181,7 +181,7 @@ const Page = () => <html lang="en">
           <p>JavaScript files without a build-step would have more characters as a result of the types. This is the same trade-off as adding comments to files, and the same solutions apply, e.g. use a minifier.</p>
         </Entry>
 
-        <Entry title="How does this differ from JSDoc support in editors?">
+        <Entry title="How does this differ from JSDoc support?">
           <p>Today JavaScript users use JSDoc syntax with tooling in order to create a type-system in JavaScript code without a build step. </p>
           <p>The syntax for JSDoc support is intentionally more verbose than type syntax, and is less ergonomic for complex typing as it is a documentation format. With this proposal, you can get JSDoc-like 'works without build tools' without the constraint of specially formatted comments.</p>
         </Entry>
@@ -211,7 +211,7 @@ const Page = () => <html lang="en">
           <Code lang="ts">{`
             const message: { abc=123 } = "Hello, types"`}
           </Code>
-          <p>Which would run perfectly fine in a JavaScript engine supporting this proposal, but TypeScript or Flow would show their own errors. </p>
+          <p>Which would run perfectly fine in a JavaScript engine supporting this proposal, but TypeScript or any other external type checker will catch those type errors. </p>
           <p>The proposal leaves type space errors to the IDE and type checker to declare the code inside the types are invalid, not the JavaScript runtime.</p>
         </Entry>
 
