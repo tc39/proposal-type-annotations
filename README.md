@@ -43,7 +43,7 @@ Additionally, TypeScript was currently listed as the 4th most-used language in [
 ### Trends in JavaScript Compilation
 
 The rise of type syntax in JavaScript coincided with the rise of *downlevel compilation* (sometimes called "transpilation").
-As ES2015 was standardized, JavaScript developers saw wonderful new features they could not immediately because of constraints around supporting older browsers.
+As ES2015 was standardized, JavaScript developers saw wonderful new features they could not immediately use because of constraints around supporting older browsers.
 For example, an arrow function could provide developer ergonomics, but wouldn't run on every end-user's machine.
 As a result, projects like Traceur, TypeScript, and Babel filled the gap by rewriting ES2015 code into equivalent code that would work on older runtimes.
 
