@@ -123,7 +123,7 @@ x = 100;
 
 The above example places an annotation on `x`.
 The type specified for `x` is `string`, and tools such as TypeScript can utilize that type;
-however, a JavaScript engine would execute every line here without error.
+however, a JavaScript engine that followed this proposal would execute every line here without error.
 This is because annotations do not change the semantics of a program, and are equivalent to comments.
 
 Annotations can also be placed on parameters to specify the types that they accept, and following the end of parameter lists to specify the return type of a function.
