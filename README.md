@@ -110,7 +110,7 @@ syntax to appear as-is in JavaScript source files, interpreted as comments.
 
 ### Type Annotations
 
-Type annotations allow a developer to explicitly state what a type is intended to be.
+Type annotations allow a developer to explicitly state what type a variable or expression is intended to be.
 Annotations follow the name or binding pattern of a declaration, and are followed by the actual type.
 
 ```ts
