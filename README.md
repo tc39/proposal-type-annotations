@@ -179,7 +179,7 @@ class Person {
 
 Annotated class members would contribute to the type produced by constructing a given class.
 In the above example, a type-checker could assume a new type named `Person`, with a property `name` of type `string` and a method `getGreeting` that returns a `string`;
-but like any other syntax in this proposal, these annotations not weigh into the runtime behavior of the program.
+but like any other syntax in this proposal, these annotations do not weigh into the runtime behavior of the program.
 
 ### Kinds of Types
 
