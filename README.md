@@ -631,6 +631,32 @@ However this situation already exists.
 Today, many users omit a build step and ship large amounts of comments and other extraneous information, e.g. unminified code.
 It remains a best practice to perform an ahead-of-time optimization step on code destined for production if the use-case is performance-sensitive.
 
+#### Are unchecked types a footgun?
+
+This proposal introduces type annotations that are explicitly **not** checked at runtime.
+This is intentional, to minimize the runtime cost of the annotations and to provide a consistent mental model.
+There is a risk that this may surprise users who assume that the runtime is performing checking and later run into unexpected bugs as a result.
+
+For today's users of external type-checkers, this is already the case.
+Anyone starting to use TypeScript could be surprised to find there is no runtime checking.
+In practice, this has not been a significant problem - users learn this early on and remember it.
+In fact, it would be more of a surprise to those users if those types did become runtime-checked.
+Therefore similar to the first question of "Does JavaScript need a type system?", this question has been answered, in part, by the widespread success of external type-checkers.
+
+#### How could runtime-checked types be added in future?
+
+At this point in time, it seems unlikely that JavaScript would adopt a pervasive runtime-checked type system due to the runtime performance overheads that would incur.
+That is one reason why this proposal endorses purely static types.
+
+If that sentiment changes in future and there was a strong desire to introduce runtime-checked types, we would need a syntax to differentiate checked vs unchecked types.
+Therefore we suggest reserving `:: <type>` as the primary token for binding checked types, acting as a stronger alternative to `: <type>` that is used for unchecked types.
+The reserved `:: <type>` form would explicitly be a `SyntaxError` to prevent future conflicts.
+
+```ts
+let a: number = 1;   // unchecked
+let b:: number = 2;  // checked
+```
+
 ## Prior Art
 
 #### Other languages that implemented the "types as comments" idea
