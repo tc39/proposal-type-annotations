@@ -207,7 +207,7 @@ The challenge with this is denoting the *end* of a type - this involves stating 
 An easy first step is to ensure that anything within matching parentheses and brackets (`(...)`, `[...]`, `{...}`, or `<...>`) can be immediately skipped.
 Going further is where things get harder.
 
-These rules have not yet been established, but will be explored in more detail.
+These rules have not yet been established, but will be explored in more detail upon advancement of this proposal.
 
 See also
 
@@ -228,74 +228,100 @@ function split(str: string, separator?: string) {
 }
 ```
 
-### Modules:  Importing and Exporting Types
+### Importing and Exporting Types
 
-#### Importing and Exporting Types
+As projects get bigger, code is split into modules, and sometimes a developer will need to refer to a type declared in another file.
 
-##### Type-only Statements
+Types declarations can be exported by prefixing them with the `export` keyword.
 
-The `type` keyword immediately after `import` or `export` means this is a ***type-only import/export*** that is entirely
-ignored by JavaScript.
-###### **Import**
 ```ts
-// type-only import statement
-import type { someType } from 'module';
+export type SpecialBool = boolean;
 
-// Aliasing type bindings using `as`.
-import type { someType as alias } from 'module';
+export interface Person {
+    name: string;
+    age: number;
+}
 ```
 
-###### **Export**
+Types can also be exported using an `export type` statement.
 
 ```ts
-type myType = number  
-interface myInterface {}
+export type { SomeLocalType };
 
-// type-only export statement
-export type { myType, myInterface }
-
-// Aliasing type bindings using `as`.
-export type { myType as aliasType }
+export type { SomeType as AnotherType } from "some-module";
 ```
 
-##### Type-only bindings Statements
+Correspondingly, another module can use an `import type` statement to reference these types.
 
-For mixed `imports` or `exports` containing both type and value bindings, the user can express which bindings are type-only by prefixing with `type` keyword.
-
-###### **Import**
 ```ts
-import { someValue, type someType, someOtherValue } from 'module'
+import type { Person } from "schema";
 
-// runtime treats as the following JavaScript... 
-import { someValue               , someOtherValue } from 'module'
+let person: Person;
+
+// or...
+
+import type * as schema from "schema";
+
+let person: schema.Person;
 ```
-or
-```ts
-import { type someType as aliasType } from 'module'
 
-// runtime treats as the following JavaScript... 
-import {                            } from 'module'
+These `type`-specified declarations act as comments as well.
+They would not trigger any resolution or inclusion of modules.
+Similarly, their named bindings are not validated, and thus there is no runtime error if a named binding references an entity that was never declared.
+Instead, design-time tools would be free to statically analyze these declarations and issue an error under such conditions.
+
+#### Type-Only Named Bindings
+
+Maintaining separate import statements for values and types can be cumbersome - especially when many modules export both types and values.
+
+```ts
+import { parseSourceFile } from "./parser";
+import type { SourceFile } from "./parser";
+
+// ...
+
+let file: SourceFile;
+try {
+    file = parseSourceFile(filePath);
+}
+catch {
+  // ...
+}
 ```
-> The delimiters are restricted to the binding clause. Meaning such imports are retained even if all bindings are declared type-only.
-###### **Export**
+
+To support `import` or `export` statements containing both type and value bindings, a user can express which bindings are type-only by prefixing them with the `type` keyword.
 
 ```ts
-type myType = number
-var myValue;
+import { parseSourceFile, type SourceFile } from "./parser";
+```
 
-export { myValue, type myType, myValue, type myType as aliasType }
+A major difference with the above is that such imports are retained even if all bindings are declared type-only.
 
-// runtime treats as the following JavaScript... 
-export { myValue,              myValue                           }
+```ts
+// This still imports "./parser" at runtime.
+import { type SourceFile } from "./parser";
 ```
  
-### Typecasting
+### Type Assertions
 
-A new operator, `as`, is defined, which takes as a left operand an expression,
-and a type as the right operand. It returns the left operand. Example
+Type systems do not have perfect information about the runtime type of an expression.
+In some cases, they will need be informed of a more-appropriate type at a given position.
+Type assertions - sometimes called casts - are a means of asserting an expression's static type.
 
 ```ts
-const point = JSON.parse(serializedPoint) as ({x: number, y: number})
+const point = JSON.parse(serializedPoint) as ({ x: number, y: number });
+```
+
+The term "type assertion" was chosen in TypeScript to distance from the idea of a "cast" which often has runtime implications.
+In contrast, type assertions have no runtime behavior.
+
+#### Non-Nullable Assertions
+
+One of the most common type-assertions is one to convince a type-system that a value is neither `null` nor `undefined`.
+One can write `x!.foo` to specify that `x` cannot be null or `undefined`.
+
+```ts
+document.getElementById("entry")!.innerText = "...";
 ```
 
 ### Generics
@@ -490,13 +516,6 @@ class Point {
 The above ideas try to strike a balance between not impeding too much on JavaScript
 syntax, enabling TypeScript and other type checkers to define any traits they want in the future,
 while breaking as little compatibility as possible with TypeScript. We're open to any of the four solutions presented here, or other ideas people may have.
-
-#### Null typeguards
-
-In TypeScript, one can write `x!.foo` to specify that `x` cannot be null,
-even if its type specifies that it can be. This is known as a [null typeguard](https://www.typescriptlang.org/docs/handbook/advanced-types.html#nullable-types).
-This construct is syntactic sugar for `(x as NonNullable<typeof x>)`. It's debatable whether this syntax
-should be included (as it feels somehow "deep" in the expression), but it would be straightforward to ignore a `!` and treat the expression as `x.foo`.
 
 ## FAQ
 
