@@ -641,7 +641,7 @@ For today's users of external type-checkers, this is already the case.
 Anyone starting to use TypeScript could be surprised to find there is no runtime checking.
 In practice, this has not been a significant problem - users learn this early on and remember it.
 In fact, it would be more of a surprise to those users if those types did become runtime-checked.
-Therefore similar to the first question of "Does JavaScript need a type system?", this question has been answered, in part, by the widespread success of external type-checkers.
+Therefore similar to the first question of "does JavaScript need a (static) type system?", this question has been answered, in part, by the widespread success of external type-checkers.
 
 #### How could runtime-checked types be added in future?
 
