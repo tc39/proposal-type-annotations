@@ -645,7 +645,7 @@ Therefore similar to the first question of "does JavaScript need a (static) type
 
 #### How could runtime-checked types be added in future?
 
-At this point in time, it seems unlikely that JavaScript would adopt a pervasive runtime-checked type system due to the runtime performance overheads that would incur.
+It seems unlikely that JavaScript would adopt a pervasive runtime-checked type system due to the runtime performance overhead that it would bring.
 That is one reason why this proposal endorses purely static types.
 
 If that sentiment changes in future and there was a strong desire to introduce runtime-checked types, we would need a syntax to differentiate between checked and unchecked types.
