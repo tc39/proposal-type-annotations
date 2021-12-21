@@ -648,7 +648,7 @@ Therefore similar to the first question of "does JavaScript need a (static) type
 At this point in time, it seems unlikely that JavaScript would adopt a pervasive runtime-checked type system due to the runtime performance overheads that would incur.
 That is one reason why this proposal endorses purely static types.
 
-If that sentiment changes in future and there was a strong desire to introduce runtime-checked types, we would need a syntax to differentiate checked vs unchecked types.
+If that sentiment changes in future and there was a strong desire to introduce runtime-checked types, we would need a syntax to differentiate between checked and unchecked types.
 Therefore we suggest reserving `:: <type>` as the primary token for binding checked types, acting as a stronger alternative to `: <type>` that is used for unchecked types.
 The reserved `:: <type>` form would explicitly be a `SyntaxError` to prevent future conflicts.
 
