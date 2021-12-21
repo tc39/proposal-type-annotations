@@ -634,7 +634,7 @@ It remains a best practice to perform an ahead-of-time optimization step on code
 #### Are unchecked types a footgun?
 
 This proposal introduces type annotations that are explicitly **not** checked at runtime.
-This is intentional to minimize the runtime cost of the annotations and to provide a consistent mental model.
+This is intentional to minimize the runtime cost of the annotations and to provide a consistent mental model in which the types do not affect program behaviour.
 There is a risk that this may surprise users who assume that the runtime is performing checking and later run into unexpected bugs as a result.
 
 For today's users of external type-checkers, this is already the case.
