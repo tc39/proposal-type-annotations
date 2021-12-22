@@ -324,6 +324,10 @@ One can write `x!.foo` to specify that `x` cannot be null or `undefined`.
 document.getElementById("entry")!.innerText = "...";
 ```
 
+In TypeScript, the non-null assertion operator has no runtime semantics, and this proposal would specify it similarly;
+but there is a case for adding non-nullable assertions as a runtime operator instead.
+If the champions come to the conclusion that the latter is preferred, this operator may warrant its own proposal.
+
 ### Generics
 
 Generics can appear in types and interfaces. They MUST start with a `<` after the identifier
