@@ -654,6 +654,33 @@ However this situation already exists.
 Today, many users omit a build step and ship large amounts of comments and other extraneous information, e.g. unminified code.
 It remains a best practice to perform an ahead-of-time optimization step on code destined for production if the use-case is performance-sensitive.
 
+#### Are unchecked types a footgun?
+
+This proposal introduces type annotations that are explicitly **not** checked at runtime.
+This is intentional to minimize the runtime cost of the annotations and to provide a consistent mental model in which the types do not affect program behavior.
+A potential risk is that users might not realize they need to run an external tool to find type errors, and consequently are surprised when type-related bugs arise in their type-annotated code.
+
+For today's users of external type-checkers, this risk already exists.
+Users mitigate this risk today via a combination of:
+
+- IDEs that perform type checking and proactively surface type errors
+- Integration of type checking into project development workflows, e.g. npm scripts, CI systems, `tsc`
+
+In some ways it would be more of a surprise to users if the types ***were*** runtime-checked.
+It is common in other languages for there to be minimal runtime checking.
+For example in C++ there is almost no checking at runtime except for some known cases such as when the programmer requests it, e.g. `dynamic_cast`.
+
+As has been seen with TypeScript, folk quickly learn that the types play no role at runtime.
+Therefore similar to the first question of "Does JavaScript need a static type system?", this question has been answered, in part, by the widespread success of external type-checkers.
+
+#### How could runtime-checked types be added in future?
+
+It seems unlikely that JavaScript would adopt a pervasive runtime-checked type system due to the runtime performance overhead that it would bring.
+While it's possible that there may have been room for improvement, past efforts such as [TS* (Swamy et al)](http://goto.ucsd.edu/~pvekris/docs/safets.pdf) have shown that runtime type-checking based on annotations adds a non-negligible slowdown.
+That is one reason why this proposal endorses purely static types.
+
+If there is a desire to keep language open to later adding runtime-checked types, in addition to the static types proposed here, we could make an explicit syntax reservation in the grammar to support both.
+
 ## Prior Art
 
 #### Other languages that implemented the "types as comments" idea
