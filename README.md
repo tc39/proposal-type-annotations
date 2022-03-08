@@ -454,7 +454,7 @@ At the moment, this proposal does not reserve space for ambient declarations, bu
 ### Function Overloads
 
 In existing type systems, functions declarations and methods may omit their body.
-This may be used to  form may be used for [TypeScript function overloading](https://www.typescriptlang.org/docs/handbook/functions.html#overloads). Example:
+This is used for [function overloading](https://www.typescriptlang.org/docs/handbook/functions.html#overloads), which communicates that the return type of a function varies with its inputs.
 
 ```ts
 function foo(x: number): number
@@ -533,8 +533,8 @@ We're open to any of the four solutions presented here, or other ideas people ma
 ### Does JavaScript need static type-checking?
 
 Given how much effort organizations and teams have put into building type-checkers and adopting them, the answer is **yes**.
-Perhaps not every developer will reach for static type-checking, **and that's okay**;
-however, the ecosystem demand is undeniable.
+Perhaps not every developer will reach for static type-checking, **and that's okay** - that's why this proposal makes type annotations entirely optional;
+however, the ecosystem demand for using types is undeniable.
 
 TypeScript has done a great job of demonstrating this - it's gained very widespread use with broad signals that people want to keep using it.
 It's opt-in, but it has a major presence in the ecosystem, and these days TypeScript support is seen as a huge advantage for libraries.
@@ -587,7 +587,6 @@ Instead there are tools that grow in popularity and evolve over time.
 Additionally, type checkers, such as Flow, Closure, and Hegel may wish to use this proposal to enable developers to use their type checkers to check their code.
 Making this proposal be only about TypeScript can hamper this effort.
 Amicable competition in this space would be beneficial to JavaScript as it can enable experimentation and and new ideas.
-We want to encourage 
 
 ### Why not unofficially build TS checking and compilation into various systems?
 
@@ -662,7 +661,7 @@ We believe that many developers would be motivated by removing a build step, but
 Given the fact that some TypeScript features are [out of scope](#intentional-omissions), and that standard JavaScript will not evolve as fast as TypeScript or support its variety of configurations, there will continue to be an advantage for many tools to support TypeScript in its fuller form, beyond what is potentially standardized as JavaScript.
 
 Some tools currently need a "plugin" or option to get TypeScript support working.
-This proposal would mean that these tools could support type syntax by default, as they could a standard, versionless, always-on common base for type syntax.
+This proposal would mean that these tools could support type syntax by default, forming a standard, versionless, always-on common base for type syntax.
 Full and prescriptive support for TypeScript, Flow, etc. could be remain an opt-in mode on top of that.
 
 ### What about compatibililty with ReasonML, PureScript, and other statically typed languages that compile to JavaScript?
