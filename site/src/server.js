@@ -1,11 +1,14 @@
+// @ts-check
 import { watch, readFileSync, writeFileSync, existsSync, mkdirSync } from "fs"
+import { readFile, writeFile } from "fs/promises";
 import { createServer } from "http"
 import { tmpdir } from "os";
 import { join } from "path";
 import { stdout } from "process";
 import { createRequire } from 'module';
 
-import { buildSync } from "esbuild";
+import { buildSync as esbuildSync } from "esbuild";
+import { build as buildEcmarkup } from "ecmarkup"
 import { WebSocketServer } from 'ws';
 import sass from "sass";
 
@@ -15,8 +18,14 @@ const build = async () => {
   const tmpFile = join(tmpdir(), "tc39-template.js")
   try {
 
+  const ecmarkupOutput = await buildEcmarkup("./src/grammar-input.html", path => readFile(path, { encoding: "utf-8" }), {
+    outfile: "./out/grammar.html"
+  });
+  for (const [filePath, content] of ecmarkupOutput.generatedFiles) {
+    await writeFile(filePath, content, "utf8")
+  }
   // Use esbuild to convert JSX -> JS and to bundle the necessary JS into a single file.
-  const result = buildSync({ logLevel: "warning", platform: "node", bundle: true, outfile: tmpFile, entryPoints: ['src/site.jsx'], external: ["remark-shiki-twoslash"] })
+  const result = esbuildSync({ logLevel: "warning", platform: "node", bundle: true, outfile: tmpFile, entryPoints: ['src/site.jsx'], external: ["remark-shiki-twoslash"] })
   if (!result.errors.length) {
       // This require is used inside the eval below.
       const require = createRequire(import.meta.url);

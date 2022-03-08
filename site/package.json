@@ -11,12 +11,19 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "ecmarkup": "^10.0.2",
     "esbuild": "^0.12.17",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "remark-shiki-twoslash": "^3.0.5",
     "sass": "^1.37.0",
     "ws": "^8.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.21",
+    "@types/react": "^17.0.39",
+    "@types/react-dom": "^17.0.13",
+    "typescript": "^4.6.2"
   },
   "keywords": [],
   "author": "Orta Therox + Types as Comments Contributors",
