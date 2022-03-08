@@ -1,0 +1,3385 @@
+<!doctype html>
+<head><meta charset="utf-8"><title>Types as Comments Proposed Grammar</title><script>'use strict';
+let sdoBox = {
+  init() {
+    this.$alternativeId = null;
+    this.$outer = document.createElement('div');
+    this.$outer.classList.add('toolbox-container');
+    this.$container = document.createElement('div');
+    this.$container.classList.add('toolbox');
+    this.$displayLink = document.createElement('a');
+    this.$displayLink.setAttribute('href', '#');
+    this.$displayLink.textContent = 'Syntax-Directed Operations';
+    this.$displayLink.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      referencePane.showSDOs(sdoMap[this.$alternativeId] || {}, this.$alternativeId);
+    });
+    this.$container.appendChild(this.$displayLink);
+    this.$outer.appendChild(this.$container);
+    document.body.appendChild(this.$outer);
+  },
+
+  activate(el) {
+    clearTimeout(this.deactiveTimeout);
+    Toolbox.deactivate();
+    this.$alternativeId = el.id;
+    let numSdos = Object.keys(sdoMap[this.$alternativeId] || {}).length;
+    this.$displayLink.textContent = 'Syntax-Directed Operations (' + numSdos + ')';
+    this.$outer.classList.add('active');
+    let top = el.offsetTop - this.$outer.offsetHeight;
+    let left = el.offsetLeft + 50 - 10; // 50px = padding-left(=75px) + text-indent(=-25px)
+    this.$outer.setAttribute('style', 'left: ' + left + 'px; top: ' + top + 'px');
+    if (top < document.body.scrollTop) {
+      this.$container.scrollIntoView();
+    }
+  },
+
+  deactivate() {
+    clearTimeout(this.deactiveTimeout);
+    this.$outer.classList.remove('active');
+  },
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof sdoMap == 'undefined') {
+    console.error('could not find sdo map');
+    return;
+  }
+  sdoBox.init();
+
+  let insideTooltip = false;
+  sdoBox.$outer.addEventListener('pointerenter', () => {
+    insideTooltip = true;
+  });
+  sdoBox.$outer.addEventListener('pointerleave', () => {
+    insideTooltip = false;
+    sdoBox.deactivate();
+  });
+
+  sdoBox.deactiveTimeout = null;
+  [].forEach.call(document.querySelectorAll('emu-grammar[type=definition] emu-rhs'), node => {
+    node.addEventListener('pointerenter', function () {
+      sdoBox.activate(this);
+    });
+
+    node.addEventListener('pointerleave', () => {
+      sdoBox.deactiveTimeout = setTimeout(() => {
+        if (!insideTooltip) {
+          sdoBox.deactivate();
+        }
+      }, 500);
+    });
+  });
+
+  document.addEventListener(
+    'keydown',
+    debounce(e => {
+      if (e.code === 'Escape') {
+        sdoBox.deactivate();
+      }
+    })
+  );
+});
+
+'use strict';
+function Search(menu) {
+  this.menu = menu;
+  this.$search = document.getElementById('menu-search');
+  this.$searchBox = document.getElementById('menu-search-box');
+  this.$searchResults = document.getElementById('menu-search-results');
+
+  this.loadBiblio();
+
+  document.addEventListener('keydown', this.documentKeydown.bind(this));
+
+  this.$searchBox.addEventListener(
+    'keydown',
+    debounce(this.searchBoxKeydown.bind(this), { stopPropagation: true })
+  );
+  this.$searchBox.addEventListener(
+    'keyup',
+    debounce(this.searchBoxKeyup.bind(this), { stopPropagation: true })
+  );
+
+  // Perform an initial search if the box is not empty.
+  if (this.$searchBox.value) {
+    this.search(this.$searchBox.value);
+  }
+}
+
+Search.prototype.loadBiblio = function () {
+  if (typeof biblio === 'undefined') {
+    console.error('could not find biblio');
+    this.biblio = { refToClause: {}, entries: [] };
+  } else {
+    this.biblio = biblio;
+    this.biblio.clauses = this.biblio.entries.filter(e => e.type === 'clause');
+    this.biblio.byId = this.biblio.entries.reduce((map, entry) => {
+      map[entry.id] = entry;
+      return map;
+    }, {});
+    let refParentClause = Object.create(null);
+    this.biblio.refParentClause = refParentClause;
+    let refsByClause = this.biblio.refsByClause;
+    Object.keys(refsByClause).forEach(clause => {
+      refsByClause[clause].forEach(ref => {
+        refParentClause[ref] = clause;
+      });
+    });
+  }
+};
+
+Search.prototype.documentKeydown = function (e) {
+  if (e.key === '/') {
+    e.preventDefault();
+    e.stopPropagation();
+    this.triggerSearch();
+  }
+};
+
+Search.prototype.searchBoxKeydown = function (e) {
+  e.stopPropagation();
+  e.preventDefault();
+  if (e.keyCode === 191 && e.target.value.length === 0) {
+    e.preventDefault();
+  } else if (e.keyCode === 13) {
+    e.preventDefault();
+    this.selectResult();
+  }
+};
+
+Search.prototype.searchBoxKeyup = function (e) {
+  if (e.keyCode === 13 || e.keyCode === 9) {
+    return;
+  }
+
+  this.search(e.target.value);
+};
+
+Search.prototype.triggerSearch = function () {
+  if (this.menu.isVisible()) {
+    this._closeAfterSearch = false;
+  } else {
+    this._closeAfterSearch = true;
+    this.menu.show();
+  }
+
+  this.$searchBox.focus();
+  this.$searchBox.select();
+};
+// bit 12 - Set if the result starts with searchString
+// bits 8-11: 8 - number of chunks multiplied by 2 if cases match, otherwise 1.
+// bits 1-7: 127 - length of the entry
+// General scheme: prefer case sensitive matches with fewer chunks, and otherwise
+// prefer shorter matches.
+function relevance(result) {
+  let relevance = 0;
+
+  relevance = Math.max(0, 8 - result.match.chunks) << 7;
+
+  if (result.match.caseMatch) {
+    relevance *= 2;
+  }
+
+  if (result.match.prefix) {
+    relevance += 2048;
+  }
+
+  relevance += Math.max(0, 255 - result.key.length);
+
+  return relevance;
+}
+
+Search.prototype.search = function (searchString) {
+  if (searchString === '') {
+    this.displayResults([]);
+    this.hideSearch();
+    return;
+  } else {
+    this.showSearch();
+  }
+
+  if (searchString.length === 1) {
+    this.displayResults([]);
+    return;
+  }
+
+  let results;
+
+  if (/^[\d.]*$/.test(searchString)) {
+    results = this.biblio.clauses
+      .filter(clause => clause.number.substring(0, searchString.length) === searchString)
+      .map(clause => ({ entry: clause }));
+  } else {
+    results = [];
+
+    for (let i = 0; i < this.biblio.entries.length; i++) {
+      let entry = this.biblio.entries[i];
+      let key = getKey(entry);
+      if (!key) {
+        // biblio entries without a key aren't searchable
+        continue;
+      }
+
+      let match = fuzzysearch(searchString, key);
+      if (match) {
+        results.push({ key, entry, match });
+      }
+    }
+
+    results.forEach(result => {
+      result.relevance = relevance(result, searchString);
+    });
+
+    results = results.sort((a, b) => b.relevance - a.relevance);
+  }
+
+  if (results.length > 50) {
+    results = results.slice(0, 50);
+  }
+
+  this.displayResults(results);
+};
+Search.prototype.hideSearch = function () {
+  this.$search.classList.remove('active');
+};
+
+Search.prototype.showSearch = function () {
+  this.$search.classList.add('active');
+};
+
+Search.prototype.selectResult = function () {
+  let $first = this.$searchResults.querySelector('li:first-child a');
+
+  if ($first) {
+    document.location = $first.getAttribute('href');
+  }
+
+  this.$searchBox.value = '';
+  this.$searchBox.blur();
+  this.displayResults([]);
+  this.hideSearch();
+
+  if (this._closeAfterSearch) {
+    this.menu.hide();
+  }
+};
+
+Search.prototype.displayResults = function (results) {
+  if (results.length > 0) {
+    this.$searchResults.classList.remove('no-results');
+
+    let html = '<ul>';
+
+    results.forEach(result => {
+      let key = result.key;
+      let entry = result.entry;
+      let id = entry.id;
+      let cssClass = '';
+      let text = '';
+
+      if (entry.type === 'clause') {
+        let number = entry.number ? entry.number + ' ' : '';
+        text = number + key;
+        cssClass = 'clause';
+        id = entry.id;
+      } else if (entry.type === 'production') {
+        text = key;
+        cssClass = 'prod';
+        id = entry.id;
+      } else if (entry.type === 'op') {
+        text = key;
+        cssClass = 'op';
+        id = entry.id || entry.refId;
+      } else if (entry.type === 'term') {
+        text = key;
+        cssClass = 'term';
+        id = entry.id || entry.refId;
+      }
+
+      if (text) {
+        // prettier-ignore
+        html += `<li class=menu-search-result-${cssClass}><a href="${makeLinkToId(id)}">${text}</a></li>`;
+      }
+    });
+
+    html += '</ul>';
+
+    this.$searchResults.innerHTML = html;
+  } else {
+    this.$searchResults.innerHTML = '';
+    this.$searchResults.classList.add('no-results');
+  }
+};
+
+function getKey(item) {
+  if (item.key) {
+    return item.key;
+  }
+  switch (item.type) {
+    case 'clause':
+      return item.title || item.titleHTML;
+    case 'production':
+      return item.name;
+    case 'op':
+      return item.aoid;
+    case 'term':
+      return item.term;
+    case 'table':
+    case 'figure':
+    case 'example':
+    case 'note':
+      return item.caption;
+    case 'step':
+      return item.id;
+    default:
+      throw new Error("Can't get key for " + item.type);
+  }
+}
+
+function Menu() {
+  this.$toggle = document.getElementById('menu-toggle');
+  this.$menu = document.getElementById('menu');
+  this.$toc = document.querySelector('menu-toc > ol');
+  this.$pins = document.querySelector('#menu-pins');
+  this.$pinList = document.getElementById('menu-pins-list');
+  this.$toc = document.querySelector('#menu-toc > ol');
+  this.$specContainer = document.getElementById('spec-container');
+  this.search = new Search(this);
+
+  this._pinnedIds = {};
+  this.loadPinEntries();
+
+  // toggle menu
+  this.$toggle.addEventListener('click', this.toggle.bind(this));
+
+  // keydown events for pinned clauses
+  document.addEventListener('keydown', this.documentKeydown.bind(this));
+
+  // toc expansion
+  let tocItems = this.$menu.querySelectorAll('#menu-toc li');
+  for (let i = 0; i < tocItems.length; i++) {
+    let $item = tocItems[i];
+    $item.addEventListener('click', event => {
+      $item.classList.toggle('active');
+      event.stopPropagation();
+    });
+  }
+
+  // close toc on toc item selection
+  let tocLinks = this.$menu.querySelectorAll('#menu-toc li > a');
+  for (let i = 0; i < tocLinks.length; i++) {
+    let $link = tocLinks[i];
+    $link.addEventListener('click', event => {
+      this.toggle();
+      event.stopPropagation();
+    });
+  }
+
+  // update active clause on scroll
+  window.addEventListener('scroll', debounce(this.updateActiveClause.bind(this)));
+  this.updateActiveClause();
+
+  // prevent menu scrolling from scrolling the body
+  this.$toc.addEventListener('wheel', e => {
+    let target = e.currentTarget;
+    let offTop = e.deltaY < 0 && target.scrollTop === 0;
+    if (offTop) {
+      e.preventDefault();
+    }
+    let offBottom = e.deltaY > 0 && target.offsetHeight + target.scrollTop >= target.scrollHeight;
+
+    if (offBottom) {
+      e.preventDefault();
+    }
+  });
+}
+
+Menu.prototype.documentKeydown = function (e) {
+  e.stopPropagation();
+  if (e.keyCode === 80) {
+    this.togglePinEntry();
+  } else if (e.keyCode > 48 && e.keyCode < 58) {
+    this.selectPin(e.keyCode - 49);
+  }
+};
+
+Menu.prototype.updateActiveClause = function () {
+  this.setActiveClause(findActiveClause(this.$specContainer));
+};
+
+Menu.prototype.setActiveClause = function (clause) {
+  this.$activeClause = clause;
+  this.revealInToc(this.$activeClause);
+};
+
+Menu.prototype.revealInToc = function (path) {
+  let current = this.$toc.querySelectorAll('li.revealed');
+  for (let i = 0; i < current.length; i++) {
+    current[i].classList.remove('revealed');
+    current[i].classList.remove('revealed-leaf');
+  }
+
+  current = this.$toc;
+  let index = 0;
+  outer: while (index < path.length) {
+    let children = current.children;
+    for (let i = 0; i < children.length; i++) {
+      if ('#' + path[index].id === children[i].children[1].hash) {
+        children[i].classList.add('revealed');
+        if (index === path.length - 1) {
+          children[i].classList.add('revealed-leaf');
+          let rect = children[i].getBoundingClientRect();
+          // this.$toc.getBoundingClientRect().top;
+          let tocRect = this.$toc.getBoundingClientRect();
+          if (rect.top + 10 > tocRect.bottom) {
+            this.$toc.scrollTop =
+              this.$toc.scrollTop + (rect.top - tocRect.bottom) + (rect.bottom - rect.top);
+          } else if (rect.top < tocRect.top) {
+            this.$toc.scrollTop = this.$toc.scrollTop - (tocRect.top - rect.top);
+          }
+        }
+        current = children[i].querySelector('ol');
+        index++;
+        continue outer;
+      }
+    }
+    console.log('could not find location in table of contents', path);
+    break;
+  }
+};
+
+function findActiveClause(root, path) {
+  let clauses = getChildClauses(root);
+  path = path || [];
+
+  for (let $clause of clauses) {
+    let rect = $clause.getBoundingClientRect();
+    let $header = $clause.querySelector('h1');
+    let marginTop = Math.max(
+      parseInt(getComputedStyle($clause)['margin-top']),
+      parseInt(getComputedStyle($header)['margin-top'])
+    );
+
+    if (rect.top - marginTop <= 1 && rect.bottom > 0) {
+      return findActiveClause($clause, path.concat($clause)) || path;
+    }
+  }
+
+  return path;
+}
+
+function* getChildClauses(root) {
+  for (let el of root.children) {
+    switch (el.nodeName) {
+      // descend into <emu-import>
+      case 'EMU-IMPORT':
+        yield* getChildClauses(el);
+        break;
+
+      // accept <emu-clause>, <emu-intro>, and <emu-annex>
+      case 'EMU-CLAUSE':
+      case 'EMU-INTRO':
+      case 'EMU-ANNEX':
+        yield el;
+    }
+  }
+}
+
+Menu.prototype.toggle = function () {
+  this.$menu.classList.toggle('active');
+};
+
+Menu.prototype.show = function () {
+  this.$menu.classList.add('active');
+};
+
+Menu.prototype.hide = function () {
+  this.$menu.classList.remove('active');
+};
+
+Menu.prototype.isVisible = function () {
+  return this.$menu.classList.contains('active');
+};
+
+Menu.prototype.showPins = function () {
+  this.$pins.classList.add('active');
+};
+
+Menu.prototype.hidePins = function () {
+  this.$pins.classList.remove('active');
+};
+
+Menu.prototype.addPinEntry = function (id) {
+  let entry = this.search.biblio.byId[id];
+  if (!entry) {
+    // id was deleted after pin (or something) so remove it
+    delete this._pinnedIds[id];
+    this.persistPinEntries();
+    return;
+  }
+
+  if (entry.type === 'clause') {
+    let prefix;
+    if (entry.number) {
+      prefix = entry.number + ' ';
+    } else {
+      prefix = '';
+    }
+    // prettier-ignore
+    this.$pinList.innerHTML += `<li><a href="${makeLinkToId(entry.id)}">${prefix}${entry.titleHTML}</a></li>`;
+  } else {
+    this.$pinList.innerHTML += `<li><a href="${makeLinkToId(entry.id)}">${getKey(entry)}</a></li>`;
+  }
+
+  if (Object.keys(this._pinnedIds).length === 0) {
+    this.showPins();
+  }
+  this._pinnedIds[id] = true;
+  this.persistPinEntries();
+};
+
+Menu.prototype.removePinEntry = function (id) {
+  let item = this.$pinList.querySelector(`a[href="${makeLinkToId(id)}"]`).parentNode;
+  this.$pinList.removeChild(item);
+  delete this._pinnedIds[id];
+  if (Object.keys(this._pinnedIds).length === 0) {
+    this.hidePins();
+  }
+
+  this.persistPinEntries();
+};
+
+Menu.prototype.persistPinEntries = function () {
+  try {
+    if (!window.localStorage) return;
+  } catch (e) {
+    return;
+  }
+
+  localStorage.pinEntries = JSON.stringify(Object.keys(this._pinnedIds));
+};
+
+Menu.prototype.loadPinEntries = function () {
+  try {
+    if (!window.localStorage) return;
+  } catch (e) {
+    return;
+  }
+
+  let pinsString = window.localStorage.pinEntries;
+  if (!pinsString) return;
+  let pins = JSON.parse(pinsString);
+  for (let i = 0; i < pins.length; i++) {
+    this.addPinEntry(pins[i]);
+  }
+};
+
+Menu.prototype.togglePinEntry = function (id) {
+  if (!id) {
+    id = this.$activeClause[this.$activeClause.length - 1].id;
+  }
+
+  if (this._pinnedIds[id]) {
+    this.removePinEntry(id);
+  } else {
+    this.addPinEntry(id);
+  }
+};
+
+Menu.prototype.selectPin = function (num) {
+  document.location = this.$pinList.children[num].children[0].href;
+};
+
+let menu;
+
+document.addEventListener('DOMContentLoaded', init);
+
+function debounce(fn, opts) {
+  opts = opts || {};
+  let timeout;
+  return function (e) {
+    if (opts.stopPropagation) {
+      e.stopPropagation();
+    }
+    let args = arguments;
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+    timeout = setTimeout(() => {
+      timeout = null;
+      fn.apply(this, args);
+    }, 150);
+  };
+}
+
+let CLAUSE_NODES = ['EMU-CLAUSE', 'EMU-INTRO', 'EMU-ANNEX'];
+function findContainer($elem) {
+  let parentClause = $elem.parentNode;
+  while (parentClause && CLAUSE_NODES.indexOf(parentClause.nodeName) === -1) {
+    parentClause = parentClause.parentNode;
+  }
+  return parentClause;
+}
+
+function findLocalReferences(parentClause, name) {
+  let vars = parentClause.querySelectorAll('var');
+  let references = [];
+
+  for (let i = 0; i < vars.length; i++) {
+    let $var = vars[i];
+
+    if ($var.innerHTML === name) {
+      references.push($var);
+    }
+  }
+
+  return references;
+}
+
+let REFERENCED_CLASSES = Array.from({ length: 7 }, (x, i) => `referenced${i}`);
+function chooseHighlightIndex(parentClause) {
+  let counts = REFERENCED_CLASSES.map($class => parentClause.getElementsByClassName($class).length);
+  // Find the earliest index with the lowest count.
+  let minCount = Infinity;
+  let index = null;
+  for (let i = 0; i < counts.length; i++) {
+    if (counts[i] < minCount) {
+      minCount = counts[i];
+      index = i;
+    }
+  }
+  return index;
+}
+
+function toggleFindLocalReferences($elem) {
+  let parentClause = findContainer($elem);
+  let references = findLocalReferences(parentClause, $elem.innerHTML);
+  if ($elem.classList.contains('referenced')) {
+    references.forEach($reference => {
+      $reference.classList.remove('referenced', ...REFERENCED_CLASSES);
+    });
+  } else {
+    let index = chooseHighlightIndex(parentClause);
+    references.forEach($reference => {
+      $reference.classList.add('referenced', `referenced${index}`);
+    });
+  }
+}
+
+function installFindLocalReferences() {
+  document.addEventListener('click', e => {
+    if (e.target.nodeName === 'VAR') {
+      toggleFindLocalReferences(e.target);
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', installFindLocalReferences);
+
+// The following license applies to the fuzzysearch function
+// The MIT License (MIT)
+// Copyright © 2015 Nicolas Bevacqua
+// Copyright © 2016 Brian Terlson
+// Permission is hereby granted, free of charge, to any person obtaining a copy of
+// this software and associated documentation files (the "Software"), to deal in
+// the Software without restriction, including without limitation the rights to
+// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+// the Software, and to permit persons to whom the Software is furnished to do so,
+// subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+function fuzzysearch(searchString, haystack, caseInsensitive) {
+  let tlen = haystack.length;
+  let qlen = searchString.length;
+  let chunks = 1;
+  let finding = false;
+
+  if (qlen > tlen) {
+    return false;
+  }
+
+  if (qlen === tlen) {
+    if (searchString === haystack) {
+      return { caseMatch: true, chunks: 1, prefix: true };
+    } else if (searchString.toLowerCase() === haystack.toLowerCase()) {
+      return { caseMatch: false, chunks: 1, prefix: true };
+    } else {
+      return false;
+    }
+  }
+
+  let j = 0;
+  outer: for (let i = 0; i < qlen; i++) {
+    let nch = searchString[i];
+    while (j < tlen) {
+      let targetChar = haystack[j++];
+      if (targetChar === nch) {
+        finding = true;
+        continue outer;
+      }
+      if (finding) {
+        chunks++;
+        finding = false;
+      }
+    }
+
+    if (caseInsensitive) {
+      return false;
+    }
+
+    return fuzzysearch(searchString.toLowerCase(), haystack.toLowerCase(), true);
+  }
+
+  return { caseMatch: !caseInsensitive, chunks, prefix: j <= qlen };
+}
+
+let referencePane = {
+  init() {
+    this.$container = document.createElement('div');
+    this.$container.setAttribute('id', 'references-pane-container');
+
+    let $spacer = document.createElement('div');
+    $spacer.setAttribute('id', 'references-pane-spacer');
+
+    this.$pane = document.createElement('div');
+    this.$pane.setAttribute('id', 'references-pane');
+
+    this.$container.appendChild($spacer);
+    this.$container.appendChild(this.$pane);
+
+    this.$header = document.createElement('div');
+    this.$header.classList.add('menu-pane-header');
+    this.$headerText = document.createElement('span');
+    this.$header.appendChild(this.$headerText);
+    this.$headerRefId = document.createElement('a');
+    this.$header.appendChild(this.$headerRefId);
+    this.$closeButton = document.createElement('span');
+    this.$closeButton.setAttribute('id', 'references-pane-close');
+    this.$closeButton.addEventListener('click', () => {
+      this.deactivate();
+    });
+    this.$header.appendChild(this.$closeButton);
+
+    this.$pane.appendChild(this.$header);
+    let tableContainer = document.createElement('div');
+    tableContainer.setAttribute('id', 'references-pane-table-container');
+
+    this.$table = document.createElement('table');
+    this.$table.setAttribute('id', 'references-pane-table');
+
+    this.$tableBody = this.$table.createTBody();
+
+    tableContainer.appendChild(this.$table);
+    this.$pane.appendChild(tableContainer);
+
+    menu.$specContainer.appendChild(this.$container);
+  },
+
+  activate() {
+    this.$container.classList.add('active');
+  },
+
+  deactivate() {
+    this.$container.classList.remove('active');
+    this.state = null;
+  },
+
+  showReferencesFor(entry) {
+    this.activate();
+    this.state = { type: 'ref', id: entry.id };
+    this.$headerText.textContent = 'References to ';
+    let newBody = document.createElement('tbody');
+    let previousId;
+    let previousCell;
+    let dupCount = 0;
+    this.$headerRefId.textContent = '#' + entry.id;
+    this.$headerRefId.setAttribute('href', makeLinkToId(entry.id));
+    this.$headerRefId.style.display = 'inline';
+    (entry.referencingIds || [])
+      .map(id => {
+        let cid = menu.search.biblio.refParentClause[id];
+        let clause = menu.search.biblio.byId[cid];
+        if (clause == null) {
+          throw new Error('could not find clause for id ' + cid);
+        }
+        return { id, clause };
+      })
+      .sort((a, b) => sortByClauseNumber(a.clause, b.clause))
+      .forEach(record => {
+        if (previousId === record.clause.id) {
+          previousCell.innerHTML += ` (<a href="${makeLinkToId(record.id)}">${dupCount + 2}</a>)`;
+          dupCount++;
+        } else {
+          let row = newBody.insertRow();
+          let cell = row.insertCell();
+          cell.innerHTML = record.clause.number;
+          cell = row.insertCell();
+          cell.innerHTML = `<a href="${makeLinkToId(record.id)}">${record.clause.titleHTML}</a>`;
+          previousCell = cell;
+          previousId = record.clause.id;
+          dupCount = 0;
+        }
+      }, this);
+    this.$table.removeChild(this.$tableBody);
+    this.$tableBody = newBody;
+    this.$table.appendChild(this.$tableBody);
+  },
+
+  showSDOs(sdos, alternativeId) {
+    let rhs = document.getElementById(alternativeId);
+    let parentName = rhs.parentNode.getAttribute('name');
+    let colons = rhs.parentNode.querySelector('emu-geq');
+    rhs = rhs.cloneNode(true);
+    rhs.querySelectorAll('emu-params,emu-constraints').forEach(e => {
+      e.remove();
+    });
+    rhs.querySelectorAll('[id]').forEach(e => {
+      e.removeAttribute('id');
+    });
+    rhs.querySelectorAll('a').forEach(e => {
+      e.parentNode.replaceChild(document.createTextNode(e.textContent), e);
+    });
+
+    // prettier-ignore
+    this.$headerText.innerHTML = `Syntax-Directed Operations for<br><a href="${makeLinkToId(alternativeId)}" class="menu-pane-header-production"><emu-nt>${parentName}</emu-nt> ${colons.outerHTML} </a>`;
+    this.$headerText.querySelector('a').append(rhs);
+    this.showSDOsBody(sdos, alternativeId);
+  },
+
+  showSDOsBody(sdos, alternativeId) {
+    this.activate();
+    this.state = { type: 'sdo', id: alternativeId, html: this.$headerText.innerHTML };
+    this.$headerRefId.style.display = 'none';
+    let newBody = document.createElement('tbody');
+    Object.keys(sdos).forEach(sdoName => {
+      let pair = sdos[sdoName];
+      let clause = pair.clause;
+      let ids = pair.ids;
+      let first = ids[0];
+      let row = newBody.insertRow();
+      let cell = row.insertCell();
+      cell.innerHTML = clause;
+      cell = row.insertCell();
+      let html = '<a href="' + makeLinkToId(first) + '">' + sdoName + '</a>';
+      for (let i = 1; i < ids.length; ++i) {
+        html += ' (<a href="' + makeLinkToId(ids[i]) + '">' + (i + 1) + '</a>)';
+      }
+      cell.innerHTML = html;
+    });
+    this.$table.removeChild(this.$tableBody);
+    this.$tableBody = newBody;
+    this.$table.appendChild(this.$tableBody);
+  },
+};
+
+let Toolbox = {
+  init() {
+    this.$outer = document.createElement('div');
+    this.$outer.classList.add('toolbox-container');
+    this.$container = document.createElement('div');
+    this.$container.classList.add('toolbox');
+    this.$outer.appendChild(this.$container);
+    this.$permalink = document.createElement('a');
+    this.$permalink.textContent = 'Permalink';
+    this.$pinLink = document.createElement('a');
+    this.$pinLink.textContent = 'Pin';
+    this.$pinLink.setAttribute('href', '#');
+    this.$pinLink.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      menu.togglePinEntry(this.entry.id);
+    });
+
+    this.$refsLink = document.createElement('a');
+    this.$refsLink.setAttribute('href', '#');
+    this.$refsLink.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      referencePane.showReferencesFor(this.entry);
+    });
+    this.$container.appendChild(this.$permalink);
+    this.$container.appendChild(this.$pinLink);
+    this.$container.appendChild(this.$refsLink);
+    document.body.appendChild(this.$outer);
+  },
+
+  activate(el, entry, target) {
+    if (el === this._activeEl) return;
+    sdoBox.deactivate();
+    this.active = true;
+    this.entry = entry;
+    this.$outer.classList.add('active');
+    this.top = el.offsetTop - this.$outer.offsetHeight;
+    this.left = el.offsetLeft - 10;
+    this.$outer.setAttribute('style', 'left: ' + this.left + 'px; top: ' + this.top + 'px');
+    this.updatePermalink();
+    this.updateReferences();
+    this._activeEl = el;
+    if (this.top < document.body.scrollTop && el === target) {
+      // don't scroll unless it's a small thing (< 200px)
+      this.$outer.scrollIntoView();
+    }
+  },
+
+  updatePermalink() {
+    this.$permalink.setAttribute('href', makeLinkToId(this.entry.id));
+  },
+
+  updateReferences() {
+    this.$refsLink.textContent = `References (${(this.entry.referencingIds || []).length})`;
+  },
+
+  activateIfMouseOver(e) {
+    let ref = this.findReferenceUnder(e.target);
+    if (ref && (!this.active || e.pageY > this._activeEl.offsetTop)) {
+      let entry = menu.search.biblio.byId[ref.id];
+      this.activate(ref.element, entry, e.target);
+    } else if (
+      this.active &&
+      (e.pageY < this.top || e.pageY > this._activeEl.offsetTop + this._activeEl.offsetHeight)
+    ) {
+      this.deactivate();
+    }
+  },
+
+  findReferenceUnder(el) {
+    while (el) {
+      let parent = el.parentNode;
+      if (el.nodeName === 'EMU-RHS' || el.nodeName === 'EMU-PRODUCTION') {
+        return null;
+      }
+      if (
+        el.nodeName === 'H1' &&
+        parent.nodeName.match(/EMU-CLAUSE|EMU-ANNEX|EMU-INTRO/) &&
+        parent.id
+      ) {
+        return { element: el, id: parent.id };
+      } else if (el.nodeName === 'EMU-NT') {
+        if (
+          parent.nodeName === 'EMU-PRODUCTION' &&
+          parent.id &&
+          parent.id[0] !== '_' &&
+          parent.firstElementChild === el
+        ) {
+          // return the LHS non-terminal element
+          return { element: el, id: parent.id };
+        }
+        return null;
+      } else if (
+        el.nodeName.match(/EMU-(?!CLAUSE|XREF|ANNEX|INTRO)|DFN/) &&
+        el.id &&
+        el.id[0] !== '_'
+      ) {
+        if (
+          el.nodeName === 'EMU-FIGURE' ||
+          el.nodeName === 'EMU-TABLE' ||
+          el.nodeName === 'EMU-EXAMPLE'
+        ) {
+          // return the figcaption element
+          return { element: el.children[0].children[0], id: el.id };
+        } else {
+          return { element: el, id: el.id };
+        }
+      }
+      el = parent;
+    }
+  },
+
+  deactivate() {
+    this.$outer.classList.remove('active');
+    this._activeEl = null;
+    this.active = false;
+  },
+};
+
+function sortByClauseNumber(clause1, clause2) {
+  let c1c = clause1.number.split('.');
+  let c2c = clause2.number.split('.');
+
+  for (let i = 0; i < c1c.length; i++) {
+    if (i >= c2c.length) {
+      return 1;
+    }
+
+    let c1 = c1c[i];
+    let c2 = c2c[i];
+    let c1cn = Number(c1);
+    let c2cn = Number(c2);
+
+    if (Number.isNaN(c1cn) && Number.isNaN(c2cn)) {
+      if (c1 > c2) {
+        return 1;
+      } else if (c1 < c2) {
+        return -1;
+      }
+    } else if (!Number.isNaN(c1cn) && Number.isNaN(c2cn)) {
+      return -1;
+    } else if (Number.isNaN(c1cn) && !Number.isNaN(c2cn)) {
+      return 1;
+    } else if (c1cn > c2cn) {
+      return 1;
+    } else if (c1cn < c2cn) {
+      return -1;
+    }
+  }
+
+  if (c1c.length === c2c.length) {
+    return 0;
+  }
+  return -1;
+}
+
+function makeLinkToId(id) {
+  let hash = '#' + id;
+  if (typeof idToSection === 'undefined' || !idToSection[id]) {
+    return hash;
+  }
+  let targetSec = idToSection[id];
+  return (targetSec === 'index' ? './' : targetSec + '.html') + hash;
+}
+
+function doShortcut(e) {
+  if (!(e.target instanceof HTMLElement)) {
+    return;
+  }
+  let target = e.target;
+  let name = target.nodeName.toLowerCase();
+  if (name === 'textarea' || name === 'input' || name === 'select' || target.isContentEditable) {
+    return;
+  }
+  if (e.altKey || e.ctrlKey || e.metaKey) {
+    return;
+  }
+  if (e.key === 'm' && usesMultipage) {
+    let pathParts = location.pathname.split('/');
+    let hash = location.hash;
+    if (pathParts[pathParts.length - 2] === 'multipage') {
+      if (hash === '') {
+        let sectionName = pathParts[pathParts.length - 1];
+        if (sectionName.endsWith('.html')) {
+          sectionName = sectionName.slice(0, -5);
+        }
+        if (idToSection['sec-' + sectionName] !== undefined) {
+          hash = '#sec-' + sectionName;
+        }
+      }
+      location = pathParts.slice(0, -2).join('/') + '/' + hash;
+    } else {
+      location = 'multipage/' + hash;
+    }
+  } else if (e.key === 'u') {
+    document.documentElement.classList.toggle('show-ao-annotations');
+  } else if (e.key === '?') {
+    document.getElementById('shortcuts-help').classList.toggle('active');
+  }
+}
+
+function init() {
+  menu = new Menu();
+  let $container = document.getElementById('spec-container');
+  $container.addEventListener(
+    'mouseover',
+    debounce(e => {
+      Toolbox.activateIfMouseOver(e);
+    })
+  );
+  document.addEventListener(
+    'keydown',
+    debounce(e => {
+      if (e.code === 'Escape') {
+        if (Toolbox.active) {
+          Toolbox.deactivate();
+        }
+        document.getElementById('shortcuts-help').classList.remove('active');
+      }
+    })
+  );
+}
+
+document.addEventListener('keypress', doShortcut);
+
+document.addEventListener('DOMContentLoaded', () => {
+  Toolbox.init();
+  referencePane.init();
+});
+
+'use strict';
+let decimalBullet = Array.from({ length: 100 }, (a, i) => '' + (i + 1));
+let alphaBullet = Array.from({ length: 26 }, (a, i) => String.fromCharCode('a'.charCodeAt(0) + i));
+
+// prettier-ignore
+let romanBullet = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x', 'xi', 'xii', 'xiii', 'xiv', 'xv', 'xvi', 'xvii', 'xviii', 'xix', 'xx', 'xxi', 'xxii', 'xxiii', 'xxiv', 'xxv'];
+// prettier-ignore
+let bullets = [decimalBullet, alphaBullet, romanBullet, decimalBullet, alphaBullet, romanBullet];
+
+function addStepNumberText(ol, parentIndex) {
+  for (let i = 0; i < ol.children.length; ++i) {
+    let child = ol.children[i];
+    let index = parentIndex.concat([i]);
+    let applicable = bullets[Math.min(index.length - 1, 5)];
+    let span = document.createElement('span');
+    span.textContent = (applicable[i] || '?') + '. ';
+    span.style.fontSize = '0';
+    span.setAttribute('aria-hidden', 'true');
+    child.prepend(span);
+    let sublist = child.querySelector('ol');
+    if (sublist != null) {
+      addStepNumberText(sublist, index);
+    }
+  }
+}
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('emu-alg > ol').forEach(ol => {
+    addStepNumberText(ol, []);
+  });
+});
+
+let sdoMap = JSON.parse(`{}`);
+let biblio = JSON.parse(`{"refsByClause":{},"entries":[{"type":"clause","id":"modified-productions","titleHTML":"Modified Productions","number":"1"},{"type":"clause","id":"new-productions","titleHTML":"New Productions","number":"2"}]}`);
+;let usesMultipage = false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.0.1/styles/base16/solarized-light.min.css"><style>body {
+  display: flex;
+  font-size: 18px;
+  line-height: 1.5;
+  font-family: Cambria, Palatino Linotype, Palatino, Liberation Serif, serif;
+  padding: 0;
+  margin: 0;
+  color: #111;
+}
+
+#spec-container {
+  padding: 0 20px;
+  flex-grow: 1;
+  flex-basis: 66%;
+  box-sizing: border-box;
+  overflow: hidden;
+  padding-bottom: 1em;
+}
+
+body.oldtoc {
+  margin: 0 auto;
+}
+
+a {
+  text-decoration: none;
+  color: #206ca7;
+}
+
+a:visited {
+  color: #206ca7;
+}
+
+a:hover {
+  text-decoration: underline;
+  color: #239dee;
+}
+
+a.e-user-code,
+span.e-user-code {
+  white-space: nowrap;
+}
+
+a.e-user-code::before,
+span.e-user-code::before {
+  display: none;
+  color: brown;
+  background-color: white;
+  border: 2pt solid brown;
+  padding: 0.3ex;
+  margin: 0 0.25em 0 0;
+  line-height: 1;
+  vertical-align: text-top;
+  text-transform: uppercase;
+  font-family: 'Comic Code', sans-serif;
+  font-weight: 900;
+  font-size: x-small;
+}
+
+a.e-user-code:hover::before,
+span.e-user-code:hover::before {
+  background-color: brown;
+  color: white;
+}
+
+html.show-ao-annotations a.e-user-code::before,
+html.show-ao-annotations span.e-user-code::before {
+  display: inline-block;
+}
+
+a.e-user-code::before,
+span.e-user-code::before {
+  content: 'UC';
+}
+
+code {
+  font-weight: bold;
+  font-family: Consolas, Monaco, monospace;
+  white-space: pre;
+}
+
+pre code {
+  font-weight: inherit;
+}
+
+pre code.hljs {
+  background-color: #fff;
+  margin: 0;
+  padding: 0;
+}
+
+ol.toc {
+  list-style: none;
+  padding-left: 0;
+}
+
+ol.toc ol.toc {
+  padding-left: 2ex;
+  list-style: none;
+}
+
+var {
+  color: #2aa198;
+  transition: background-color 0.25s ease;
+  cursor: pointer;
+}
+
+var.referenced0 {
+  color: inherit;
+  background-color: #ffff33;
+  box-shadow: 0 0 0 2px #ffff33;
+}
+var.referenced1 {
+  color: inherit;
+  background-color: #ff87a2;
+  box-shadow: 0 0 0 2px #ff87a2;
+}
+var.referenced2 {
+  color: inherit;
+  background-color: #96e885;
+  box-shadow: 0 0 0 2px #96e885;
+}
+var.referenced3 {
+  color: inherit;
+  background-color: #3eeed2;
+  box-shadow: 0 0 0 2px #3eeed2;
+}
+var.referenced4 {
+  color: inherit;
+  background-color: #eacfb6;
+  box-shadow: 0 0 0 2px #eacfb6;
+}
+var.referenced5 {
+  color: inherit;
+  background-color: #82ddff;
+  box-shadow: 0 0 0 2px #82ddff;
+}
+var.referenced6 {
+  color: inherit;
+  background-color: #ffbcf2;
+  box-shadow: 0 0 0 2px #ffbcf2;
+}
+
+emu-const {
+  font-family: sans-serif;
+}
+
+emu-val {
+  font-weight: bold;
+}
+
+/* depth 1 */
+emu-alg ol,
+/* depth 4 */
+emu-alg ol ol ol ol,
+emu-alg ol.nested-thrice,
+emu-alg ol.nested-twice ol,
+emu-alg ol.nested-once ol ol {
+  list-style-type: decimal;
+}
+
+/* depth 2 */
+emu-alg ol ol,
+emu-alg ol.nested-once,
+/* depth 5 */
+emu-alg ol ol ol ol ol,
+emu-alg ol.nested-four-times,
+emu-alg ol.nested-thrice ol,
+emu-alg ol.nested-twice ol ol,
+emu-alg ol.nested-once ol ol ol {
+  list-style-type: lower-alpha;
+}
+
+/* depth 3 */
+emu-alg ol ol ol,
+emu-alg ol.nested-twice,
+emu-alg ol.nested-once ol,
+/* depth 6 */
+emu-alg ol ol ol ol ol ol,
+emu-alg ol.nested-lots,
+emu-alg ol.nested-four-times ol,
+emu-alg ol.nested-thrice ol ol,
+emu-alg ol.nested-twice ol ol ol,
+emu-alg ol.nested-once ol ol ol ol,
+/* depth 7+ */
+emu-alg ol.nested-lots ol {
+  list-style-type: lower-roman;
+}
+
+emu-eqn {
+  display: block;
+  margin-left: 4em;
+}
+
+emu-eqn.inline {
+  display: inline;
+  margin: 0;
+}
+
+emu-eqn div:first-child {
+  margin-left: -2em;
+}
+
+emu-note {
+  margin: 1em 0;
+  display: flex;
+  flex-direction: row;
+  color: inherit;
+  border-left: 5px solid #52e052;
+  background: #e9fbe9;
+  padding: 10px 10px 10px 0;
+}
+
+emu-note > span.note {
+  flex-basis: 100px;
+  min-width: 100px;
+  flex-grow: 0;
+  flex-shrink: 1;
+  text-transform: uppercase;
+  padding-left: 5px;
+}
+
+emu-note[type='editor'] {
+  border-left-color: #faa;
+}
+
+emu-note > div.note-contents {
+  flex-grow: 1;
+  flex-shrink: 1;
+  overflow: auto;
+}
+
+emu-note > div.note-contents > p:first-of-type {
+  margin-top: 0;
+}
+
+emu-note > div.note-contents > p:last-of-type {
+  margin-bottom: 0;
+}
+
+emu-table td code {
+  white-space: normal;
+}
+
+emu-figure {
+  display: block;
+}
+
+emu-example {
+  display: block;
+  margin: 1em 3em;
+}
+
+emu-example figure figcaption {
+  margin-top: 0.5em;
+  text-align: left;
+}
+
+emu-figure figure,
+emu-example figure,
+emu-table figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+emu-production {
+  display: block;
+}
+
+emu-grammar[type='example'] emu-production,
+emu-grammar[type='definition'] emu-production {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  margin-left: 5ex;
+}
+
+emu-grammar.inline,
+emu-production.inline,
+emu-grammar.inline emu-production emu-rhs,
+emu-production.inline emu-rhs,
+emu-grammar[collapsed] emu-production emu-rhs {
+  display: inline;
+  padding-left: 1ex;
+  margin-left: 0;
+}
+
+emu-production[collapsed] emu-rhs {
+  display: inline;
+  padding-left: 0.5ex;
+  margin-left: 0;
+}
+
+emu-grammar[collapsed] emu-production,
+emu-production[collapsed] {
+  margin: 0;
+}
+
+emu-constraints {
+  font-size: 0.75em;
+  margin-right: 0.5ex;
+}
+
+emu-gann {
+  margin-right: 0.5ex;
+}
+
+emu-gann emu-t:last-child,
+emu-gann emu-gprose:last-child,
+emu-gann emu-nt:last-child {
+  margin-right: 0;
+}
+
+emu-geq {
+  margin-left: 0.5ex;
+  font-weight: bold;
+}
+
+emu-oneof {
+  font-weight: bold;
+  margin-left: 0.5ex;
+}
+
+emu-nt {
+  display: inline-block;
+  font-style: italic;
+  white-space: nowrap;
+  text-indent: 0;
+}
+
+emu-nt a,
+emu-nt a:visited {
+  color: #333;
+}
+
+emu-rhs emu-nt {
+  margin-right: 0.5ex;
+}
+
+emu-t {
+  display: inline-block;
+  font-family: monospace;
+  font-weight: bold;
+  white-space: nowrap;
+  text-indent: 0;
+}
+
+emu-production emu-t {
+  margin-right: 0.5ex;
+}
+
+emu-rhs {
+  display: block;
+  padding-left: 75px;
+  text-indent: -25px;
+}
+
+emu-production:not([collapsed]) emu-rhs {
+  border: 0.2ex dashed transparent;
+}
+
+emu-production:not([collapsed]) emu-rhs:hover {
+  border-color: #888;
+  background-color: #f0f0f0;
+}
+
+emu-mods {
+  font-size: 0.85em;
+  vertical-align: sub;
+  font-style: normal;
+  font-weight: normal;
+}
+
+emu-params,
+emu-opt {
+  margin-right: 1ex;
+  font-family: monospace;
+}
+
+emu-params,
+emu-constraints {
+  color: #2aa198;
+}
+
+emu-opt {
+  color: #b58900;
+}
+
+emu-gprose {
+  font-size: 0.9em;
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+emu-production emu-gprose {
+  margin-right: 1ex;
+}
+
+h1.shortname {
+  color: #f60;
+  font-size: 1.5em;
+  margin: 0;
+}
+
+h1.version {
+  color: #f60;
+  font-size: 1.5em;
+}
+
+h1.title {
+  color: #f60;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  position: relative;
+}
+
+h1 .secnum {
+  text-decoration: none;
+  margin-right: 5px;
+}
+
+h1 span.title {
+  order: 2;
+}
+
+h1 {
+  font-size: 2.67em;
+  margin-bottom: 0;
+  line-height: 1em;
+}
+h2 {
+  font-size: 2em;
+}
+h3 {
+  font-size: 1.56em;
+}
+h4 {
+  font-size: 1.25em;
+}
+h5 {
+  font-size: 1.11em;
+}
+h6 {
+  font-size: 1em;
+}
+
+pre code.hljs {
+  background: transparent;
+}
+
+emu-clause[id],
+emu-annex[id],
+emu-intro[id] {
+  scroll-margin-top: 2ex;
+}
+
+emu-intro h1,
+emu-clause h1,
+emu-annex h1 {
+  font-size: 2em;
+}
+emu-intro h2,
+emu-clause h2,
+emu-annex h2 {
+  font-size: 1.56em;
+}
+emu-intro h3,
+emu-clause h3,
+emu-annex h3 {
+  font-size: 1.25em;
+}
+emu-intro h4,
+emu-clause h4,
+emu-annex h4 {
+  font-size: 1.11em;
+}
+emu-intro h5,
+emu-clause h5,
+emu-annex h5 {
+  font-size: 1em;
+}
+emu-intro h6,
+emu-clause h6,
+emu-annex h6 {
+  font-size: 0.9em;
+}
+emu-intro emu-intro h1,
+emu-clause emu-clause h1,
+emu-annex emu-annex h1 {
+  font-size: 1.56em;
+}
+emu-intro emu-intro h2,
+emu-clause emu-clause h2,
+emu-annex emu-annex h2 {
+  font-size: 1.25em;
+}
+emu-intro emu-intro h3,
+emu-clause emu-clause h3,
+emu-annex emu-annex h3 {
+  font-size: 1.11em;
+}
+emu-intro emu-intro h4,
+emu-clause emu-clause h4,
+emu-annex emu-annex h4 {
+  font-size: 1em;
+}
+emu-intro emu-intro h5,
+emu-clause emu-clause h5,
+emu-annex emu-annex h5 {
+  font-size: 0.9em;
+}
+emu-intro emu-intro emu-intro h1,
+emu-clause emu-clause emu-clause h1,
+emu-annex emu-annex emu-annex h1 {
+  font-size: 1.25em;
+}
+emu-intro emu-intro emu-intro h2,
+emu-clause emu-clause emu-clause h2,
+emu-annex emu-annex emu-annex h2 {
+  font-size: 1.11em;
+}
+emu-intro emu-intro emu-intro h3,
+emu-clause emu-clause emu-clause h3,
+emu-annex emu-annex emu-annex h3 {
+  font-size: 1em;
+}
+emu-intro emu-intro emu-intro h4,
+emu-clause emu-clause emu-clause h4,
+emu-annex emu-annex emu-annex h4 {
+  font-size: 0.9em;
+}
+emu-intro emu-intro emu-intro emu-intro h1,
+emu-clause emu-clause emu-clause emu-clause h1,
+emu-annex emu-annex emu-annex emu-annex h1 {
+  font-size: 1.11em;
+}
+emu-intro emu-intro emu-intro emu-intro h2,
+emu-clause emu-clause emu-clause emu-clause h2,
+emu-annex emu-annex emu-annex emu-annex h2 {
+  font-size: 1em;
+}
+emu-intro emu-intro emu-intro emu-intro h3,
+emu-clause emu-clause emu-clause emu-clause h3,
+emu-annex emu-annex emu-annex emu-annex h3 {
+  font-size: 0.9em;
+}
+emu-intro emu-intro emu-intro emu-intro emu-intro h1,
+emu-clause emu-clause emu-clause emu-clause emu-clause h1,
+emu-annex emu-annex emu-annex emu-annex emu-annex h1 {
+  font-size: 1em;
+}
+emu-intro emu-intro emu-intro emu-intro emu-intro h2,
+emu-clause emu-clause emu-clause emu-clause emu-clause h2,
+emu-annex emu-annex emu-annex emu-annex emu-annex h2 {
+  font-size: 0.9em;
+}
+emu-intro emu-intro emu-intro emu-intro emu-intro emu-intro h1,
+emu-clause emu-clause emu-clause emu-clause emu-clause emu-clause h1,
+emu-annex emu-annex emu-annex emu-annex emu-annex emu-annex h1 {
+  font-size: 0.9em;
+}
+
+emu-clause,
+emu-intro,
+emu-annex {
+  display: block;
+}
+
+/* these values are twice the font-size for the <h1> titles for clauses */
+emu-intro,
+emu-clause,
+emu-annex {
+  margin-top: 4em;
+}
+emu-intro emu-intro,
+emu-clause emu-clause,
+emu-annex emu-annex {
+  margin-top: 3.12em;
+}
+emu-intro emu-intro emu-intro,
+emu-clause emu-clause emu-clause,
+emu-annex emu-annex emu-annex {
+  margin-top: 2.5em;
+}
+emu-intro emu-intro emu-intro emu-intro,
+emu-clause emu-clause emu-clause emu-clause,
+emu-annex emu-annex emu-annex emu-annex {
+  margin-top: 2.22em;
+}
+emu-intro emu-intro emu-intro emu-intro emu-intro,
+emu-clause emu-clause emu-clause emu-clause emu-clause,
+emu-annex emu-annex emu-annex emu-annex emu-annex {
+  margin-top: 2em;
+}
+emu-intro emu-intro emu-intro emu-intro emu-intro emu-intro,
+emu-clause emu-clause emu-clause emu-clause emu-clause emu-clause,
+emu-annex emu-annex emu-annex emu-annex emu-annex emu-annex {
+  margin-top: 1.8em;
+}
+
+#spec-container > emu-intro:first-of-type,
+#spec-container > emu-clause:first-of-type,
+#spec-container > emu-annex:first-of-type {
+  margin-top: 0;
+}
+
+/* Figures and tables */
+figure {
+  display: block;
+  margin: 1em 0 3em 0;
+}
+figure object {
+  display: block;
+  margin: 0 auto;
+}
+figure table.real-table {
+  margin: 0 auto;
+}
+figure figcaption {
+  display: block;
+  color: #555555;
+  font-weight: bold;
+  text-align: center;
+}
+
+emu-table table {
+  margin: 0 auto;
+}
+
+emu-table table,
+table.real-table {
+  border-collapse: collapse;
+}
+
+emu-table td,
+emu-table th,
+table.real-table td,
+table.real-table th {
+  border: 1px solid black;
+  padding: 0.4em;
+  vertical-align: baseline;
+}
+emu-table th,
+emu-table thead td,
+table.real-table th {
+  background-color: #eeeeee;
+}
+
+emu-table td {
+  background: #fff;
+}
+
+/* Note: the left content edges of table.lightweight-table >tbody >tr >td
+   and div.display line up. */
+table.lightweight-table {
+  border-collapse: collapse;
+  margin: 0 0 0 1.5em;
+}
+table.lightweight-table td,
+table.lightweight-table th {
+  border: none;
+  padding: 0 0.5em;
+  vertical-align: baseline;
+}
+
+/* diff styles */
+ins {
+  background-color: #e0f8e0;
+  text-decoration: none;
+  border-bottom: 1px solid #396;
+}
+
+del {
+  background-color: #fee;
+}
+
+ins.block,
+del.block,
+emu-production > ins,
+emu-production > del,
+emu-grammar > ins,
+emu-grammar > del {
+  display: block;
+}
+emu-rhs > ins,
+emu-rhs > del {
+  display: inline;
+}
+
+tr.ins > td > ins {
+  border-bottom: none;
+}
+
+tr.ins > td {
+  background-color: #e0f8e0;
+}
+
+tr.del > td {
+  background-color: #fee;
+}
+
+/* Menu Styles */
+#menu-toggle {
+  font-size: 2em;
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 1.5em;
+  height: 1.5em;
+  z-index: 3;
+  visibility: hidden;
+  color: #1567a2;
+  background-color: #fff;
+
+  line-height: 1.5em;
+  text-align: center;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  cursor: pointer;
+}
+
+#menu {
+  display: flex;
+  flex-direction: column;
+  width: 33%;
+  height: 100vh;
+  max-width: 500px;
+  box-sizing: border-box;
+  background-color: #ddd;
+  overflow: hidden;
+  transition: opacity 0.1s linear;
+  padding: 0 5px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  border-right: 2px solid #bbb;
+
+  z-index: 2;
+}
+
+#menu-spacer {
+  flex-basis: 33%;
+  max-width: 500px;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+#menu a {
+  color: #1567a2;
+}
+
+#menu.active {
+  display: flex;
+  opacity: 1;
+  z-index: 2;
+}
+
+#menu-pins {
+  flex-grow: 1;
+  display: none;
+}
+
+#menu-pins.active {
+  display: block;
+}
+
+#menu-pins-list {
+  margin: 0;
+  padding: 0;
+  counter-reset: pins-counter;
+}
+
+#menu-pins-list > li:before {
+  content: counter(pins-counter);
+  counter-increment: pins-counter;
+  display: inline-block;
+  width: 25px;
+  text-align: center;
+  border: 1px solid #bbb;
+  padding: 2px;
+  margin: 4px;
+  box-sizing: border-box;
+  line-height: 1em;
+  background-color: #ccc;
+  border-radius: 4px;
+}
+#menu-toc > ol {
+  padding: 0;
+  flex-grow: 1;
+}
+
+#menu-toc > ol li {
+  padding: 0;
+}
+
+#menu-toc > ol,
+#menu-toc > ol ol {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+#menu-toc > ol ol {
+  padding-left: 0.75em;
+}
+
+#menu-toc li {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+#menu-toc .item-toggle {
+  display: inline-block;
+  transform: rotate(-45deg) translate(-5px, -5px);
+  transition: transform 0.1s ease;
+  text-align: center;
+  width: 20px;
+
+  color: #aab;
+
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  cursor: pointer;
+}
+
+#menu-toc .item-toggle-none {
+  display: inline-block;
+  width: 20px;
+}
+
+#menu-toc li.active > .item-toggle {
+  transform: rotate(45deg) translate(-5px, -5px);
+}
+
+#menu-toc li > ol {
+  display: none;
+}
+
+#menu-toc li.active > ol {
+  display: block;
+}
+
+#menu-toc li.revealed > a {
+  background-color: #bbb;
+  font-weight: bold;
+  /*
+  background-color: #222;
+  color: #c6d8e4;
+  */
+}
+
+#menu-toc li.revealed-leaf > a {
+  color: #206ca7;
+  /*
+  background-color: #222;
+  color: #c6d8e4;
+  */
+}
+
+#menu-toc li.revealed > .item-toggle {
+  transform: rotate(45deg) translate(-5px, -5px);
+}
+
+#menu-toc li.revealed > ol {
+  display: block;
+}
+
+#menu-toc li > a {
+  padding: 2px 5px;
+}
+
+#menu > * {
+  margin-bottom: 5px;
+}
+
+.menu-pane-header {
+  padding: 0 5px;
+  text-transform: uppercase;
+  background-color: #aaa;
+  color: #335;
+  font-weight: bold;
+  letter-spacing: 2px;
+  flex-grow: 0;
+  flex-shrink: 0;
+  font-size: 0.8em;
+}
+
+.menu-pane-header emu-opt,
+.menu-pane-header emu-t,
+.menu-pane-header emu-nt {
+  margin-right: 0px;
+  display: inline;
+  color: inherit;
+}
+
+.menu-pane-header emu-rhs {
+  display: inline;
+  padding-left: 0px;
+  text-indent: 0px;
+}
+
+.menu-pane-header emu-geq {
+  margin-left: 0px;
+}
+
+a.menu-pane-header-production {
+  color: inherit;
+}
+
+.menu-pane-header-production {
+  text-transform: none;
+  letter-spacing: 1.5px;
+  padding-left: 0.5em;
+}
+
+#menu-toc {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: hidden;
+  flex-grow: 1;
+}
+
+#menu-toc ol.toc {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+#menu-search {
+  position: relative;
+  flex-grow: 0;
+  flex-shrink: 0;
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  max-height: 300px;
+}
+
+#menu-trace-list {
+  display: none;
+}
+
+#menu-search-box {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  margin: 5px 0 0 0;
+  font-size: 1em;
+  padding: 2px;
+  background-color: #bbb;
+  border: 1px solid #999;
+}
+
+#menu-search-results {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+li.menu-search-result-clause:before {
+  content: 'clause';
+  width: 40px;
+  display: inline-block;
+  text-align: right;
+  padding-right: 1ex;
+  color: #666;
+  font-size: 75%;
+}
+li.menu-search-result-op:before {
+  content: 'op';
+  width: 40px;
+  display: inline-block;
+  text-align: right;
+  padding-right: 1ex;
+  color: #666;
+  font-size: 75%;
+}
+
+li.menu-search-result-prod:before {
+  content: 'prod';
+  width: 40px;
+  display: inline-block;
+  text-align: right;
+  padding-right: 1ex;
+  color: #666;
+  font-size: 75%;
+}
+
+li.menu-search-result-term:before {
+  content: 'term';
+  width: 40px;
+  display: inline-block;
+  text-align: right;
+  padding-right: 1ex;
+  color: #666;
+  font-size: 75%;
+}
+
+#menu-search-results ul {
+  padding: 0 5px;
+  margin: 0;
+}
+
+#menu-search-results li {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+#menu-trace-list {
+  counter-reset: item;
+  margin: 0 0 0 20px;
+  padding: 0;
+}
+#menu-trace-list li {
+  display: block;
+  white-space: nowrap;
+}
+
+#menu-trace-list li .secnum:after {
+  content: ' ';
+}
+#menu-trace-list li:before {
+  content: counter(item) ' ';
+  background-color: #222;
+  counter-increment: item;
+  color: #999;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  display: inline-block;
+  text-align: center;
+  margin: 2px 4px 2px 0;
+}
+
+@media (max-width: 1000px) {
+  body {
+    margin: 0;
+    display: block;
+  }
+
+  #menu {
+    display: none;
+    padding-top: 3em;
+    width: 450px;
+  }
+
+  #menu.active {
+    position: fixed;
+    height: 100%;
+    left: 0;
+    top: 0;
+    right: 300px;
+  }
+
+  #menu-toggle {
+    visibility: visible;
+  }
+
+  #spec-container {
+    padding: 0 5px;
+  }
+
+  #references-pane-spacer {
+    display: none;
+  }
+}
+
+@media only screen and (max-width: 800px) {
+  #menu {
+    width: 100%;
+  }
+
+  h1 .secnum:empty {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+/* Toolbox */
+.toolbox-container {
+  position: absolute;
+  display: none;
+  padding-bottom: 7px;
+}
+
+.toolbox-container.active {
+  display: inline-block;
+}
+
+.toolbox {
+  position: relative;
+  background: #ddd;
+  border: 1px solid #aaa;
+  color: #eee;
+  padding: 5px;
+  border-radius: 3px;
+}
+
+.toolbox a {
+  text-decoration: none;
+  padding: 0 5px;
+}
+
+.toolbox a:hover {
+  text-decoration: underline;
+}
+
+.toolbox:after,
+.toolbox:before {
+  top: 100%;
+  left: 15px;
+  border: solid transparent;
+  content: ' ';
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+.toolbox:after {
+  border-color: rgba(0, 0, 0, 0);
+  border-top-color: #ddd;
+  border-width: 10px;
+  margin-left: -10px;
+}
+.toolbox:before {
+  border-color: rgba(204, 204, 204, 0);
+  border-top-color: #aaa;
+  border-width: 12px;
+  margin-left: -12px;
+}
+
+#references-pane-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 250px;
+  display: none;
+  background-color: #ddd;
+  z-index: 1;
+}
+
+#references-pane-table-container {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+#references-pane-spacer {
+  flex-basis: 33%;
+  max-width: 500px;
+}
+
+#references-pane {
+  flex-grow: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+#references-pane-container.active {
+  display: flex;
+}
+
+#references-pane-close:after {
+  content: '✖';
+  float: right;
+  cursor: pointer;
+}
+
+#references-pane table tr td:first-child {
+  text-align: right;
+  padding-right: 5px;
+}
+
+@media print {
+  #menu-toggle {
+    display: none;
+  }
+}
+
+[normative-optional],
+[legacy] {
+  border-left: 5px solid #ff6600;
+  padding: 0.5em;
+  display: block;
+  background: #ffeedd;
+}
+
+.clause-attributes-tag {
+  text-transform: uppercase;
+  color: #884400;
+}
+
+.clause-attributes-tag a {
+  color: #884400;
+}
+
+/* Shortcuts help dialog */
+
+#shortcuts-help {
+  position: fixed;
+  left: 5%;
+  margin: 0 auto;
+  right: 5%;
+  z-index: 10;
+  top: 10%;
+  top: calc(5vw + 5vh);
+  padding: 30px 90px;
+  max-width: 500px;
+  outline: solid 10000px rgba(255, 255, 255, 0.6);
+  border-radius: 5px;
+  border-width: 1px 1px 0 1px;
+  background-color: #ddd;
+  display: none;
+}
+
+#shortcuts-help.active {
+  display: block;
+}
+
+#shortcuts-help ul {
+  padding: 0;
+}
+
+#shortcuts-help li {
+  display: flex;
+  justify-content: space-between;
+}
+
+#shortcuts-help code {
+  padding: 3px 10px;
+  border-radius: 3px;
+  border-width: 1px 1px 0 1px;
+  border-color: #bbb;
+  background-color: #eee;
+  box-shadow: inset 0 -1px 0 #ccc;
+}
+</style></head><body><div id="shortcuts-help">
+<ul>
+  <li><span>Toggle shortcuts help</span><code>?</code></li>
+  <li><span>Toggle "can call user code" annotations</span><code>u</code></li>
+
+  <li><span>Jump to search box</span><code>/</code></li>
+</ul></div><div id="menu-toggle"><svg xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%; stroke:currentColor" viewBox="0 0 120 120">
+      <title>Menu</title>
+      <path stroke-width="10" stroke-linecap="round" d="M30,60 h60  M30,30 m0,5 h60  M30,90 m0,-5 h60"></path>
+    </svg></div><div id="menu-spacer"></div><div id="menu"><div id="menu-search"><input type="text" id="menu-search-box" placeholder="Search..."><div id="menu-search-results" class="inactive"></div></div><div id="menu-pins"><div class="menu-pane-header">Pins</div><ul id="menu-pins-list"></ul></div><div class="menu-pane-header">Table of Contents</div><div id="menu-toc"><ol class="toc"><li><span class="item-toggle-none"></span><a href="#modified-productions" title="Modified Productions"><span class="secnum">1</span> Modified Productions</a></li><li><span class="item-toggle-none"></span><a href="#new-productions" title="New Productions"><span class="secnum">2</span> New Productions</a></li></ol></div></div><div id="spec-container"><h1 class="version">Stage 0 Draft / March 8, 2022</h1><h1 class="title">Types as Comments Proposed Grammar</h1>
+<emu-clause id="modified-productions">
+<h1><span class="secnum">1</span> Modified Productions</h1>
+<br>
+<br>
+<emu-grammar><emu-production name="MemberExpression">
+    <emu-nt>MemberExpression</emu-nt> <emu-geq>:</emu-geq> <ins><emu-rhs a="rtg-8u7y">
+        <emu-nt>MemberExpression</emu-nt>
+        <emu-t>::</emu-t>
+        <emu-nt>TypeArguments</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="-swm3xiy">
+        <emu-nt>MemberExpression</emu-nt>
+        <emu-gann>[no <emu-nt>LineTerminator</emu-nt> here]</emu-gann>
+        <emu-t>!</emu-t>
+    </emu-rhs>
+    </ins>
+</emu-production>
+<emu-production name="CallExpression">
+    <emu-nt>CallExpression</emu-nt> <emu-geq>:</emu-geq> <ins><emu-rhs a="n9vjhjni">
+        <emu-nt>CallExpression</emu-nt>
+        <emu-t>::</emu-t>
+        <emu-nt>TypeArguments</emu-nt>
+    </emu-rhs></ins>
+</emu-production>
+<emu-production name="OptionalChain">
+    <emu-nt>OptionalChain</emu-nt> <emu-geq>:</emu-geq> <ins><emu-rhs a="ouj8f2ec">
+        <emu-nt>OptionalChain</emu-nt>
+        <emu-t>::</emu-t>
+        <emu-nt>TypeArguments</emu-nt>
+    </emu-rhs></ins>
+</emu-production>
+<emu-production name="RelationalExpression">
+    <emu-nt>RelationalExpression</emu-nt> <emu-geq>:</emu-geq> <ins><emu-rhs a="hi5ogzth">
+        <emu-nt>RelationalExpression</emu-nt>
+        <emu-gann>[no <emu-nt>LineTerminator</emu-nt> here]</emu-gann>
+        <emu-t>as</emu-t>
+        <emu-nt>Type</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="aeninaan">
+        <emu-nt>RelationalExpression</emu-nt>
+        <emu-gann>[no <emu-nt>LineTerminator</emu-nt> here]</emu-gann>
+        <emu-t>as</emu-t>
+        <emu-t>const</emu-t>
+    </emu-rhs>
+    </ins>
+</emu-production>
+<emu-production name="Declaration">
+    <emu-nt>Declaration</emu-nt> <emu-geq>:</emu-geq> <ins><emu-rhs a="w2tdkpon">
+        <emu-nt>TypeDeclaration</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="eao1hhac">
+        <emu-nt>InterfaceDeclaration</emu-nt>
+    </emu-rhs>
+    </ins>
+</emu-production>
+<emu-production name="LexicalBinding">
+    <emu-nt>LexicalBinding</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="iyno2-k2">
+        <emu-nt>BindingIdentifier</emu-nt>
+        <emu-nt optional="">TypeAnnotation<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-nt optional="">Initializer<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+    </emu-rhs>
+    <emu-rhs a="vezatff5">
+        <emu-nt>BindingPattern</emu-nt>
+        <emu-nt optional="">TypeAnnotation<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-nt>Initializer</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="VariableDeclaration">
+    <emu-nt>VariableDeclaration</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="iyno2-k2">
+        <emu-nt>BindingIdentifier</emu-nt>
+        <emu-nt optional="">TypeAnnotation<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-nt optional="">Initializer<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+    </emu-rhs>
+    <emu-rhs a="vezatff5">
+        <emu-nt>BindingPattern</emu-nt>
+        <emu-nt optional="">TypeAnnotation<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-nt>Initializer</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="Catch">
+    <emu-nt>Catch</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="9ail-vn0">
+        <emu-t>catch</emu-t>
+        <emu-t>(</emu-t>
+        <emu-nt>CatchParameter</emu-nt>
+        <emu-nt optional="">TypeAnnotation<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>)</emu-t>
+        <emu-nt>Block</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="oyp2rsut">
+        <emu-t>catch</emu-t>
+        <emu-nt>Block</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="FormalParameter">
+    <emu-nt>FormalParameter</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="iyno2-k2">
+        <emu-nt>BindingIdentifier</emu-nt>
+        <emu-nt optional="">TypeAnnotation<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-nt optional="">Initializer<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+    </emu-rhs>
+    <emu-rhs a="7wli6nk9">
+        <emu-nt>BindingIdentifier</emu-nt>
+        <emu-t>?</emu-t>
+        <emu-nt optional="">TypeAnnotation<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+    </emu-rhs>
+    <emu-rhs a="cyddyaxk">
+        <emu-nt>BindingPattern</emu-nt>
+        <emu-nt optional="">TypeAnnotation<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-nt optional="">Initializer<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="FunctionRestParameter">
+    <emu-nt>FunctionRestParameter</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="0y71p5tx">
+        <emu-t>...</emu-t>
+        <emu-nt>BindingIdentifier</emu-nt>
+        <emu-nt optional="">TypeAnnotation<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+    </emu-rhs>
+    <emu-rhs a="0vpcovwl">
+        <emu-t>...</emu-t>
+        <emu-nt>BindingPattern</emu-nt>
+        <emu-nt optional="">TypeAnnotation<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="FunctionDeclaration">
+    <emu-nt>FunctionDeclaration</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="qrym85qj">
+        <emu-t>function</emu-t>
+        <emu-nt>BindingIdentifier</emu-nt>
+        <emu-nt optional="">TypeParameters<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>(</emu-t>
+        <emu-nt>FormalParameters</emu-nt>
+        <emu-t>)</emu-t>
+        <emu-nt optional="">TypeAnnotation<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>{</emu-t>
+        <emu-nt>FunctionBody</emu-nt>
+        <emu-t>}</emu-t>
+    </emu-rhs>
+</emu-production>
+<emu-production name="FunctionExpression">
+    <emu-nt>FunctionExpression</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="rnovpvhl">
+        <emu-t>function</emu-t>
+        <emu-nt optional="">BindingIdentifier<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-nt optional="">TypeParameters<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>(</emu-t>
+        <emu-nt>FormalParameters</emu-nt>
+        <emu-t>)</emu-t>
+        <emu-nt optional="">TypeAnnotation<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>{</emu-t>
+        <emu-nt>FunctionBody</emu-nt>
+        <emu-t>}</emu-t>
+    </emu-rhs>
+</emu-production>
+<emu-production name="ArrowFunction">
+    <emu-nt>ArrowFunction</emu-nt> <emu-geq>:</emu-geq> <ins><emu-rhs a="ujr7acpo">
+        <emu-nt>ArrowParameters</emu-nt>
+        <emu-nt>TypeAnnotation</emu-nt>
+        <emu-t>=&gt;</emu-t>
+        <emu-nt>ConciseBody</emu-nt>
+    </emu-rhs></ins>
+</emu-production>
+<emu-production name="ArrowParameters">
+    <emu-nt>ArrowParameters</emu-nt> <emu-geq>:</emu-geq> <ins><emu-rhs a="taqpebud">
+        <emu-nt>TypeParameters</emu-nt>
+        <emu-t>(</emu-t>
+        <emu-nt>UniqueFormalParameters</emu-nt>
+        <emu-t>)</emu-t>
+    </emu-rhs></ins>
+</emu-production>
+<emu-production name="MethodDefinition">
+    <emu-nt>MethodDefinition</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="tzgybll3">
+        <emu-nt>ClassElementName</emu-nt>
+        <emu-t optional="">?<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-t>
+        <emu-nt optional="">TypeParameters<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>(</emu-t>
+        <emu-nt>UniqueFormalParameters</emu-nt>
+        <emu-t>)</emu-t>
+        <emu-nt optional="">TypeAnnotation<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>{</emu-t>
+        <emu-nt>FunctionBody</emu-nt>
+        <emu-t>}</emu-t>
+    </emu-rhs>
+    <emu-rhs a="uv5zsffy">
+        <emu-nt>GeneratorMethod</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="pbphxm47">
+        <emu-nt>AsyncMethod</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="gbmuvro8">
+        <emu-nt>AsyncGeneratorMethod</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="rtxjzqhl">
+        <emu-t>get</emu-t>
+        <emu-nt>ClassElementName</emu-nt>
+        <emu-t>(</emu-t>
+        <emu-t>)</emu-t>
+        <emu-nt optional="">TypeAnnotation<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>{</emu-t>
+        <emu-nt>FunctionBody</emu-nt>
+        <emu-t>}</emu-t>
+    </emu-rhs>
+    <emu-rhs a="lbu40xzc">
+        <emu-t>set</emu-t>
+        <emu-nt>ClassElementName</emu-nt>
+        <emu-t>(</emu-t>
+        <emu-nt>PropertySetParameterList</emu-nt>
+        <emu-t>)</emu-t>
+        <emu-t>{</emu-t>
+        <emu-nt>FunctionBody</emu-nt>
+        <emu-t>}</emu-t>
+    </emu-rhs>
+</emu-production>
+<emu-production name="GeneratorDeclaration">
+    <emu-nt>GeneratorDeclaration</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="qjalmb_k">
+        <emu-t>function</emu-t>
+        <emu-t>*</emu-t>
+        <emu-nt>BindingIdentifier</emu-nt>
+        <emu-nt optional="">TypeParameters<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>(</emu-t>
+        <emu-nt>FormalParameters</emu-nt>
+        <emu-t>)</emu-t>
+        <emu-nt optional="">TypeAnnotation<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>{</emu-t>
+        <emu-nt>GeneratorBody</emu-nt>
+        <emu-t>}</emu-t>
+    </emu-rhs>
+</emu-production>
+<emu-production name="GeneratorExpression">
+    <emu-nt>GeneratorExpression</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="t8kb_nka">
+        <emu-t>function</emu-t>
+        <emu-t>*</emu-t>
+        <emu-nt optional="">BindingIdentifier<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-nt optional="">TypeParameters<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>(</emu-t>
+        <emu-nt>FormalParameters</emu-nt>
+        <emu-t>)</emu-t>
+        <emu-nt optional="">TypeAnnotation<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>{</emu-t>
+        <emu-nt>GeneratorBody</emu-nt>
+        <emu-t>}</emu-t>
+    </emu-rhs>
+</emu-production>
+<emu-production name="GeneratorMethod">
+    <emu-nt>GeneratorMethod</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="f6ijpw7l">
+        <emu-t>*</emu-t>
+        <emu-nt>ClassElementName</emu-nt>
+        <emu-t optional="">?<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-t>
+        <emu-nt optional="">TypeParameters<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>(</emu-t>
+        <emu-nt>UniqueFormalParameters</emu-nt>
+        <emu-t>)</emu-t>
+        <emu-nt optional="">TypeAnnotation<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>{</emu-t>
+        <emu-nt>GeneratorBody</emu-nt>
+        <emu-t>}</emu-t>
+    </emu-rhs>
+</emu-production>
+<emu-production name="AsyncGeneratorDeclaration">
+    <emu-nt>AsyncGeneratorDeclaration</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="bz7tbton">
+        <emu-t>async</emu-t>
+        <emu-gann>[no <emu-nt>LineTerminator</emu-nt> here]</emu-gann>
+        <emu-t>function</emu-t>
+        <emu-t>*</emu-t>
+        <emu-nt>BindingIdentifier</emu-nt>
+        <emu-nt optional="">TypeParameters<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>(</emu-t>
+        <emu-nt>FormalParameters</emu-nt>
+        <emu-t>)</emu-t>
+        <emu-nt optional="">TypeAnnotation<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>{</emu-t>
+        <emu-nt>AsyncGeneratorBody</emu-nt>
+        <emu-t>}</emu-t>
+    </emu-rhs>
+</emu-production>
+<emu-production name="AsyncGeneratorExpression">
+    <emu-nt>AsyncGeneratorExpression</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="qnftdy--">
+        <emu-t>async</emu-t>
+        <emu-gann>[no <emu-nt>LineTerminator</emu-nt> here]</emu-gann>
+        <emu-t>function</emu-t>
+        <emu-t>*</emu-t>
+        <emu-nt optional="">BindingIdentifier<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-nt optional="">TypeParameters<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>(</emu-t>
+        <emu-nt>FormalParameters</emu-nt>
+        <emu-t>)</emu-t>
+        <emu-nt optional="">TypeAnnotation<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>{</emu-t>
+        <emu-nt>AsyncGeneratorBody</emu-nt>
+        <emu-t>}</emu-t>
+    </emu-rhs>
+</emu-production>
+<emu-production name="AsyncGeneratorMethod">
+    <emu-nt>AsyncGeneratorMethod</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="hq1nckrs">
+        <emu-t>async</emu-t>
+        <emu-gann>[no <emu-nt>LineTerminator</emu-nt> here]</emu-gann>
+        <emu-t>*</emu-t>
+        <emu-nt>ClassElementName</emu-nt>
+        <emu-t optional="">?<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-t>
+        <emu-nt optional="">TypeParameters<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>(</emu-t>
+        <emu-nt>UniqueFormalParameters</emu-nt>
+        <emu-t>)</emu-t>
+        <emu-nt optional="">TypeAnnotation<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>{</emu-t>
+        <emu-nt>AsyncGeneratorBody</emu-nt>
+        <emu-t>}</emu-t>
+    </emu-rhs>
+</emu-production>
+<emu-production name="ClassDeclaration">
+    <emu-nt>ClassDeclaration</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="egudb7tr">
+        <emu-nt optional="">AbstractModifier<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>class</emu-t>
+        <emu-nt>BindingIdentifier</emu-nt>
+        <emu-nt>ClassTail</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="ClassExpression">
+    <emu-nt>ClassExpression</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="ihxvw014">
+        <emu-nt optional="">AbstractModifier<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>class</emu-t>
+        <emu-nt optional="">BindingIdentifier<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-nt>ClassTail</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="ClassHeritage">
+    <emu-nt>ClassHeritage</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="iunlyxmb">
+        <emu-t>extends</emu-t>
+        <emu-nt>LeftHandSideExpression</emu-nt>
+        <emu-nt optional="">TypeArguments<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-nt optional="">ClassImplementsClause<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="FieldDefinition">
+    <emu-nt>FieldDefinition</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="fge-vqx-">
+        <emu-nt>ClassElementName</emu-nt>
+        <emu-t optional="">?<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-t>
+        <emu-nt optional="">TypeAnnotation<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-nt optional="">Initializer<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+    </emu-rhs>
+    <emu-rhs a="vmvg0dsd">
+        <emu-nt>ClassElementName</emu-nt>
+        <emu-t>!</emu-t>
+        <emu-nt optional="">TypeAnnotation<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-nt optional="">Initializer<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="ClassElement">
+    <emu-nt>ClassElement</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="da8oijto">
+        <emu-nt optional="">AccessibilityModifier<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-nt optional="">OverrideModifier<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-nt>MethodDefinition</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="yjtaybox">
+        <emu-nt optional="">AccessibilityModifier<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>static</emu-t>
+        <emu-nt optional="">OverrideModifier<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-nt>MethodDefinition</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="bdabavqs">
+        <emu-nt optional="">AccessibilityModifier<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-nt>FieldDefinition</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="o_do4fnp">
+        <emu-nt optional="">AccessibilityModifier<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>static</emu-t>
+        <emu-nt>FieldDefinition</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="2ui-f2qn">
+        <emu-nt>ClassStaticBlock</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="jrjcqsze">
+        <emu-nt>AbstractClassElement</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="dda1seh7">
+        <emu-nt>IndexSignature</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="sg2sawim">
+        <emu-t>;</emu-t>
+    </emu-rhs>
+</emu-production>
+<emu-production name="AsyncFunctionDeclaration">
+    <emu-nt>AsyncFunctionDeclaration</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="poefzcfn">
+        <emu-t>async</emu-t>
+        <emu-gann>[no <emu-nt>LineTerminator</emu-nt> here]</emu-gann>
+        <emu-t>function</emu-t>
+        <emu-nt>BindingIdentifier</emu-nt>
+        <emu-nt optional="">TypeParameters<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>(</emu-t>
+        <emu-nt>FormalParameters</emu-nt>
+        <emu-t>)</emu-t>
+        <emu-nt optional="">TypeAnnotation<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>{</emu-t>
+        <emu-nt>AsyncFunctionBody</emu-nt>
+        <emu-t>}</emu-t>
+    </emu-rhs>
+</emu-production>
+<emu-production name="AsyncFunctionExpression">
+    <emu-nt>AsyncFunctionExpression</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="wnbhs16v">
+        <emu-t>async</emu-t>
+        <emu-gann>[no <emu-nt>LineTerminator</emu-nt> here]</emu-gann>
+        <emu-t>function</emu-t>
+        <emu-nt optional="">BindingIdentifier<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-nt optional="">TypeParameters<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>(</emu-t>
+        <emu-nt>FormalParameters</emu-nt>
+        <emu-t>)</emu-t>
+        <emu-nt optional="">TypeAnnotation<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>{</emu-t>
+        <emu-nt>AsyncFunctionBody</emu-nt>
+        <emu-t>}</emu-t>
+    </emu-rhs>
+</emu-production>
+<emu-production name="AsyncMethod">
+    <emu-nt>AsyncMethod</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="am8rcys-">
+        <emu-t>async</emu-t>
+        <emu-gann>[no <emu-nt>LineTerminator</emu-nt> here]</emu-gann>
+        <emu-nt>ClassElementName</emu-nt>
+        <emu-t optional="">?<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-t>
+        <emu-nt optional="">TypeParameters<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>(</emu-t>
+        <emu-nt>UniqueFormalParameters</emu-nt>
+        <emu-t>)</emu-t>
+        <emu-nt optional="">TypeAnnotation<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>{</emu-t>
+        <emu-nt>AsyncFunctionBody</emu-nt>
+        <emu-t>}</emu-t>
+    </emu-rhs>
+</emu-production>
+<emu-production name="CoverCallExpressionAndAsyncArrowHead">
+    <emu-nt>CoverCallExpressionAndAsyncArrowHead</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="l66spocu">
+        <emu-nt>MemberExpression</emu-nt>
+        <emu-nt optional="">TypeParameters<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-nt>Arguments</emu-nt>
+        <emu-nt optional="">TypeAnnotation<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="AsyncArrowHead">
+    <emu-nt>AsyncArrowHead</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="0-nt_maj">
+        <emu-t>async</emu-t>
+        <emu-gann>[no <emu-nt>LineTerminator</emu-nt> here]</emu-gann>
+        <emu-nt optional="">TypeParameters<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-nt>ArrowFormalParameters</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="ImportDeclaration">
+    <emu-nt>ImportDeclaration</emu-nt> <emu-geq>:</emu-geq> <ins><emu-rhs a="u-qnk6-e">
+        <emu-t>import</emu-t>
+        <emu-t>type</emu-t>
+        <emu-nt>ImportClause</emu-nt>
+        <emu-nt>FromClause</emu-nt>
+        <emu-t>;</emu-t>
+    </emu-rhs></ins>
+</emu-production>
+<emu-production name="ImportSpecifier">
+    <emu-nt>ImportSpecifier</emu-nt> <emu-geq>:</emu-geq> <ins><emu-rhs a="muqwhgn7">
+        <emu-t>type</emu-t>
+        <emu-nt>ImportedBinding</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="jdic9jdu">
+        <emu-t>type</emu-t>
+        <emu-nt>ModuleExportName</emu-nt>
+        <emu-t>as</emu-t>
+        <emu-nt>ImportedBinding</emu-nt>
+    </emu-rhs>
+    </ins>
+</emu-production>
+</emu-grammar>
+</emu-clause>
+
+<emu-clause id="new-productions">
+<h1><span class="secnum">2</span> New Productions</h1>
+<br>
+<emu-grammar><emu-production name="TypeArguments">
+    <emu-nt>TypeArguments</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="fr4okyj-">
+        <emu-nt>AngleBracketedTokens</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="TypeDeclaration">
+    <emu-nt>TypeDeclaration</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="zg6mkdzc">
+        <emu-t>type</emu-t>
+        <emu-nt>BindingIdentifier</emu-nt>
+        <emu-nt optional="">TypeParameters<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>=</emu-t>
+        <emu-nt>Type</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="TypeParameters">
+    <emu-nt>TypeParameters</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="fr4okyj-">
+        <emu-nt>AngleBracketedTokens</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="Type">
+    <emu-nt>Type</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="xbsb_zrd">
+        <emu-nt>ConditionalType</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="c7vsxddz">
+        <emu-nt>NonConditionalType</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="ConditionalType">
+    <emu-nt>ConditionalType</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="tvqotfkp">
+        <emu-nt>NonConditionalType</emu-nt>
+        <emu-gann>[no <emu-nt>LineTerminator</emu-nt> here]</emu-gann>
+        <emu-t>extends</emu-t>
+        <emu-nt>NonConditionalType</emu-nt>
+        <emu-t>?</emu-t>
+        <emu-nt>Type</emu-nt>
+        <emu-t>:</emu-t>
+        <emu-nt>Type</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="NonConditionalType">
+    <emu-nt>NonConditionalType</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="lp7xv-4o">
+        <emu-nt>UnionType</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="6u6d7nzy">
+        <emu-nt>FunctionType</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="pgjubjo4">
+        <emu-nt>ConstructorType</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="UnionType">
+    <emu-nt>UnionType</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="wzos1-m7">
+        <emu-t optional="">|<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-t>
+        <emu-nt>IntersectionType</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="m3nm-ohq">
+        <emu-nt>UnionType</emu-nt>
+        <emu-t>|</emu-t>
+        <emu-nt>IntersectionType</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="IntersectionType">
+    <emu-nt>IntersectionType</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="vbdzcegr">
+        <emu-t optional="">&amp;<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-t>
+        <emu-nt>TypeOperatorType</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="eejwjn7r">
+        <emu-nt>IntersectionType</emu-nt>
+        <emu-t>&amp;</emu-t>
+        <emu-nt>TypeOperatorType</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="TypeOperatorType">
+    <emu-nt>TypeOperatorType</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="vnz9gpyu">
+        <emu-t>readonly</emu-t>
+        <emu-nt>TypeOperatorType</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="pg4xvwfw">
+        <emu-t>keyof</emu-t>
+        <emu-nt>TypeOperatorType</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="vw7fm2ol">
+        <emu-t>unique</emu-t>
+        <emu-nt>TypeOperatorType</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="97acqhpk">
+        <emu-t>infer</emu-t>
+        <emu-nt>TypeOperatorType</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="qfn9tmu6">
+        <emu-t>not</emu-t>
+        <emu-nt>TypeOperatorType</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="lxo0rcnf">
+        <emu-nt>PrimaryType</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="PrimaryType">
+    <emu-nt>PrimaryType</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="6j_y7b71">
+        <emu-nt>ParenthesizedType</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="zj7lj919">
+        <emu-nt>SquareBracketedType</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="tyh8crox">
+        <emu-nt>CurlyBracketedType</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="doi8ufqr">
+        <emu-nt>TypeReference</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="d-chgvaw">
+        <emu-nt>ArrayType</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="iwtglo93">
+        <emu-nt>LiteralType</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="kkaxychj">
+        <emu-nt>TypeQuery</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="erp1xd2a">
+        <emu-nt>ImportType</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="greqkehu">
+        <emu-nt>TypePredicate</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="jo4mwtvh">
+        <emu-t>this</emu-t>
+    </emu-rhs>
+    <emu-rhs a="llgnlz3m">
+        <emu-t>void</emu-t>
+    </emu-rhs>
+</emu-production>
+<emu-production name="ParenthesizedType">
+    <emu-nt>ParenthesizedType</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="ccms2our">
+        <emu-nt>ParenthesizedTokens</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="SquareBracketedType">
+    <emu-nt>SquareBracketedType</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="lklz6agl">
+        <emu-nt>SquareBracketedTokens</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="CurlyBracketedType">
+    <emu-nt>CurlyBracketedType</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="lnjpak9t">
+        <emu-nt>CurlyBracketedTokens</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="TypeReference">
+    <emu-nt>TypeReference</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="gdwbnckg">
+        <emu-nt>TypeName</emu-nt>
+        <emu-gann>[no <emu-nt>LineTerminator</emu-nt> here]</emu-gann>
+        <emu-nt optional="">TypeArguments<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="TypeName">
+    <emu-nt>TypeName</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="bras6mo_">
+        <emu-nt>Identifier</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="3jn7zdhs">
+        <emu-nt>TypeName</emu-nt>
+        <emu-t>.</emu-t>
+        <emu-nt>Identifier</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="ArrayType">
+    <emu-nt>ArrayType</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="poxxbrgz">
+        <emu-nt>PrimaryType</emu-nt>
+        <emu-gann>[no <emu-nt>LineTerminator</emu-nt> here]</emu-gann>
+        <emu-t>[</emu-t>
+        <emu-t>]</emu-t>
+    </emu-rhs>
+</emu-production>
+<emu-production name="LiteralType">
+    <emu-nt>LiteralType</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="c00zduer">
+        <emu-nt>NumericLiteralType</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="xhtltz00">
+        <emu-nt>StringLiteral</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="cppfy8a0">
+        <emu-nt>TemplateLiteralType</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="-jc4xg27">
+        <emu-t>true</emu-t>
+    </emu-rhs>
+    <emu-rhs a="i9lgnxtt">
+        <emu-t>false</emu-t>
+    </emu-rhs>
+    <emu-rhs a="d7uiab7a">
+        <emu-t>null</emu-t>
+    </emu-rhs>
+</emu-production>
+<emu-production name="TemplateLiteralType">
+    <emu-nt>TemplateLiteralType</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="e_otk8es">
+        <emu-nt>NoSubstitutionTemplate</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="nxzescpy">
+        <emu-nt>TemplateBracketedTokens</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="NumericLiteralType">
+    <emu-nt>NumericLiteralType</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="pui0b1rt">
+        <emu-nt>NumericLiteral</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="fgbdsj4y">
+        <emu-t>-</emu-t>
+        <emu-gann>[no <emu-nt>LineTerminator</emu-nt> here]</emu-gann>
+        <emu-nt>NumericLiteral</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="TypeQuery">
+    <emu-nt>TypeQuery</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="-jb3rl3c">
+        <emu-t>typeof</emu-t>
+        <emu-gann>[no <emu-nt>LineTerminator</emu-nt> here]</emu-gann>
+        <emu-nt>EntityName</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="EntityName">
+    <emu-nt>EntityName</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="drsx4tka">
+        <emu-nt>IdentifierName</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="upllvvnq">
+        <emu-nt>ImportSpecifier</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="oyhsmmci">
+        <emu-nt>EntityName</emu-nt>
+        <emu-t>.</emu-t>
+        <emu-nt>IdentifierName</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="dinaevva">
+        <emu-nt>EntityName</emu-nt>
+        <emu-t>::</emu-t>
+        <emu-nt>TypeArguments</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="ImportSpecifier">
+    <emu-nt>ImportSpecifier</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="d4zm0gav">
+        <emu-t>import</emu-t>
+        <emu-gann>[no <emu-nt>LineTerminator</emu-nt> here]</emu-gann>
+        <emu-t>(</emu-t>
+        <emu-nt>ModuleSpecifier</emu-nt>
+        <emu-t>)</emu-t>
+    </emu-rhs>
+</emu-production>
+<emu-production name="ImportType">
+    <emu-nt>ImportType</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="upllvvnq">
+        <emu-nt>ImportSpecifier</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="hkwcwovd">
+        <emu-nt>ImportSpecifier</emu-nt>
+        <emu-t>.</emu-t>
+        <emu-nt>TypeName</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="TypePredicate">
+    <emu-nt>TypePredicate</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="kpjrwych">
+        <emu-nt>IdentifierOrThis</emu-nt>
+        <emu-gann>[no <emu-nt>LineTerminator</emu-nt> here]</emu-gann>
+        <emu-t>is</emu-t>
+        <emu-nt>Type</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="1bkuq8ho">
+        <emu-t>asserts</emu-t>
+        <emu-nt>IdentifierOrThis</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="scx_u0av">
+        <emu-t>asserts</emu-t>
+        <emu-nt>IdentifierOrThis</emu-nt>
+        <emu-gann>[no <emu-nt>LineTerminator</emu-nt> here]</emu-gann>
+        <emu-t>is</emu-t>
+        <emu-nt>Type</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="IdentifierOrThis">
+    <emu-nt>IdentifierOrThis</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="bras6mo_">
+        <emu-nt>Identifier</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="jo4mwtvh">
+        <emu-t>this</emu-t>
+    </emu-rhs>
+</emu-production>
+<emu-production name="FunctionType">
+    <emu-nt>FunctionType</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="bullzk05">
+        <emu-nt optional="">TypeParameters<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-nt>ParameterList</emu-nt>
+        <emu-t>=&gt;</emu-t>
+        <emu-nt>Type</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="ConstructorType">
+    <emu-nt>ConstructorType</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="nbe26nsh">
+        <emu-t>new</emu-t>
+        <emu-nt optional="">TypeParameters<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-nt>ParameterList</emu-nt>
+        <emu-t>=&gt;</emu-t>
+        <emu-nt>Type</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="ParameterList">
+    <emu-nt>ParameterList</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="ccms2our">
+        <emu-nt>ParenthesizedTokens</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="InterfaceDeclaration">
+    <emu-nt>InterfaceDeclaration</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="iytryxwk">
+        <emu-t>interface</emu-t>
+        <emu-nt>BindingIdentifier</emu-nt>
+        <emu-nt optional="">TypeParameters<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-nt optional="">InterfaceExtendsClause<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-nt>InterfaceBody</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="InterfaceExtendsClause">
+    <emu-nt>InterfaceExtendsClause</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="x6zvsb3x">
+        <emu-t>extends</emu-t>
+        <emu-nt>ClassOrInterfaceTypeList</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="ClassOrInterfaceTypeList">
+    <emu-nt>ClassOrInterfaceTypeList</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="doi8ufqr">
+        <emu-nt>TypeReference</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="af4ruyim">
+        <emu-nt>ClassOrInterfaceTypeList</emu-nt>
+        <emu-t>,</emu-t>
+        <emu-nt>TypeReference</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="InterfaceBody">
+    <emu-nt>InterfaceBody</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="lnjpak9t">
+        <emu-nt>CurlyBracketedTokens</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="TypeAnnotation">
+    <emu-nt>TypeAnnotation</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="fwkgihaq">
+        <emu-t>:</emu-t>
+        <emu-nt>Type</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="AbstractModifier">
+    <emu-nt>AbstractModifier</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="j7trpfym">
+        <emu-t>abstract</emu-t>
+    </emu-rhs>
+</emu-production>
+<emu-production name="ClassImplementsClause">
+    <emu-nt>ClassImplementsClause</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="kgrttw9s">
+        <emu-t>implements</emu-t>
+        <emu-nt>ClassOrInterfaceTypeList</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="AccessibilityModifier">
+    <emu-nt>AccessibilityModifier</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="is9v4klr">
+        <emu-t>public</emu-t>
+    </emu-rhs>
+    <emu-rhs a="wdoy35lb">
+        <emu-t>protected</emu-t>
+    </emu-rhs>
+    <emu-rhs a="rz4nxfeh">
+        <emu-t>private</emu-t>
+    </emu-rhs>
+</emu-production>
+<emu-production name="OverrideModifier">
+    <emu-nt>OverrideModifier</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="q8yi0dca">
+        <emu-t>override</emu-t>
+    </emu-rhs>
+</emu-production>
+<emu-production name="AbstractClassElement">
+    <emu-nt>AbstractClassElement</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="bzwjw-rk">
+        <emu-nt optional="">AccessibilityModifier<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>abstract</emu-t>
+        <emu-nt optional="">OverrideModifier<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-nt>AbstractMethodDefinition</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="bz1sujvz">
+        <emu-nt optional="">AccessibilityModifier<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>abstract</emu-t>
+        <emu-nt>AbstractFieldDefinition</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="AbstractMethodDefinition">
+    <emu-nt>AbstractMethodDefinition</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="o2zt3lov">
+        <emu-nt>ClassElementName</emu-nt>
+        <emu-nt optional="">TypeParameters<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>(</emu-t>
+        <emu-nt>UniqueFormalParameters</emu-nt>
+        <emu-t>)</emu-t>
+        <emu-nt optional="">TypeAnnotation<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+    </emu-rhs>
+    <emu-rhs a="ppzma6xi">
+        <emu-t>get</emu-t>
+        <emu-nt>ClassElementName</emu-nt>
+        <emu-t>(</emu-t>
+        <emu-t>)</emu-t>
+        <emu-nt optional="">TypeAnnotation<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+    </emu-rhs>
+    <emu-rhs a="x7btg-lg">
+        <emu-t>set</emu-t>
+        <emu-nt>ClassElementName</emu-nt>
+        <emu-t>(</emu-t>
+        <emu-nt>PropertySetParameterList</emu-nt>
+        <emu-t>)</emu-t>
+    </emu-rhs>
+</emu-production>
+<emu-production name="AbstractFieldDefinition">
+    <emu-nt>AbstractFieldDefinition</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="a6f5nbkv">
+        <emu-nt>ClassElementName</emu-nt>
+        <emu-t optional="">?<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-t>
+        <emu-nt optional="">TypeAnnotation<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="IndexSignature">
+    <emu-nt>IndexSignature</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="c7s2pcfj">
+        <emu-t>[</emu-t>
+        <emu-nt>BindingIdentifier</emu-nt>
+        <emu-nt>TypeAnnotation</emu-nt>
+        <emu-t>]</emu-t>
+        <emu-nt>TypeAnnotation</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="BracketedTokens">
+    <emu-nt>BracketedTokens</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="ccms2our">
+        <emu-nt>ParenthesizedTokens</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="lklz6agl">
+        <emu-nt>SquareBracketedTokens</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="lnjpak9t">
+        <emu-nt>CurlyBracketedTokens</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="fr4okyj-">
+        <emu-nt>AngleBracketedTokens</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="nxzescpy">
+        <emu-nt>TemplateBracketedTokens</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="ParenthesizedTokens">
+    <emu-nt>ParenthesizedTokens</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="3ub13utg">
+        <emu-t>(</emu-t>
+        <emu-nt optional="">TokenBody<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>)</emu-t>
+    </emu-rhs>
+</emu-production>
+<emu-production name="SquareBracketedTokens">
+    <emu-nt>SquareBracketedTokens</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="b3abwmy8">
+        <emu-t>[</emu-t>
+        <emu-nt optional="">TokenBody<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>]</emu-t>
+    </emu-rhs>
+</emu-production>
+<emu-production name="CurlyBracketedTokens">
+    <emu-nt>CurlyBracketedTokens</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="uxndn1zh">
+        <emu-t>{</emu-t>
+        <emu-nt optional="">TokenBody<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>}</emu-t>
+    </emu-rhs>
+</emu-production>
+<emu-production name="AngleBracketedTokens">
+    <emu-nt>AngleBracketedTokens</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="8z_ulddp">
+        <emu-t>&lt;</emu-t>
+        <emu-nt optional="">TokenBody<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+        <emu-t>&gt;</emu-t>
+    </emu-rhs>
+</emu-production>
+<emu-production name="TemplateBracketedTokens">
+    <emu-nt>TemplateBracketedTokens</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="55bfypk7">
+        <emu-nt>TemplateHead</emu-nt>
+        <emu-nt>TemplateTokenBody</emu-nt>
+        <emu-nt>TemplateTail</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="TemplateTokenBody">
+    <emu-nt>TemplateTokenBody</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="xw1jo27d">
+        <emu-nt>TokenBody</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="o0qlwyto">
+        <emu-nt>TokenBody</emu-nt>
+        <emu-nt>TemplateMiddle</emu-nt>
+        <emu-nt>TemplateTokenBody</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="TokenBody">
+    <emu-nt>TokenBody</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="osw1p1zu">
+        <emu-nt>TokenOrBracketedTokens</emu-nt>
+        <emu-nt optional="">TokenBody<emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="TokenOrBracketedTokens">
+    <emu-nt>TokenOrBracketedTokens</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="-ciqeo2x">
+        <emu-nt>NonBracketedToken</emu-nt>
+    </emu-rhs>
+    <emu-rhs a="3gfssksh">
+        <emu-nt>BracketedTokens</emu-nt>
+    </emu-rhs>
+</emu-production>
+<emu-production name="NonBracketedToken">
+    <emu-nt>NonBracketedToken</emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="35wkwslf">
+        <emu-nt>Token</emu-nt> <emu-gmod>but not one of <emu-t>(</emu-t> or <emu-t>)</emu-t> or <emu-t>[</emu-t> or <emu-t>]</emu-t> or <emu-t>{</emu-t> or <emu-t>}</emu-t> or <emu-t>&lt;</emu-t> or <emu-t>&gt;</emu-t> or <emu-nt>TemplateHead</emu-nt> or <emu-nt>TemplateMiddle</emu-nt> or <emu-nt>TemplateTail</emu-nt></emu-gmod>
+    </emu-rhs>
+</emu-production>
+</emu-grammar>
+</emu-clause>
+</div></body>
