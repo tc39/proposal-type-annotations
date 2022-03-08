@@ -1,3 +1,4 @@
+// @ts-check
 import { watch, readFileSync, writeFileSync, existsSync, mkdirSync } from "fs"
 import { createServer } from "http"
 import { tmpdir } from "os";
