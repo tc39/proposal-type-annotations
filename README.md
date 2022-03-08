@@ -328,7 +328,7 @@ document.getElementById("entry")!.innerText = "...";
 ```
 
 In TypeScript, the non-null assertion operator has no runtime semantics, and this proposal would specify it similarly;
-hpwever, there is a case for adding non-nullable assertions as a runtime operator instead.
+however, there is a case for adding non-nullable assertions as a runtime operator instead.
 If a runtime operator is preferred, that would likely become an independent proposal.
 
 ### Generics
