@@ -709,21 +709,18 @@ If there is a desire to keep language open to later adding runtime-checked types
 ### Other languages that have optional erasable type syntax
 
 When Python decided to add a gradual type system to the language, it did it in two steps.
-First, a proposal for type annotations was added to the language, that enabled
-any "types" to be added to the code, where the Python interpreter ignored them (similar to this
-proposal).
-After a few years, on top of that proposal, a standard type system ("type hints")
-was added to Python. See the [References section](#References) for links to the two proposals.
+First, a proposal for type annotations was created in [PEP-3107 - Function Annotations](https://www.python.org/dev/peps/pep-3107/) that specified parameter types and function return types in Python
+Several years later, the places in which types could occur was expanded in [Python PEP-484 - Type Hints](https://www.python.org/dev/peps/pep-0484/).
+
 
 The proposal here differs significantly from Python's types, as the types in this proposal are entirely ignored, not evaluated as expressions or accessible at runtime as metadata. This difference is largely motivated by the existing community precedent, where JS type systems do not tend to use JS expression grammar for their types, so it is not possible to evaluate them as such.
 
-Ruby 3 has now also implemented RBS: type definitions that sit _beside_ the code
-and are not part of it. See the [References section](#References) for more information.
+[Ruby 3 has now also implemented RBS](https://www.ruby-lang.org/en/news/2020/12/25/ruby-3-0-0-released/): type definitions that sit _beside_ the code
+and are not part of it.
 
 #### Languages that add type systems onto JavaScript
 
-TypeScript, Flow, and Hegel are languages that implement type systems above standard JavaScript.
-See the [references section](#References) for links to the documentation of these languages.
+[TypeScript](https://www.typescriptlang.org/docs/handbook/intro.html), [Flow](https://flow.org/en/docs/), and [Hegel](https://hegel.js.org/docs) are languages that implement type systems above standard JavaScript.
 
 #### Ability to add type systems to JavaScript via comments
 
@@ -744,15 +741,6 @@ TC39 has previously discussed [guards](https://web.archive.org/web/2014121407591
 Previously, Sam Goto led discussions around an [optional types proposal](https://github.com/samuelgoto/proposal-optional-types) which aimed to unify syntax and semantics across the type-checkers.
 Trying to find agreement across type-checkers, along with defining a sufficient subset in both syntax and semantics meant that there were difficulties with this approach.
 An evolution of this plan was [pluggable types](https://github.com/samuelgoto/proposal-pluggable-types) which was [inspired by Gilad Bracha's ideas on pluggable type systems](http://bracha.org/pluggableTypesPosition.pdf).
-This proposal is extremely similar to the pluggable types proposal, but is framed differently and comes at a time with broader adoption of type-checking and a more mature type-checking ecosystem.
+This proposal is extremely similar to the pluggable types proposal, but leans a bit more heavily on the idea of viewing types as comments, and comes at a time with broader adoption of type-checking and a more mature type-checking ecosystem.
 
-## References
-
-- [TypeScript Reference](https://www.typescriptlang.org/docs/handbook/intro.html)
-- [Flow Documentation](https://flow.org/en/docs/)
-- [Hegel Documentation](https://hegel.js.org/docs)
-- [Python PEP-3107 - Function Annotations](https://www.python.org/dev/peps/pep-3107/)
-- [Python PEP-484 - Type Hints](https://www.python.org/dev/peps/pep-0484/)
-- [Ruby 3 announcement, including a Ruby type system](https://www.ruby-lang.org/en/news/2020/12/25/ruby-3-0-0-released/)
-- [Clojure Spec, the Clojure type system](https://clojure.org/guides/spec)
-- [Github, State of the Octoverse, where TypeScript is the 4th most popular language](https://octoverse.github.com/)
+The [optional types proposal repository contains links to other prior discussions around types in JavaScript](https://github.com/samuelgoto/proposal-optional-types/blob/master/FAQ.md#tc39-discussions).
