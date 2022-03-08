@@ -122,8 +122,8 @@ x = "hello";
 x = 100;
 ```
 
-The example above shows an annotation on `x`.
-The type specified for `x` is `string`, and tools such as TypeScript can utilize that type;
+In the example above, `x` is annotated with the type `string`.
+Tools such as TypeScript can utilize that type, and might choose to error on the statement `x = 100`;
 however, a JavaScript engine that follows this proposal would execute every line here without error.
 This is because annotations do not change the semantics of a program, and are equivalent to comments.
 
@@ -333,15 +333,14 @@ If a runtime operator is preferred, that would likely become an independent prop
 
 ### Generics
 
-Occasionally functions and data structures can act over several kinds of types, and the type system needs to be able to reason about those types.
-For example, it's not enough to talk about having an `Array` - often, we're interested in whether we have an `Array` of `strings`.
+In modern type systems, it's not enough to just talk about having an `Array` - often, we're interested in what's *in* the `Array` (e.g. whether we have an `Array` of `strings`).
 *Generics* give us a way to talk about things like containers over types, and the way we talk about an `Array` of `strings` is by writing `Array<string>`.
 
 Like everything else in this proposal, generics have no runtime behavior and would be ignored by a JavaScript runtime.
 
 #### Generic Declarations
 
-Type parameters can appear on `type` and `interface` declarations.
+Generic type parameters can appear on `type` and `interface` declarations.
 They must start with a `<` after the identifier and end with a `>`:
 
 ```ts
@@ -374,7 +373,7 @@ One can explicitly specify the type arguments of a generic function invocation o
 ```ts
 // TypeScript
 add<number>(4, 5)
-new Point<bigint>(4, 5)
+new Point<bigint>(4n, 5n)
 ```
 
 The above syntax is already valid JavaScript that users may rely on, so we cannot use this syntax as-is.
@@ -384,21 +383,30 @@ No specific solution is proposed at this point of time, but one example option i
 ```ts
 // Types as Comments - example syntax solution
 add::<number>(4, 5)
-new Point::<bigint>(4, 5)
+new Point::<bigint>(4n, 5n)
 ```
 
-The type argument (`::<type>`) would be ignored by the JavaScript runtime.
-It would be natural for the non-ambiguous syntax to become first-class syntax in TypeScript as well.
+These type arguments (`::<type>`) would be ignored by the JavaScript runtime.
+It would be reasonable for this non-ambiguous syntax to adopted in TypeScript as well.
 
 ### `this` Parameters
 
 A function can have a parameter named `this` as the first parameter, and this parameter (and its type) is ignored by the runtime.
-It has no effect on arity, and does not impact values like `arguments`.
+It has no effect on the `length` property of the function, and does not impact values like `arguments`.
 
 ```ts
 function sum(this: SomeType, x: number, y: number) {
     // ...
 }
+```
+
+It would be expected that using a `this` parameter in an arrow function would either be disallowed by the grammar, or trigger an early error.
+
+```ts
+// Error!
+const oops = (this: SomeType) => {
+    // ...
+};
 ```
 
 ## Intentional Omissions
