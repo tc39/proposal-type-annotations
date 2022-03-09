@@ -11,6 +11,7 @@ import { buildSync as esbuildSync } from "esbuild";
 import { build as buildEcmarkup } from "ecmarkup"
 import { WebSocketServer } from 'ws';
 import sass from "sass";
+import { fail } from "assert";
 
 // Convert and run the 'app' code
 const build = async () => {
@@ -22,7 +23,7 @@ const build = async () => {
     outfile: "./out/grammar.html"
   });
   for (const [filePath, content] of ecmarkupOutput.generatedFiles) {
-    await writeFile(filePath, content, "utf8")
+    await writeFile(filePath ?? fail("File path must be non-null."), content, "utf8")
   }
   // Use esbuild to convert JSX -> JS and to bundle the necessary JS into a single file.
   const result = esbuildSync({ logLevel: "warning", platform: "node", bundle: true, outfile: tmpFile, entryPoints: ['src/site.jsx'], external: ["remark-shiki-twoslash"] })
@@ -46,7 +47,7 @@ const build = async () => {
 // Starts up a HTTP server which vendors files in dev mode
 if (process.env.SITE_DEV) {
   const server = createServer(function (req, res) {
-    const filepath =  req.url === "/" ? "index.html" : req.url
+    const filepath =  !req.url || req.url === "/" ? "index.html" : req.url
     if (existsSync(join("out", filepath))) {
       res.writeHead(200, {'Content-Type': 'text/html'});
       res.write(readFileSync(join("out", filepath), "utf8"));
