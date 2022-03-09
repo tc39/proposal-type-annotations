@@ -5,6 +5,9 @@
         "jsx": "react",
         "target": "esnext",
         "module": "esnext",
-        "moduleResolution": "node"
+        "moduleResolution": "node",
+        "allowSyntheticDefaultImports": true,
+        "strict": true,
+        "noImplicitAny": false // node_modules issues
     }
 }

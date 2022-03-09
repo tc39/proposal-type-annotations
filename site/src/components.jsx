@@ -67,7 +67,7 @@ export const Code = (props) => {
     const Title = props.title ? () => <h4 className="code-title">{props.title}</h4> : () => null
     const Subtitle = props.after ? () => <p className="code-after">{props.after}</p> : () => null
     const Suffix = props.emoji ? () => <span className="emoji" role="img" aria-label={props.emojiName}>{props.emoji}</span> : () => null
-    const code =  dedentString(props.children)
+    const code = dedentString(props.children)
 
     const html = transformAttributesToHTML(code, props.lang, twoslash.highlighters, twoslash.settings)
     return (<>
@@ -109,6 +109,9 @@ socket.addEventListener('message', function (event) {
     return <script dangerouslySetInnerHTML={{ __html: js}} />
 }
 
+/**
+ * @param {string} code
+ */
 function dedentString(code) {
     // Based on dedent-js, which is MIT licensed
     // at https://github.com/MartinKolarik/dedent-js/blob/master/LICENSE
@@ -122,7 +125,6 @@ function dedentString(code) {
 		}
 	}
 
-    
     if (matches.length) {
 		let size = Math.min(...matches.map(value => value.length - 1));
 		let pattern = new RegExp(`\n[\t ]{${size}}`, 'g');

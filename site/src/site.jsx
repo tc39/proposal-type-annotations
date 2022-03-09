@@ -1,8 +1,8 @@
 // @ts-check
 import * as React from 'react';
 import * as ReactDOMServer from 'react-dom/server';
-import {writeFileSync} from "fs"
-import {DevWebSocket, Entry, FAQ, Header, setupShikiTwoslash, Split, SplitReverse, Code, TwoThirdsHeading, CenterOneColumn} from "./components.jsx"
+import { writeFileSync } from "fs"
+import { DevWebSocket, Entry, FAQ, Header, setupShikiTwoslash, Split, Code, TwoThirdsHeading, CenterOneColumn } from "./components.jsx"
 
 const Page = () => <html lang="en">
     <head>
@@ -51,11 +51,10 @@ const Page = () => <html lang="en">
         </div>
       </Split>
 
-
-      <p>The Types as Comments proposal aims to simplify working in a modern JavaScript codebase.  With Types as Comments, developers can remove a build phase from their apps, keeping TypeScript and Flow codebases aligned with JavaScript. This proposal does not precisely specify a type syntax, which opens the door to many potential type systems in JavaScript.</p>
+      <p>The Types as Comments proposal aims to simplify working in a modern JavaScript codebases. With Types as Comments, developers can remove a build step from their apps, keeping TypeScript and Flow codebases aligned with JavaScript. This proposal does not precisely specify a type syntax, which provides innovative space for different type systems.</p>
 
       <h2>How the proposal works</h2>
-      <aside>Note: this is a simplification for the purposes of understanding the ideas behind Types as Comments.</aside>
+      <aside>Note: this is a simplification of the overall Types as Comments proposal.</aside>
 
       <Split>
         <Code lang="ts twoslash">{`
@@ -66,8 +65,8 @@ const Page = () => <html lang="en">
           // @log: Hello, types`}
         </Code>
         <div>
-          <p>Today, a JavaScript engine knows that a backslash and a star (<code>/*</code>) indicates the start of a multi-line comment.</p>
-          <p>Which to the engine is roughly: <em>'from this point in the code move onwards ignoring the characters until you find a star with a backslash right after <code>*/</code>'  </em>.</p>
+          <p>Today, a JavaScript engine knows that a slash and a star (<code>/*</code>) indicates the start of a multi-line comment.</p>
+          <p>To the engine, this roughly means: <em>"from this point in the code, keep reading characters and ignore them until you find a star with a slash right after <code>*/</code>"</em>.</p>
         </div>
       </Split>
 
@@ -80,9 +79,9 @@ const Page = () => <html lang="en">
           // @log: Hello, types`}
           </Code>
         <div>
-          <p>For the simplest case, the same idea could be applied to an engine which implements Type as Comments. </p>
-          <p>If the engine has just seen an identifier like '<code>message</code>' and the next character is a colon (<code>:</code>), then treat the colon (<code>:</code>) and the next word of characters ('<code>: string</code>') as a comment.</p>
-          <p>Once the engine hits the <code>=</code>'s then stop treating the code as comments and continue to create runtime code.</p>
+          <p>For the simplest case, the same idea could be applied to an engine which implements Type as Comments.</p>
+          <p>If the engine has just seen an variable like <code>message</code> and the next character is a colon (<code>:</code>), then treat the colon (<code>:</code>) and certain pieces of code after ('<code>: string</code>') as a comment.</p>
+          <p>In this case, once an engine would hit the <code>=</code> charater, it would stop interpreting the code as comments and read the initializer of <code>message</code>.</p>
         </div>
       </Split>
 
@@ -96,47 +95,19 @@ const Page = () => <html lang="en">
             console.log(message)
             // @log: Hello, types`}
           </Code>
-          <p>The underlying implementation would need to be a more complex than that, for example to handle object literal syntax (<code>{`{ id: string }`}</code>) the engine would keep track of open and close braces.</p>
+          <p>The underlying implementation would need to be a bit more complex than that. For example, to handle things like object type literals (<code>{`{ id: string }`}</code>) an engine would keep track of open and close braces.</p>
           <p>The goal of the proposal is to provide a way to describe how to safely ignore type-like code inside the JavaScript language.</p>
         </div>
       </CenterOneColumn>
-
-      {/* <SplitReverse>
-        <div>
-          <p>The underlying implementation would need to be a more complex than that, for example it to handle object literal syntax the parser would keep track of open and close braces.</p>
-        </div>
-        <div>
-          <Code lang="ts twoslash">{`            
-            const input: { [key: string]: boolean | Horse } = { 
-              del: true,
-              rodney: false,
-            }
-
-            console.log(input.name)
-            // @log: Hello, Zagreus`}
-          </Code>
-
-          <Code lang="ts twoslash">{`
-            const input: ({ name: string })  = { 
-              name: "Zagreus"
-            }
-            
-            console.log(input.name)
-            // @log: Hello, Zagreus`}
-          </Code>
-        </div>
-      </SplitReverse> */}
-
 
       <h2>Who benefits?</h2>
       <Split>
         
         <article>
-          <h4>JavaScript Users</h4>
-          <p>Greatly reduces the need for source code transformation in modern JavaScript projects.</p>
+          <h4>JavaScript and TypeScript Users</h4>
+          <p>Less need for source code transformation in modern JavaScript projects.</p>
           <p>Cleaner and more powerful syntax than JSDoc comments.</p>
-          <p>Allows users of existing static type systems to migrate back towards source code alignment with JavaScript.</p>
-          <p>Pasting typed code into the console just works.</p>
+          <p>Pasting typed code into consoles and REPLs just works.</p>
         </article>
 
         <article>
@@ -145,7 +116,6 @@ const Page = () => <html lang="en">
           <p>Existing JavaScript tools can:</p>
           <ul>
             <li>Skip source-code changes</li>
-            <li>Avoid duplicate transpiled files</li>
             <li>Reduce the need for sourcemaps</li>
             <li>Simplify file resolvers</li>
             <li>Use one parsing strategy</li>
@@ -154,7 +124,7 @@ const Page = () => <html lang="en">
 
         <article>
           <h4>Engine Maintainers</h4>
-          <p>Browser engines do not pay any type-checking cost at runtime. </p>
+          <p>Browser engines do not pay any type-checking cost at runtime.</p>
           <p>Engine maintainers avoid the burden of parser upgrades as each type system evolves.</p>
         </article>
       </Split>
@@ -164,35 +134,35 @@ const Page = () => <html lang="en">
 
       <FAQ>
         <Entry title="What type syntax is proposed?">
-          <p>Type definitions on functions and variable declarations, import/exporting types, class field and methods, generics, function overloads,  `as X` type assertions, this parameters and more.</p>
+          <p>Type definitions on functions and variable declarations, import/exporting types, class field and methods, generics, type assertions, <code>this</code> parameters, and more.</p>
         </Entry>
 
         <Entry title="Will JavaScript engines perform type-checking?">
-          <p>No, the goal is to let projects like TypeScript, Flow and others provide the type system and check the code for type errors. JavaScript would only reserve a space in the JavaScript syntax for their type syntax to exist.</p>
+          <p>No, the goal is to let projects like TypeScript, Flow, and others provide the type system and check the code for type errors. JavaScript would only reserve a space in the JavaScript syntax for their type syntax to exist.</p>
         </Entry>
 
         <Entry title="Will adding types slow down my JavaScript programs?">
-          <p>Like any new JavaScript feature, it would have performance trade-offs but the performance changes to JavaScript code would be is comparable to the performance hit in writing a comment in your code.</p>
-          <p>Basically, no</p>
+          <p>Like any new JavaScript feature, it would have performance trade-offs, and there is some amount of parsing that would be required; however the performance here should be relatively small as these types just act as comments.</p>
+          <p>In short, no.</p>
         </Entry>
 
         <Entry title="Will this grow JavaScript bundle sizes?">
-          <p>It could, but if you are already bundling then you would have the types removed during that bundling process. Negating the issue for most apps where bundle size is a concern.</p>
-          <p>JavaScript files without a build-step would have more characters as a result of the types. This is the same trade-off as adding comments to files, and the same solutions apply, e.g. use a minifier.</p>
+          <p>It could, but if you are currently bundling and using type syntax, types are already being removed during that bundling process. Most existing tools could continue to strip away types, or delegate the task to optimizers/minifiers..</p>
+          <p>JavaScript files without a build-step would have more characters as a result of the types. This is the same trade-off as adding comments to files, and the same solutions apply (e.g. use a minifier).</p>
         </Entry>
 
         <Entry title="How does this differ from JSDoc support?">
-          <p>Today JavaScript users use JSDoc syntax with tooling in order to create a type-system in JavaScript code without a build step. </p>
-          <p>The syntax for JSDoc support is intentionally more verbose than type syntax, and is less ergonomic for complex typing as it is a documentation format. With this proposal, you can get JSDoc-like 'works without build tools' without the constraint of specially formatted comments.</p>
+          <p>Today JavaScript users can write JSDoc comments and have them checked by TypeScript or Closure Compiler.</p>
+          <p>The syntax for JSDoc support is more verbose than type syntax, and is less ergonomic for complex typing. With this proposal, you can get the JSDoc-like "works without build tools" experience without the constraints of JSDoc comments.</p>
         </Entry>
 
-        <Entry title="Does this proposal favour TypeScript?">
+        <Entry title="Does this proposal favor TypeScript?">
           <p>The proposal favors TypeScript/Flow-like syntax inside JavaScript, and is strongly influenced by syntax which is common to both language extensions. The aim is to also leave the door open for new syntax extensions which haven't been anticipated yet.</p>
           <p>That said, the language in this specification favours TypeScript as it is the most popular type-system, but nearly all of the proposed syntax spaces would benefit Flow users too.</p>
         </Entry>
 
         <Entry title="Is there prior art?">
-          <p>Python similarly implements support for opt-in type-checking.  However this proposal has a stronger stance of relying solely on type erasure. Ruby is quite similar too.</p>
+          <p>Python similarly implements support for opt-in type-checking. However this proposal has a stronger stance of relying solely on type erasure. Ruby is quite similar too.</p>
         </Entry>  
 
         <Entry title="Will this slow down JavaScript's evolution?">
@@ -200,27 +170,26 @@ const Page = () => <html lang="en">
         </Entry>  
 
         <Entry title="How does this affect runtime error messaging?">
-          <p>JavaScript today throws <code>SyntaxError</code> messages when it has evaluated invalid syntax. This will still be the same after the proposal, except for invalid code inside the areas designated for Types as Comments.</p>
-          <p>For example this typo in `message` would raise an error:</p>
-          <Code lang="js twoslash">{`
-            const mes sage: string = "Hello, types"
-            // @error: SyntaxError: Unexpected token ':'. const declared variable 'message' must have an initializer.
-// @noErrors`}
-          </Code>
-          <p>Versus this 'error' in the types space (in TypeScript / Flow):</p>
+          <p>At most, the only new errors that an engine could issue are <code>SyntaxError</code>s. In some cases, the Types as Comments leaves a lot of room for invalid-<em>looking</em> syntax, but which is actually fine.</p>
+          <p>For example, this syntax would be expected to error in TypeScript or Flow, but would be accepted by a JavaScript engine.:</p>
           <Code lang="ts">{`
             const message: { abc=123 } = "Hello, types"`}
           </Code>
-          <p>Which would run perfectly fine in a JavaScript engine supporting this proposal, but TypeScript or any other external type checker will catch those type errors. </p>
-          <p>The proposal leaves type space errors to the IDE and type checker to declare the code inside the types are invalid, not the JavaScript runtime.</p>
+          <p>On the other hand, the Types as Comments proposal does have some expectations around type syntax, and ill-formatted types at the top level of an annotation might have issues.</p>
+          <Code lang="js twoslash">{`
+            const message: !!@@hello@@!! = "Hello, types"
+            // @error: SyntaxError
+            // @noErrors`}
+          </Code>
+          <p>While there would be some restrictions on type syntax, the proposal leaves type space errors to the IDE and type checker to report when certain types are invalid.</p>
         </Entry>
 
          <Entry title="I'm new, what are these terms?">
-          <p>JavaScript is a language which does not provide a way to declare the input/outputs of your code. For example in JavaScript a let variable can be set to a string, number, object or more. </p>
-          <p>JavaScript extensions like TypeScript and Flow exist to add new syntax which have a way to declare 'this let variable can only be a string.'</p>
-          <p>The value in adding these extra definitions is that tooling can make better assumptions about how your code works and doesn't. That tooling can live in your IDE, or be a command-line app.</p>
+          <p>JavaScript is a language which does not provide a way to declare the input/outputs of your code. For example, in JavaScript a variable can be set to a string, a number, an object, and more.</p>
+          <p>JavaScript extensions like TypeScript and Flow exist to add new syntax which have a way to state that "this variable should only ever hold a string."</p>
+          <p>The value in adding this syntax is that tooling can make better assumptions about how your code works, and let you know when something might go wrong. That tooling can live in your editor, or be a command-line app.</p>
           <p>The process of verifying these assumptions is called type checking, and for JavaScript there are different type checkers with different trade-offs about how JavaScript code can be validated.</p>
-          <p>Prior to this proposal, you needed a tool like Babel or TypeScript to remove those definitions, after this proposal you do not need a build tool to remove them. </p>
+          <p>Prior to this proposal, you needed a tool like Babel or TypeScript to remove these types, but if this proposal is accepted, you won't need a build tool to remove them.</p>
           <p>Removing this step can help simplify working in JavaScript projects to the point where you may not need any build tooling at all.</p>
         </Entry>
       </FAQ>
@@ -230,21 +199,22 @@ const Page = () => <html lang="en">
       <FAQ>
         <Entry title="Will all of TypeScript be supported by this proposal?">
           <p>No, not all of today's TypeScript syntax would be supported by this proposal. This is similar to how Babel support for TypeScript does not support all of the existing TypeScript syntax. </p>
-          <p>For example enums, namespaces and class parameter properties are unlikely to be supported.  In addition, specifying type parameters at function callsites will require a slightly different syntax.</p>
+          <p>For example enums, namespaces and class parameter properties are unlikely to be supported. In addition, specifying type arguments at function call-sites will require a slightly different syntax.</p>
         </Entry>
 
         <Entry title="How would I convert my TypeScript codebase to JavaScript with Types as Comments?">
-          <p>It's likely that TypeScript will introduce a TSConfig flag which indicates that you want your files to be compatible with Types as Comments. </p>
-          <p>This would allow you to migrate your code incrementally as `.ts` files before converting them to `.js` files.</p>
+          <p>It's possible that TypeScript would introduce an option to ensure that your code is compatible with Types as Comments.</p>
+          <p>Teams could incrementally migrate by addressing each reported error as necessary. When no new errors are reported, <code>.ts</code> file extensions could be replaced with <code>.js</code> and the migration would be done.</p>
         </Entry>
 
         <Entry title="How does this differ from JSDoc support?">
-          <p>JSDoc solves the same problem as this proposal by putting the type information literally inside comments! Given the constraints of not being able to change the JavaScript language, this was a good compromise between wanting the code to be regular JavaScript while still type checking it via the TypeScript checker.</p>
-          <p>This proposal is about changing the JavaScript language to improve the syntax that can be used for types. This proposal allows you to have the cake ("It's just JavaScript") and eat it too ("I want to check the types"). You get all the benefits of TypeScript's JSDoc support, but without the awkward syntax.</p>
+          <p>JSDoc solves the same problem as this proposal by putting the type information inside existing comments! Given the constraint of not being able to change the JavaScript language, this was the best compromise to introduce type-checking in plain JavaScript.</p>
+          <p>This proposal removes that constraint and changes the JavaScript language to permit syntax that can be used for types. This proposal allows you to have the cake ("It's just JavaScript") and eat it too ("I want to check the types"). You get all the benefits of TypeScript's JSDoc support, but without the awkward syntax.</p>
         </Entry>
 
         <Entry title="Do I need to migrate?">
-          <p>No. TypeScript has backwards compatibility guarantees which means that you can continue to use `.ts` and `.tsx` files for TypeScript.</p>
+          <p>No. TypeScript has backwards compatibility guarantees which means that you can continue to use `.ts` and `.tsx` files for TypeScript. Your code that works today will continue to work tomorrow.</p>
+          <p>In fact, given how new this proposal is, we strongly advise not to rewrite existing code as it would be premature.</p>
         </Entry>
       </FAQ>
 
