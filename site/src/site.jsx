@@ -216,6 +216,10 @@ const Page = () => <html lang="en">
           <p>No. TypeScript has backwards compatibility guarantees which means that you can continue to use `.ts` and `.tsx` files for TypeScript. Your code that works today will continue to work tomorrow.</p>
           <p>In fact, given how new this proposal is, we strongly advise not to rewrite existing code as it would be premature.</p>
         </Entry>
+
+        <Entry title="What does the grammar look like?">
+          <p>You can read the <a href="https://giltayar.github.io/proposal-types-as-comments/grammar.html">grammar spec here</a> and <a href="https://github.com/giltayar/proposal-types-as-comments/blob/master/syntax/grammar-ideas.md">notes for implementation</a> inside the repo.</p>
+        </Entry>
       </FAQ>
 
       <h2>Links</h2>
