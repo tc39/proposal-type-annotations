@@ -1,395 +1,674 @@
 # Modified productions
 
+
+
 MemberExpression :
-    > ...
-    MemberExpression  `::`  TypeArguments
-    MemberExpression  [no LineTerminator here]  `!`
+
+&nbsp;&nbsp;&nbsp;&nbsp;<em>...</em>
+
+&nbsp;&nbsp;&nbsp;&nbsp;MemberExpression  `::`  TypeArguments
+
+&nbsp;&nbsp;&nbsp;&nbsp;MemberExpression  [no LineTerminator here]  `!`
+
+
 
 CallExpression :
-    > ...
-    CallExpression  `::`  TypeArguments
+
+&nbsp;&nbsp;&nbsp;&nbsp;<em>...</em>
+
+&nbsp;&nbsp;&nbsp;&nbsp;CallExpression  `::`  TypeArguments
+
+
 
 OptionalChain :
-    > ...
-    OptionalChain  `::`  TypeArguments
+
+&nbsp;&nbsp;&nbsp;&nbsp;<em>...</em>
+
+&nbsp;&nbsp;&nbsp;&nbsp;OptionalChain  `::`  TypeArguments
+
+
 
 RelationalExpression :
-    > ...
-    RelationalExpression  [no LineTerminator here]  `as`  Type
-    RelationalExpression  [no LineTerminator here]  `as`  `const`
+
+&nbsp;&nbsp;&nbsp;&nbsp;<em>...</em>
+
+&nbsp;&nbsp;&nbsp;&nbsp;RelationalExpression  [no LineTerminator here]  `as`  Type
+
+&nbsp;&nbsp;&nbsp;&nbsp;RelationalExpression  [no LineTerminator here]  `as`  `const`
+
+
 
 Declaration :
-    > ...
-    TypeDeclaration
-    InterfaceDeclaration
+
+&nbsp;&nbsp;&nbsp;&nbsp;<em>...</em>
+
+&nbsp;&nbsp;&nbsp;&nbsp;TypeDeclaration
+
+&nbsp;&nbsp;&nbsp;&nbsp;InterfaceDeclaration
+
+
 
 LexicalBinding :
-    BindingIdentifier  TypeAnnotation?  Initializer?
-    BindingPattern  TypeAnnotation?  Initializer
+
+&nbsp;&nbsp;&nbsp;&nbsp;BindingIdentifier  TypeAnnotation?  Initializer?
+
+&nbsp;&nbsp;&nbsp;&nbsp;BindingPattern  TypeAnnotation?  Initializer
+
+
 
 VariableDeclaration :
-    BindingIdentifier  TypeAnnotation?  Initializer?
-    BindingPattern  TypeAnnotation?  Initializer
+
+&nbsp;&nbsp;&nbsp;&nbsp;BindingIdentifier  TypeAnnotation?  Initializer?
+
+&nbsp;&nbsp;&nbsp;&nbsp;BindingPattern  TypeAnnotation?  Initializer
+
+
 
 Catch :
-    `catch`  `(`  CatchParameter  TypeAnnotation?  `)`  Block
-    `catch`  Block
+
+&nbsp;&nbsp;&nbsp;&nbsp;`catch`  `(`  CatchParameter  TypeAnnotation?  `)`  Block
+
+&nbsp;&nbsp;&nbsp;&nbsp;`catch`  Block
+
+
 
 FormalParameter :
-    BindingIdentifier  TypeAnnotation?  Initializer?
-    BindingIdentifier  `?`  TypeAnnotation?
-    BindingPattern  TypeAnnotation?  Initializer?
+
+&nbsp;&nbsp;&nbsp;&nbsp;BindingIdentifier  TypeAnnotation?  Initializer?
+
+&nbsp;&nbsp;&nbsp;&nbsp;BindingIdentifier  `?`  TypeAnnotation?
+
+&nbsp;&nbsp;&nbsp;&nbsp;BindingPattern  TypeAnnotation?  Initializer?
+
+
 
 FunctionRestParameter :
-    `...`  BindingIdentifier  TypeAnnotation?
-    `...`  BindingPattern  TypeAnnotation?
+
+&nbsp;&nbsp;&nbsp;&nbsp;`...`  BindingIdentifier  TypeAnnotation?
+
+&nbsp;&nbsp;&nbsp;&nbsp;`...`  BindingPattern  TypeAnnotation?
+
+
 
 FunctionDeclaration :
-    `function`  BindingIdentifier  TypeParameters?  `(`  FormalParameters  `)`  TypeAnnotation?  `{`  FunctionBody  `}`
+
+&nbsp;&nbsp;&nbsp;&nbsp;`function`  BindingIdentifier  TypeParameters?  `(`  FormalParameters  `)`  TypeAnnotation?  `{`  FunctionBody  `}`
+
+
 
 FunctionExpression :
-    `function`  BindingIdentifier?  TypeParameters?  `(`  FormalParameters  `)`  TypeAnnotation?  `{`  FunctionBody  `}`
+
+&nbsp;&nbsp;&nbsp;&nbsp;`function`  BindingIdentifier?  TypeParameters?  `(`  FormalParameters  `)`  TypeAnnotation?  `{`  FunctionBody  `}`
+
+
 
 ArrowFunction :
-    > ...
-    ArrowParameters  TypeAnnotation  `=>`  ConciseBody
+
+&nbsp;&nbsp;&nbsp;&nbsp;<em>...</em>
+
+&nbsp;&nbsp;&nbsp;&nbsp;ArrowParameters  TypeAnnotation  `=>`  ConciseBody
+
+
 
 ArrowParameters :
-    > ...
-    TypeParameters  `(`  UniqueFormalParameters  `)`
+
+&nbsp;&nbsp;&nbsp;&nbsp;<em>...</em>
+
+&nbsp;&nbsp;&nbsp;&nbsp;TypeParameters  `(`  UniqueFormalParameters  `)`
+
+
 
 MethodDefinition :
-    ClassElementName  `?`?  TypeParameters?  `(`  UniqueFormalParameters  `)`  TypeAnnotation?  `{`  FunctionBody  `}`
-    GeneratorMethod
-    AsyncMethod
-    AsyncGeneratorMethod
-    `get`  ClassElementName  `(`  `)`  TypeAnnotation?  `{`  FunctionBody  `}`
-    `set`  ClassElementName  `(`  PropertySetParameterList  `)`  `{`  FunctionBody  `}`
+
+&nbsp;&nbsp;&nbsp;&nbsp;ClassElementName  `?`?  TypeParameters?  `(`  UniqueFormalParameters  `)`  TypeAnnotation?  `{`  FunctionBody  `}`
+
+&nbsp;&nbsp;&nbsp;&nbsp;GeneratorMethod
+
+&nbsp;&nbsp;&nbsp;&nbsp;AsyncMethod
+
+&nbsp;&nbsp;&nbsp;&nbsp;AsyncGeneratorMethod
+
+&nbsp;&nbsp;&nbsp;&nbsp;`get`  ClassElementName  `(`  `)`  TypeAnnotation?  `{`  FunctionBody  `}`
+
+&nbsp;&nbsp;&nbsp;&nbsp;`set`  ClassElementName  `(`  PropertySetParameterList  `)`  `{`  FunctionBody  `}`
+
+
 
 GeneratorDeclaration :
-    `function`  `*`  BindingIdentifier  TypeParameters?  `(`  FormalParameters  `)`  TypeAnnotation?  `{`  GeneratorBody  `}`
+
+&nbsp;&nbsp;&nbsp;&nbsp;`function`  `*`  BindingIdentifier  TypeParameters?  `(`  FormalParameters  `)`  TypeAnnotation?  `{`  GeneratorBody  `}`
+
+
 
 GeneratorExpression :
-    `function`  `*`  BindingIdentifier?  TypeParameters?  `(`  FormalParameters  `)`  TypeAnnotation?  `{`  GeneratorBody  `}`
+
+&nbsp;&nbsp;&nbsp;&nbsp;`function`  `*`  BindingIdentifier?  TypeParameters?  `(`  FormalParameters  `)`  TypeAnnotation?  `{`  GeneratorBody  `}`
+
+
 
 GeneratorMethod :
-    `*`  ClassElementName  `?`?  TypeParameters?  `(`  UniqueFormalParameters  `)`  TypeAnnotation?  `{`  GeneratorBody  `}`
+
+&nbsp;&nbsp;&nbsp;&nbsp;`*`  ClassElementName  `?`?  TypeParameters?  `(`  UniqueFormalParameters  `)`  TypeAnnotation?  `{`  GeneratorBody  `}`
+
+
 
 AsyncGeneratorDeclaration :
-    `async`  [no LineTerminator here]  `function`  `*`  BindingIdentifier  TypeParameters?  `(`  FormalParameters  `)`  TypeAnnotation?  `{`  AsyncGeneratorBody  `}`
+
+&nbsp;&nbsp;&nbsp;&nbsp;`async`  [no LineTerminator here]  `function`  `*`  BindingIdentifier  TypeParameters?  `(`  FormalParameters  `)`  TypeAnnotation?  `{`  AsyncGeneratorBody  `}`
+
+
 
 AsyncGeneratorExpression :
-    `async`  [no LineTerminator here]  `function`  `*`  BindingIdentifier?  TypeParameters?  `(`  FormalParameters  `)`  TypeAnnotation?  `{`  AsyncGeneratorBody  `}`
+
+&nbsp;&nbsp;&nbsp;&nbsp;`async`  [no LineTerminator here]  `function`  `*`  BindingIdentifier?  TypeParameters?  `(`  FormalParameters  `)`  TypeAnnotation?  `{`  AsyncGeneratorBody  `}`
+
+
 
 AsyncGeneratorMethod :
-    `async`  [no LineTerminator here]  `*`  ClassElementName  `?`?  TypeParameters?  `(`  UniqueFormalParameters  `)`  TypeAnnotation?  `{`  AsyncGeneratorBody  `}`
+
+&nbsp;&nbsp;&nbsp;&nbsp;`async`  [no LineTerminator here]  `*`  ClassElementName  `?`?  TypeParameters?  `(`  UniqueFormalParameters  `)`  TypeAnnotation?  `{`  AsyncGeneratorBody  `}`
+
+
 
 ClassDeclaration :
-    AbstractModifier?  `class`  BindingIdentifier  ClassTail
+
+&nbsp;&nbsp;&nbsp;&nbsp;AbstractModifier?  `class`  BindingIdentifier  ClassTail
+
+
 
 ClassExpression :
-    AbstractModifier?  `class`  BindingIdentifier?  ClassTail
+
+&nbsp;&nbsp;&nbsp;&nbsp;AbstractModifier?  `class`  BindingIdentifier?  ClassTail
+
+
 
 ClassHeritage :
-    `extends`  LeftHandSideExpression  TypeArguments?  ClassImplementsClause?
+
+&nbsp;&nbsp;&nbsp;&nbsp;`extends`  LeftHandSideExpression  TypeArguments?  ClassImplementsClause?
+
+
 
 FieldDefinition :
-    ClassElementName  `?`?  TypeAnnotation?  Initializer?
-    ClassElementName  `!`  TypeAnnotation?  Initializer?
+
+&nbsp;&nbsp;&nbsp;&nbsp;ClassElementName  `?`?  TypeAnnotation?  Initializer?
+
+&nbsp;&nbsp;&nbsp;&nbsp;ClassElementName  `!`  TypeAnnotation?  Initializer?
+
+
 
 ClassElement :
-    AccessibilityModifier?  OverrideModifier?  MethodDefinition
-    AccessibilityModifier?  `static`  OverrideModifier?  MethodDefinition
-    AccessibilityModifier?  FieldDefinition
-    AccessibilityModifier?  `static`  FieldDefinition
-    ClassStaticBlock
-    AbstractClassElement
-    IndexSignature
-    `;`
+
+&nbsp;&nbsp;&nbsp;&nbsp;AccessibilityModifier?  OverrideModifier?  MethodDefinition
+
+&nbsp;&nbsp;&nbsp;&nbsp;AccessibilityModifier?  `static`  OverrideModifier?  MethodDefinition
+
+&nbsp;&nbsp;&nbsp;&nbsp;AccessibilityModifier?  FieldDefinition
+
+&nbsp;&nbsp;&nbsp;&nbsp;AccessibilityModifier?  `static`  FieldDefinition
+
+&nbsp;&nbsp;&nbsp;&nbsp;ClassStaticBlock
+
+&nbsp;&nbsp;&nbsp;&nbsp;AbstractClassElement
+
+&nbsp;&nbsp;&nbsp;&nbsp;IndexSignature
+
+&nbsp;&nbsp;&nbsp;&nbsp;`;`
+
+
 
 AsyncFunctionDeclaration :
-    `async`  [no LineTerminator here]  `function`  BindingIdentifier  TypeParameters?  `(`  FormalParameters  `)`  TypeAnnotation?  `{`  AsyncFunctionBody  `}`
+
+&nbsp;&nbsp;&nbsp;&nbsp;`async`  [no LineTerminator here]  `function`  BindingIdentifier  TypeParameters?  `(`  FormalParameters  `)`  TypeAnnotation?  `{`  AsyncFunctionBody  `}`
+
+
 
 AsyncFunctionExpression :
-    `async`  [no LineTerminator here]  `function`  BindingIdentifier?  TypeParameters?  `(`  FormalParameters  `)`  TypeAnnotation?  `{`  AsyncFunctionBody  `}`
+
+&nbsp;&nbsp;&nbsp;&nbsp;`async`  [no LineTerminator here]  `function`  BindingIdentifier?  TypeParameters?  `(`  FormalParameters  `)`  TypeAnnotation?  `{`  AsyncFunctionBody  `}`
+
+
 
 AsyncMethod :
-    `async`  [no LineTerminator here]  ClassElementName  `?`?  TypeParameters?  `(`  UniqueFormalParameters  `)`  TypeAnnotation?  `{`  AsyncFunctionBody  `}`
+
+&nbsp;&nbsp;&nbsp;&nbsp;`async`  [no LineTerminator here]  ClassElementName  `?`?  TypeParameters?  `(`  UniqueFormalParameters  `)`  TypeAnnotation?  `{`  AsyncFunctionBody  `}`
+
+
 
 CoverCallExpressionAndAsyncArrowHead :
-    MemberExpression  TypeParameters?  Arguments  TypeAnnotation?
+
+&nbsp;&nbsp;&nbsp;&nbsp;MemberExpression  TypeParameters?  Arguments  TypeAnnotation?
+
+
 
 AsyncArrowHead :
-    `async`  [no LineTerminator here]  TypeParameters?  ArrowFormalParameters
+
+&nbsp;&nbsp;&nbsp;&nbsp;`async`  [no LineTerminator here]  TypeParameters?  ArrowFormalParameters
+
+
 
 ImportDeclaration :
-    > ...
-    `import`  `type`  ImportClause  FromClause  `;`
+
+&nbsp;&nbsp;&nbsp;&nbsp;<em>...</em>
+
+&nbsp;&nbsp;&nbsp;&nbsp;`import`  `type`  ImportClause  FromClause  `;`
+
+
 
 ImportSpecifier :
-    > ...
-    `type`  ImportedBinding
-    `type`  ModuleExportName  `as`  ImportedBinding
+
+&nbsp;&nbsp;&nbsp;&nbsp;<em>...</em>
+
+&nbsp;&nbsp;&nbsp;&nbsp;`type`  ImportedBinding
+
+&nbsp;&nbsp;&nbsp;&nbsp;`type`  ModuleExportName  `as`  ImportedBinding
+
+
 
 # New productions
 
+
+
 TypeArguments :
-    AngleBracketedTokens
+
+&nbsp;&nbsp;&nbsp;&nbsp;AngleBracketedTokens
+
+
 
 TypeDeclaration :
-    `type`  BindingIdentifier  TypeParameters?  `=`  Type
+
+&nbsp;&nbsp;&nbsp;&nbsp;`type`  BindingIdentifier  TypeParameters?  `=`  Type
+
+
 
 TypeParameters :
-    AngleBracketedTokens
+
+&nbsp;&nbsp;&nbsp;&nbsp;AngleBracketedTokens
+
+
 
 Type :
-    ConditionalType
-    NonConditionalType
+
+&nbsp;&nbsp;&nbsp;&nbsp;ConditionalType
+
+&nbsp;&nbsp;&nbsp;&nbsp;NonConditionalType
+
+
 
 ConditionalType :
-    NonConditionalType  [no LineTerminator here]  `extends`  NonConditionalType  `?`  Type  `:`  Type
+
+&nbsp;&nbsp;&nbsp;&nbsp;NonConditionalType  [no LineTerminator here]  `extends`  NonConditionalType  `?`  Type  `:`  Type
+
+
 
 NonConditionalType :
-    UnionType
-    FunctionType
-    ConstructorType
+
+&nbsp;&nbsp;&nbsp;&nbsp;UnionType
+
+&nbsp;&nbsp;&nbsp;&nbsp;FunctionType
+
+&nbsp;&nbsp;&nbsp;&nbsp;ConstructorType
+
+
 
 UnionType :
-    `|`?  IntersectionType
-    UnionType  `|`  IntersectionType
+
+&nbsp;&nbsp;&nbsp;&nbsp;`|`?  IntersectionType
+
+&nbsp;&nbsp;&nbsp;&nbsp;UnionType  `|`  IntersectionType
+
+
 
 IntersectionType :
-    `&`?  TypeOperatorType
-    IntersectionType  `&`  TypeOperatorType
+
+&nbsp;&nbsp;&nbsp;&nbsp;`&`?  TypeOperatorType
+
+&nbsp;&nbsp;&nbsp;&nbsp;IntersectionType  `&`  TypeOperatorType
+
+
 
 TypeOperatorType :
-    `readonly`  TypeOperatorType
-    `keyof`  TypeOperatorType
-    `unique`  TypeOperatorType
-    `infer`  TypeOperatorType
-    `not`  TypeOperatorType
-    PrimaryType
+
+&nbsp;&nbsp;&nbsp;&nbsp;`readonly`  TypeOperatorType
+
+&nbsp;&nbsp;&nbsp;&nbsp;`keyof`  TypeOperatorType
+
+&nbsp;&nbsp;&nbsp;&nbsp;`unique`  TypeOperatorType
+
+&nbsp;&nbsp;&nbsp;&nbsp;`infer`  TypeOperatorType
+
+&nbsp;&nbsp;&nbsp;&nbsp;`not`  TypeOperatorType
+
+&nbsp;&nbsp;&nbsp;&nbsp;PrimaryType
+
+
 
 PrimaryType :
-    ParenthesizedType
-    SquareBracketedType
-    CurlyBracketedType
-    TypeReference
-    ArrayType
-    LiteralType
-    TypeQuery
-    ImportType
-    TypePredicate
-    `this`
-    `void`
+
+&nbsp;&nbsp;&nbsp;&nbsp;ParenthesizedType
+
+&nbsp;&nbsp;&nbsp;&nbsp;SquareBracketedType
+
+&nbsp;&nbsp;&nbsp;&nbsp;CurlyBracketedType
+
+&nbsp;&nbsp;&nbsp;&nbsp;TypeReference
+
+&nbsp;&nbsp;&nbsp;&nbsp;ArrayType
+
+&nbsp;&nbsp;&nbsp;&nbsp;LiteralType
+
+&nbsp;&nbsp;&nbsp;&nbsp;TypeQuery
+
+&nbsp;&nbsp;&nbsp;&nbsp;ImportType
+
+&nbsp;&nbsp;&nbsp;&nbsp;TypePredicate
+
+&nbsp;&nbsp;&nbsp;&nbsp;`this`
+
+&nbsp;&nbsp;&nbsp;&nbsp;`void`
+
+
 
 ParenthesizedType :
-    ParenthesizedTokens
+
+&nbsp;&nbsp;&nbsp;&nbsp;ParenthesizedTokens
+
+
 
 SquareBracketedType :
-    SquareBracketedTokens
+
+&nbsp;&nbsp;&nbsp;&nbsp;SquareBracketedTokens
+
+
 
 CurlyBracketedType :
-    CurlyBracketedTokens
+
+&nbsp;&nbsp;&nbsp;&nbsp;CurlyBracketedTokens
+
+
 
 TypeReference :
-    TypeName  [no LineTerminator here]  TypeArguments?
+
+&nbsp;&nbsp;&nbsp;&nbsp;TypeName  [no LineTerminator here]  TypeArguments?
+
+
 
 TypeName :
-    Identifier
-    TypeName  `.`  Identifier
+
+&nbsp;&nbsp;&nbsp;&nbsp;Identifier
+
+&nbsp;&nbsp;&nbsp;&nbsp;TypeName  `.`  Identifier
+
+
 
 ArrayType :
-    PrimaryType  [no LineTerminator here]  `[`  `]`
+
+&nbsp;&nbsp;&nbsp;&nbsp;PrimaryType  [no LineTerminator here]  `[`  `]`
+
+
 
 LiteralType :
-    NumericLiteralType
-    StringLiteral
-    TemplateLiteralType
-    `true`
-    `false`
-    `null`
+
+&nbsp;&nbsp;&nbsp;&nbsp;NumericLiteralType
+
+&nbsp;&nbsp;&nbsp;&nbsp;StringLiteral
+
+&nbsp;&nbsp;&nbsp;&nbsp;TemplateLiteralType
+
+&nbsp;&nbsp;&nbsp;&nbsp;`true`
+
+&nbsp;&nbsp;&nbsp;&nbsp;`false`
+
+&nbsp;&nbsp;&nbsp;&nbsp;`null`
+
+
 
 TemplateLiteralType :
-    NoSubstitutionTemplate
-    TemplateBracketedTokens
+
+&nbsp;&nbsp;&nbsp;&nbsp;NoSubstitutionTemplate
+
+&nbsp;&nbsp;&nbsp;&nbsp;TemplateBracketedTokens
+
+
 
 NumericLiteralType :
-    NumericLiteral
-    `-`  [no LineTerminator here]  NumericLiteral
+
+&nbsp;&nbsp;&nbsp;&nbsp;NumericLiteral
+
+&nbsp;&nbsp;&nbsp;&nbsp;`-`  [no LineTerminator here]  NumericLiteral
+
+
 
 TypeQuery :
-    `typeof`  [no LineTerminator here]  EntityName
+
+&nbsp;&nbsp;&nbsp;&nbsp;`typeof`  [no LineTerminator here]  EntityName
+
+
 
 EntityName :
-    IdentifierName
-    ImportSpecifier
-    EntityName  `.`  IdentifierName
-    EntityName  `::`  TypeArguments
+
+&nbsp;&nbsp;&nbsp;&nbsp;IdentifierName
+
+&nbsp;&nbsp;&nbsp;&nbsp;ImportSpecifier
+
+&nbsp;&nbsp;&nbsp;&nbsp;EntityName  `.`  IdentifierName
+
+&nbsp;&nbsp;&nbsp;&nbsp;EntityName  `::`  TypeArguments
+
+
 
 ImportSpecifier :
-    `import`  [no LineTerminator here]  `(`  ModuleSpecifier  `)`
+
+&nbsp;&nbsp;&nbsp;&nbsp;`import`  [no LineTerminator here]  `(`  ModuleSpecifier  `)`
+
+
 
 ImportType :
-    ImportSpecifier
-    ImportSpecifier  `.`  TypeName
+
+&nbsp;&nbsp;&nbsp;&nbsp;ImportSpecifier
+
+&nbsp;&nbsp;&nbsp;&nbsp;ImportSpecifier  `.`  TypeName
+
+
 
 TypePredicate :
-    IdentifierOrThis  [no LineTerminator here]  `is`  Type
-    `asserts`  IdentifierOrThis
-    `asserts`  IdentifierOrThis  [no LineTerminator here]  `is`  Type
+
+&nbsp;&nbsp;&nbsp;&nbsp;IdentifierOrThis  [no LineTerminator here]  `is`  Type
+
+&nbsp;&nbsp;&nbsp;&nbsp;`asserts`  IdentifierOrThis
+
+&nbsp;&nbsp;&nbsp;&nbsp;`asserts`  IdentifierOrThis  [no LineTerminator here]  `is`  Type
+
+
 
 IdentifierOrThis :
-    Identifier
-    `this`
+
+&nbsp;&nbsp;&nbsp;&nbsp;Identifier
+
+&nbsp;&nbsp;&nbsp;&nbsp;`this`
+
+
 
 FunctionType :
-    TypeParameters?  ParameterList  `=>`  Type
+
+&nbsp;&nbsp;&nbsp;&nbsp;TypeParameters?  ParameterList  `=>`  Type
+
+
 
 ConstructorType :
-    `new`  TypeParameters?  ParameterList  `=>`  Type
+
+&nbsp;&nbsp;&nbsp;&nbsp;`new`  TypeParameters?  ParameterList  `=>`  Type
+
+
 
 ParameterList :
-    ParenthesizedTokens
+
+&nbsp;&nbsp;&nbsp;&nbsp;ParenthesizedTokens
+
+
 
 InterfaceDeclaration :
-    `interface`  BindingIdentifier  TypeParameters?  InterfaceExtendsClause?  InterfaceBody
+
+&nbsp;&nbsp;&nbsp;&nbsp;`interface`  BindingIdentifier  TypeParameters?  InterfaceExtendsClause?  InterfaceBody
+
+
 
 InterfaceExtendsClause :
-    `extends`  ClassOrInterfaceTypeList
+
+&nbsp;&nbsp;&nbsp;&nbsp;`extends`  ClassOrInterfaceTypeList
+
+
 
 ClassOrInterfaceTypeList :
-    TypeReference
-    ClassOrInterfaceTypeList  `,`  TypeReference
+
+&nbsp;&nbsp;&nbsp;&nbsp;TypeReference
+
+&nbsp;&nbsp;&nbsp;&nbsp;ClassOrInterfaceTypeList  `,`  TypeReference
+
+
 
 InterfaceBody :
-    CurlyBracketedTokens
+
+&nbsp;&nbsp;&nbsp;&nbsp;CurlyBracketedTokens
+
+
 
 TypeAnnotation :
-    `:`  Type
+
+&nbsp;&nbsp;&nbsp;&nbsp;`:`  Type
+
+
 
 AbstractModifier :
-    `abstract`
+
+&nbsp;&nbsp;&nbsp;&nbsp;`abstract`
+
+
 
 ClassImplementsClause :
-    `implements`  ClassOrInterfaceTypeList
+
+&nbsp;&nbsp;&nbsp;&nbsp;`implements`  ClassOrInterfaceTypeList
+
+
 
 AccessibilityModifier :
-    `public`
-    `protected`
-    `private`
+
+&nbsp;&nbsp;&nbsp;&nbsp;`public`
+
+&nbsp;&nbsp;&nbsp;&nbsp;`protected`
+
+&nbsp;&nbsp;&nbsp;&nbsp;`private`
+
+
 
 OverrideModifier :
-    `override`
+
+&nbsp;&nbsp;&nbsp;&nbsp;`override`
+
+
 
 AbstractClassElement :
-    AccessibilityModifier?  `abstract`  OverrideModifier?  AbstractMethodDefinition
-    AccessibilityModifier?  `abstract`  AbstractFieldDefinition
+
+&nbsp;&nbsp;&nbsp;&nbsp;AccessibilityModifier?  `abstract`  OverrideModifier?  AbstractMethodDefinition
+
+&nbsp;&nbsp;&nbsp;&nbsp;AccessibilityModifier?  `abstract`  AbstractFieldDefinition
+
+
 
 AbstractMethodDefinition :
-    ClassElementName  TypeParameters?  `(`  UniqueFormalParameters  `)`  TypeAnnotation?
-    `get`  ClassElementName  `(`  `)`  TypeAnnotation?
-    `set`  ClassElementName  `(`  PropertySetParameterList  `)`
+
+&nbsp;&nbsp;&nbsp;&nbsp;ClassElementName  TypeParameters?  `(`  UniqueFormalParameters  `)`  TypeAnnotation?
+
+&nbsp;&nbsp;&nbsp;&nbsp;`get`  ClassElementName  `(`  `)`  TypeAnnotation?
+
+&nbsp;&nbsp;&nbsp;&nbsp;`set`  ClassElementName  `(`  PropertySetParameterList  `)`
+
+
 
 AbstractFieldDefinition :
-    ClassElementName  `?`?  TypeAnnotation?
+
+&nbsp;&nbsp;&nbsp;&nbsp;ClassElementName  `?`?  TypeAnnotation?
+
+
 
 IndexSignature :
-    `[`  BindingIdentifier  TypeAnnotation  `]`  TypeAnnotation
+
+&nbsp;&nbsp;&nbsp;&nbsp;`[`  BindingIdentifier  TypeAnnotation  `]`  TypeAnnotation
+
+
 
 // New token section productions
 
+
+
 BracketedTokens :
-    ParenthesizedTokens
-    SquareBracketedTokens
-    CurlyBracketedTokens
-    AngleBracketedTokens
-    TemplateBracketedTokens
+
+&nbsp;&nbsp;&nbsp;&nbsp;ParenthesizedTokens
+
+&nbsp;&nbsp;&nbsp;&nbsp;SquareBracketedTokens
+
+&nbsp;&nbsp;&nbsp;&nbsp;CurlyBracketedTokens
+
+&nbsp;&nbsp;&nbsp;&nbsp;AngleBracketedTokens
+
+&nbsp;&nbsp;&nbsp;&nbsp;TemplateBracketedTokens
+
+
 
 ParenthesizedTokens :
-    `(`  TokenBody?  `)`
+
+&nbsp;&nbsp;&nbsp;&nbsp;`(`  TokenBody?  `)`
+
+
 
 SquareBracketedTokens :
-    `[`  TokenBody?  `]`
+
+&nbsp;&nbsp;&nbsp;&nbsp;`[`  TokenBody?  `]`
+
+
 
 CurlyBracketedTokens :
-    `{`  TokenBody?  `}`
+
+&nbsp;&nbsp;&nbsp;&nbsp;`{`  TokenBody?  `}`
+
+
 
 AngleBracketedTokens :
-    `<`  TokenBody?  `>`
+
+&nbsp;&nbsp;&nbsp;&nbsp;`<`  TokenBody?  `>`
+
+
 
 TemplateBracketedTokens :
-    TemplateHead  TemplateTokenBody  TemplateTail
+
+&nbsp;&nbsp;&nbsp;&nbsp;TemplateHead  TemplateTokenBody  TemplateTail
+
+
 
 TemplateTokenBody :
-    TokenBody
-    TokenBody  TemplateMiddle  TemplateTokenBody
+
+&nbsp;&nbsp;&nbsp;&nbsp;TokenBody
+
+&nbsp;&nbsp;&nbsp;&nbsp;TokenBody  TemplateMiddle  TemplateTokenBody
+
+
 
 TokenBody :
-    TokenOrBracketedTokens  TokenBody?
+
+&nbsp;&nbsp;&nbsp;&nbsp;TokenOrBracketedTokens  TokenBody?
+
+
 
 TokenOrBracketedTokens :
-    NonBracketedToken
-    BracketedTokens
+
+&nbsp;&nbsp;&nbsp;&nbsp;NonBracketedToken
+
+&nbsp;&nbsp;&nbsp;&nbsp;BracketedTokens
+
+
 
 NonBracketedToken :
-    Token but not one of `(` or `)` or `[` or `]` or `{` or `}` or `<` or `>` or TemplateHead or TemplateMiddle or TemplateTail
+
+&nbsp;&nbsp;&nbsp;&nbsp;Token but not one of `(` or `)` or `[` or `]` or `{` or `}` or `<` or `>` or TemplateHead or TemplateMiddle or TemplateTail
+
 # Annotation type delimiters and allowed types
 
-### How to define where the type annotation begins and ends
-
-```ts
-function foo(a : (this<is><x, y>TYPE!), b: thisIsAlso) {
-  //..
-}
-```
-
-*How does the JavaScript parser know where a type annotation begins?*
-
-In the above example, as we defined, the `:` is used to indicate that a type begins. But how does it know that it
-ends? In the above case, `(this<is><x, y>TYPE!)`, we can't just search for the comma, because
-the type itself incorporates a `,`.
-
-It's a bit unclear how to define this. Intuitively, it could be reasonable to parse tokens within matching parentheses and brackets (including `(...)`, `[...]`, `{...}`, or `<...>`), with the type ending when brackets are closed, but also permitting certain tokens to continue until a newline (if outside of a parenthesized region).
-
-Some more complexity comes in in cases such as:
-- How incompatible would this scheme be, given that it may prohibit newlines or require parentheses in certain cases?
-- How do we avoid ambiguity with JSX, which uses `<...>` in a decidedly different way?
-
-
-### Allowed types
-
-Example of types that are allowed:
-
-- Simple "identifier" style: `number`, `Foo`, `string`
-- Adding `?`: `number?`, `?number`, `Foo?`
-- Adding parentheses after an identifier: `string[]`, `Foo<T>`, `Foo<T extends ReturnType<Bar>>`
-- Starting with parentheses: `{x: number, y: number}`, `{|x: number, y: number|}`, `(() => number)`
-
-
-### Types under consideration
-
-We're still considering how/whether the syntax could accommodate these cases without enclosing parentheses:
-
-- Illegal characters in identifier: `number!`, `string | number`, `string & number`,
-  `(x: number) => string`
-- Multiple parentheses in sequence: `<T>(arg: T) => T`
-- Unmatched parentheses: `Foo<T condition T < 5>`
-- type operators: `typeof s`
-- [Template literal types](https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html):
-  `` `${EmailLocaleIDs | FooterLocaleIDs}_id` ``
-
-#### Potential solution -  Proposal 
-
-The above could be made legal by wrapping with `(...)`. Note that TypeScript, Flow, and Hegel all permit
-parentheses in these contexts today:
-
-- `(number!)`, `(string | number)`, `(string & number)`, `((x: number) => string)`
-- `(<T>(arg: T) => T)`
-- `(Foo<T condition T < 5>)`
-- `(typeof s)`
-- ``(`${EmailLocaleIDs | FooterLocaleIDs}_id`)``
-
-> Note that this is a place where compatibility with _existing_ TypeScript code
-  might not be provided. But that code can be easily fixed, probably even via a codemod, to conform to
-  the restricted way of declaring a type, by wrapping the difficult-to-parse types with a `(...)`.
