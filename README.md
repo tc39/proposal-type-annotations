@@ -479,7 +479,7 @@ function foo(x: string | number): string | number {
 
 At the moment, this proposal does not reserve space for overload declarations, but it is an option.
 
-#### Class and Field Modifiers
+### Class and Field Modifiers
 
 Several keywords in TypeScript and other type systems are used outside of a type context:
 
