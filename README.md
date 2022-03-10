@@ -5,6 +5,8 @@ At runtime, a JavaScript engine ignores them, treating the types as comments.
 
 The aim of this proposal is to enable developers to run programs written in [TypeScript](https://www.typescriptlang.org/), [Flow](https://flow.org/), and other static typing supersets of JavaScript without any need for transpilation, if they stick within a certain reasonably large subset of the language.
 
+[A *tentative* grammar for this proposal is available here.](https://giltayar.github.io/proposal-types-as-comments/grammar.html)
+
 ## Status
 
 **Stage:** 0 (Not yet presented to TC39)
