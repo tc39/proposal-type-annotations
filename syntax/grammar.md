@@ -669,6 +669,3 @@ TokenOrBracketedTokens :
 NonBracketedToken :
 
 &nbsp;&nbsp;&nbsp;&nbsp;Token but not one of `(` or `)` or `[` or `]` or `{` or `}` or `<` or `>` or TemplateHead or TemplateMiddle or TemplateTail
-
-# Annotation type delimiters and allowed types
-
