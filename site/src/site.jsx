@@ -195,7 +195,7 @@ const Page = () => <html lang="en">
       </FAQ>
 
       <h2>Frequently Asked Questions about TypeScript</h2>
-      <aside>Note: There is also <a href= "tbd.com">a TypeScript Blog Post</a> on the topic.</aside>
+      <aside>Note: There is also <a href= "https://devblogs.microsoft.com/typescript/a-proposal-for-type-syntax-in-javascript/">a TypeScript Blog Post</a> on the topic.</aside>
       <FAQ>
         <Entry title="Will all of TypeScript be supported by this proposal?">
           <p>No, not all of today's TypeScript syntax would be supported by this proposal. This is similar to how Babel support for TypeScript does not support all of the existing TypeScript syntax. </p>
@@ -221,17 +221,17 @@ const Page = () => <html lang="en">
       <h2>Links</h2>
       <aside>This page is a simpler overview of Types as Comments, to learn more about the proposal consult the GitHub repo.</aside>
       <Split>
-        <a className="button" href="https://github.com/tc39/proposal-types-as-comments#motivations">
+        <a className="button" href="https://github.com/giltayar/proposal-types-as-comments#motivation">
           <h5>Motivations</h5>
           <p>How does this proposal improve the JavaScript ecosystem as a whole?</p>
         </a>
 
-        <a className="button" href="https://github.com/tc39/proposal-types-as-comments#proposal">
+        <a className="button" href="https://github.com/giltayar/proposal-types-as-comments#proposal">
           <h5>Supported Syntax</h5>
           <p>From types definitions to class properties, see all the proposed supported type-level syntax.</p>
         </a>
 
-        <a className="button" href="https://github.com/tc39/proposal-types-as-comments#FAQ">
+        <a className="button" href="https://github.com/giltayar/proposal-types-as-comments#FAQ">
           <h5>Frequently Asked Questions</h5>
           <p>How does this proposal relate to TypeScript or Flow support? and many other questions.</p>
         </a>
