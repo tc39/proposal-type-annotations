@@ -202,7 +202,7 @@ Indexed Access Types                 | `T[K]`
 
 This table is not comprehensive.
 
-The goal this proposal is to find a reasonable set of syntactic rules to accommodate these constructs (and more) without prohibiting existing type systems from innovating in this space.
+The goal of this proposal is to find a reasonable set of syntactic rules to accommodate these constructs (and more) without prohibiting existing type systems from innovating in this space.
 
 The challenge with this is denoting the *end* of a type - this involves stating explicitly what tokens may and may not be part of a comment.
 An easy first step is to ensure that anything within matching parentheses and brackets (`(...)`, `[...]`, `{...}`, or `<...>`) can be immediately skipped.
