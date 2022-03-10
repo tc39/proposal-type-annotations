@@ -672,7 +672,7 @@ Some tools currently need a "plugin" or option to get TypeScript support working
 This proposal would mean that these tools could support type syntax by default, forming a standard, versionless, always-on common base for type syntax.
 Full and prescriptive support for TypeScript, Flow, etc. could be remain an opt-in mode on top of that.
 
-### What about compatibililty with ReasonML, PureScript, and other statically typed languages that compile to JavaScript?
+### What about compatibility with ReasonML, PureScript, and other statically typed languages that compile to JavaScript?
 
 While these languages _compile_ to JavaScript, and have static typing, they are not supersets of JavaScript, and thus are not relevant to this proposal.
 
