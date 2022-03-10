@@ -594,7 +594,7 @@ Instead there are tools that grow in popularity and evolve over time.
 
 Additionally, type checkers, such as Flow, Closure, and Hegel may wish to use this proposal to enable developers to use their type checkers to check their code.
 Making this proposal be only about TypeScript can hamper this effort.
-Amicable competition in this space would be beneficial to JavaScript as it can enable experimentation and and new ideas.
+Amicable competition in this space would be beneficial to JavaScript as it can enable experimentation and new ideas.
 
 ### Why not unofficially build TS checking and compilation into various systems?
 
