@@ -1,3 +1,339 @@
+# Modified productions
+
+MemberExpression :
+    > ...
+    MemberExpression  `::`  TypeArguments
+    MemberExpression  [no LineTerminator here]  `!`
+
+CallExpression :
+    > ...
+    CallExpression  `::`  TypeArguments
+
+OptionalChain :
+    > ...
+    OptionalChain  `::`  TypeArguments
+
+RelationalExpression :
+    > ...
+    RelationalExpression  [no LineTerminator here]  `as`  Type
+    RelationalExpression  [no LineTerminator here]  `as`  `const`
+
+Declaration :
+    > ...
+    TypeDeclaration
+    InterfaceDeclaration
+
+LexicalBinding :
+    BindingIdentifier  TypeAnnotation?  Initializer?
+    BindingPattern  TypeAnnotation?  Initializer
+
+VariableDeclaration :
+    BindingIdentifier  TypeAnnotation?  Initializer?
+    BindingPattern  TypeAnnotation?  Initializer
+
+Catch :
+    `catch`  `(`  CatchParameter  TypeAnnotation?  `)`  Block
+    `catch`  Block
+
+FormalParameter :
+    BindingIdentifier  TypeAnnotation?  Initializer?
+    BindingIdentifier  `?`  TypeAnnotation?
+    BindingPattern  TypeAnnotation?  Initializer?
+
+FunctionRestParameter :
+    `...`  BindingIdentifier  TypeAnnotation?
+    `...`  BindingPattern  TypeAnnotation?
+
+FunctionDeclaration :
+    `function`  BindingIdentifier  TypeParameters?  `(`  FormalParameters  `)`  TypeAnnotation?  `{`  FunctionBody  `}`
+
+FunctionExpression :
+    `function`  BindingIdentifier?  TypeParameters?  `(`  FormalParameters  `)`  TypeAnnotation?  `{`  FunctionBody  `}`
+
+ArrowFunction :
+    > ...
+    ArrowParameters  TypeAnnotation  `=>`  ConciseBody
+
+ArrowParameters :
+    > ...
+    TypeParameters  `(`  UniqueFormalParameters  `)`
+
+MethodDefinition :
+    ClassElementName  `?`?  TypeParameters?  `(`  UniqueFormalParameters  `)`  TypeAnnotation?  `{`  FunctionBody  `}`
+    GeneratorMethod
+    AsyncMethod
+    AsyncGeneratorMethod
+    `get`  ClassElementName  `(`  `)`  TypeAnnotation?  `{`  FunctionBody  `}`
+    `set`  ClassElementName  `(`  PropertySetParameterList  `)`  `{`  FunctionBody  `}`
+
+GeneratorDeclaration :
+    `function`  `*`  BindingIdentifier  TypeParameters?  `(`  FormalParameters  `)`  TypeAnnotation?  `{`  GeneratorBody  `}`
+
+GeneratorExpression :
+    `function`  `*`  BindingIdentifier?  TypeParameters?  `(`  FormalParameters  `)`  TypeAnnotation?  `{`  GeneratorBody  `}`
+
+GeneratorMethod :
+    `*`  ClassElementName  `?`?  TypeParameters?  `(`  UniqueFormalParameters  `)`  TypeAnnotation?  `{`  GeneratorBody  `}`
+
+AsyncGeneratorDeclaration :
+    `async`  [no LineTerminator here]  `function`  `*`  BindingIdentifier  TypeParameters?  `(`  FormalParameters  `)`  TypeAnnotation?  `{`  AsyncGeneratorBody  `}`
+
+AsyncGeneratorExpression :
+    `async`  [no LineTerminator here]  `function`  `*`  BindingIdentifier?  TypeParameters?  `(`  FormalParameters  `)`  TypeAnnotation?  `{`  AsyncGeneratorBody  `}`
+
+AsyncGeneratorMethod :
+    `async`  [no LineTerminator here]  `*`  ClassElementName  `?`?  TypeParameters?  `(`  UniqueFormalParameters  `)`  TypeAnnotation?  `{`  AsyncGeneratorBody  `}`
+
+ClassDeclaration :
+    AbstractModifier?  `class`  BindingIdentifier  ClassTail
+
+ClassExpression :
+    AbstractModifier?  `class`  BindingIdentifier?  ClassTail
+
+ClassHeritage :
+    `extends`  LeftHandSideExpression  TypeArguments?  ClassImplementsClause?
+
+FieldDefinition :
+    ClassElementName  `?`?  TypeAnnotation?  Initializer?
+    ClassElementName  `!`  TypeAnnotation?  Initializer?
+
+ClassElement :
+    AccessibilityModifier?  OverrideModifier?  MethodDefinition
+    AccessibilityModifier?  `static`  OverrideModifier?  MethodDefinition
+    AccessibilityModifier?  FieldDefinition
+    AccessibilityModifier?  `static`  FieldDefinition
+    ClassStaticBlock
+    AbstractClassElement
+    IndexSignature
+    `;`
+
+AsyncFunctionDeclaration :
+    `async`  [no LineTerminator here]  `function`  BindingIdentifier  TypeParameters?  `(`  FormalParameters  `)`  TypeAnnotation?  `{`  AsyncFunctionBody  `}`
+
+AsyncFunctionExpression :
+    `async`  [no LineTerminator here]  `function`  BindingIdentifier?  TypeParameters?  `(`  FormalParameters  `)`  TypeAnnotation?  `{`  AsyncFunctionBody  `}`
+
+AsyncMethod :
+    `async`  [no LineTerminator here]  ClassElementName  `?`?  TypeParameters?  `(`  UniqueFormalParameters  `)`  TypeAnnotation?  `{`  AsyncFunctionBody  `}`
+
+CoverCallExpressionAndAsyncArrowHead :
+    MemberExpression  TypeParameters?  Arguments  TypeAnnotation?
+
+AsyncArrowHead :
+    `async`  [no LineTerminator here]  TypeParameters?  ArrowFormalParameters
+
+ImportDeclaration :
+    > ...
+    `import`  `type`  ImportClause  FromClause  `;`
+
+ImportSpecifier :
+    > ...
+    `type`  ImportedBinding
+    `type`  ModuleExportName  `as`  ImportedBinding
+
+# New productions
+
+TypeArguments :
+    AngleBracketedTokens
+
+TypeDeclaration :
+    `type`  BindingIdentifier  TypeParameters?  `=`  Type
+
+TypeParameters :
+    AngleBracketedTokens
+
+Type :
+    ConditionalType
+    NonConditionalType
+
+ConditionalType :
+    NonConditionalType  [no LineTerminator here]  `extends`  NonConditionalType  `?`  Type  `:`  Type
+
+NonConditionalType :
+    UnionType
+    FunctionType
+    ConstructorType
+
+UnionType :
+    `|`?  IntersectionType
+    UnionType  `|`  IntersectionType
+
+IntersectionType :
+    `&`?  TypeOperatorType
+    IntersectionType  `&`  TypeOperatorType
+
+TypeOperatorType :
+    `readonly`  TypeOperatorType
+    `keyof`  TypeOperatorType
+    `unique`  TypeOperatorType
+    `infer`  TypeOperatorType
+    `not`  TypeOperatorType
+    PrimaryType
+
+PrimaryType :
+    ParenthesizedType
+    SquareBracketedType
+    CurlyBracketedType
+    TypeReference
+    ArrayType
+    LiteralType
+    TypeQuery
+    ImportType
+    TypePredicate
+    `this`
+    `void`
+
+ParenthesizedType :
+    ParenthesizedTokens
+
+SquareBracketedType :
+    SquareBracketedTokens
+
+CurlyBracketedType :
+    CurlyBracketedTokens
+
+TypeReference :
+    TypeName  [no LineTerminator here]  TypeArguments?
+
+TypeName :
+    Identifier
+    TypeName  `.`  Identifier
+
+ArrayType :
+    PrimaryType  [no LineTerminator here]  `[`  `]`
+
+LiteralType :
+    NumericLiteralType
+    StringLiteral
+    TemplateLiteralType
+    `true`
+    `false`
+    `null`
+
+TemplateLiteralType :
+    NoSubstitutionTemplate
+    TemplateBracketedTokens
+
+NumericLiteralType :
+    NumericLiteral
+    `-`  [no LineTerminator here]  NumericLiteral
+
+TypeQuery :
+    `typeof`  [no LineTerminator here]  EntityName
+
+EntityName :
+    IdentifierName
+    ImportSpecifier
+    EntityName  `.`  IdentifierName
+    EntityName  `::`  TypeArguments
+
+ImportSpecifier :
+    `import`  [no LineTerminator here]  `(`  ModuleSpecifier  `)`
+
+ImportType :
+    ImportSpecifier
+    ImportSpecifier  `.`  TypeName
+
+TypePredicate :
+    IdentifierOrThis  [no LineTerminator here]  `is`  Type
+    `asserts`  IdentifierOrThis
+    `asserts`  IdentifierOrThis  [no LineTerminator here]  `is`  Type
+
+IdentifierOrThis :
+    Identifier
+    `this`
+
+FunctionType :
+    TypeParameters?  ParameterList  `=>`  Type
+
+ConstructorType :
+    `new`  TypeParameters?  ParameterList  `=>`  Type
+
+ParameterList :
+    ParenthesizedTokens
+
+InterfaceDeclaration :
+    `interface`  BindingIdentifier  TypeParameters?  InterfaceExtendsClause?  InterfaceBody
+
+InterfaceExtendsClause :
+    `extends`  ClassOrInterfaceTypeList
+
+ClassOrInterfaceTypeList :
+    TypeReference
+    ClassOrInterfaceTypeList  `,`  TypeReference
+
+InterfaceBody :
+    CurlyBracketedTokens
+
+TypeAnnotation :
+    `:`  Type
+
+AbstractModifier :
+    `abstract`
+
+ClassImplementsClause :
+    `implements`  ClassOrInterfaceTypeList
+
+AccessibilityModifier :
+    `public`
+    `protected`
+    `private`
+
+OverrideModifier :
+    `override`
+
+AbstractClassElement :
+    AccessibilityModifier?  `abstract`  OverrideModifier?  AbstractMethodDefinition
+    AccessibilityModifier?  `abstract`  AbstractFieldDefinition
+
+AbstractMethodDefinition :
+    ClassElementName  TypeParameters?  `(`  UniqueFormalParameters  `)`  TypeAnnotation?
+    `get`  ClassElementName  `(`  `)`  TypeAnnotation?
+    `set`  ClassElementName  `(`  PropertySetParameterList  `)`
+
+AbstractFieldDefinition :
+    ClassElementName  `?`?  TypeAnnotation?
+
+IndexSignature :
+    `[`  BindingIdentifier  TypeAnnotation  `]`  TypeAnnotation
+
+// New token section productions
+
+BracketedTokens :
+    ParenthesizedTokens
+    SquareBracketedTokens
+    CurlyBracketedTokens
+    AngleBracketedTokens
+    TemplateBracketedTokens
+
+ParenthesizedTokens :
+    `(`  TokenBody?  `)`
+
+SquareBracketedTokens :
+    `[`  TokenBody?  `]`
+
+CurlyBracketedTokens :
+    `{`  TokenBody?  `}`
+
+AngleBracketedTokens :
+    `<`  TokenBody?  `>`
+
+TemplateBracketedTokens :
+    TemplateHead  TemplateTokenBody  TemplateTail
+
+TemplateTokenBody :
+    TokenBody
+    TokenBody  TemplateMiddle  TemplateTokenBody
+
+TokenBody :
+    TokenOrBracketedTokens  TokenBody?
+
+TokenOrBracketedTokens :
+    NonBracketedToken
+    BracketedTokens
+
+NonBracketedToken :
+    Token but not one of `(` or `)` or `[` or `]` or `{` or `}` or `<` or `>` or TemplateHead or TemplateMiddle or TemplateTail
 # Annotation type delimiters and allowed types
 
 ### How to define where the type annotation begins and ends
