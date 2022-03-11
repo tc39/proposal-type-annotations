@@ -57,4 +57,3 @@ parentheses in these contexts today:
 > Note that this is a place where compatibility with _existing_ TypeScript code
   might not be provided. But that code can be easily fixed, probably even via a codemod, to conform to
   the restricted way of declaring a type, by wrapping the difficult-to-parse types with a `(...)`.
-diff --git a/syntax/grammar.md b/syntax/grammar.md
