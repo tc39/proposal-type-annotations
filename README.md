@@ -84,7 +84,7 @@ Here's an example of the JSDoc-based type syntax from [TypeScript's JSDoc Refere
  * @param {string} [p4="test"] - An optional param with a default value
  * @return {string} This is the result
  */
-function stringsStringStrings(p1, p2, p3, p4) {
+function stringsStringStrings(p1, p2, p3, p4="test") {
     // TODO
 }
 ```
