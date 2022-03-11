@@ -714,6 +714,17 @@ That is one reason why this proposal endorses purely static types.
 
 If there is a desire to keep language open to later adding runtime-checked types, in addition to the static types proposed here, we could make an explicit syntax reservation in the grammar to support both.
 
+### Could this proposal enable runtimes to optimize performance based on type hints?
+
+Whilst it is possible to theorize runtime optimizations driven by statically declared types, the proposal authors are not aware of successful experiments in JavaScript that meaningfully beat dynamic type-driven JIT optimization.
+
+The proposed type syntax has no defined semantics and so is opaque to the runtimes.
+It is equivalent to asking _"Could a runtime use `/** comments **/` to optimize performance?"_
+To which the answer is:  almost certainly not - at least not in a standard way.
+Therefore this proposal alone does not directly offer new opportunities for performance improvements.
+
+It is explicitly a **non-goal** of this proposal to improve the performance of JavaScript.
+
 ## Prior Art
 
 ### Other languages that have optional erasable type syntax
