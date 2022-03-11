@@ -716,8 +716,14 @@ If there is a desire to keep language open to later adding runtime-checked types
 
 ### Could this proposal enable runtimes to optimize performance based on type hints?
 
-Given that the type syntax in the type hints are opaque to the runtimes, this proposal as it stands would not allow performance improvements.
-In any case, it is a non-goal of this proposal to improve the performance of JavaScript.
+Whilst it is possible to theorize runtime optimizations driven by statically declared types, the proposal authors are not aware of successful experiments in JavaScript that meaningfully beat dynamic type-driven JIT optimization.
+
+The proposed type syntax has no defined semantics and so is opaque to the runtimes.
+It is equivalent to asking _"Could a runtime use `/** comments **/` to optimize performance?"_
+To which the answer is:  almost certainly not - at least not in a standard way.
+Therefore this proposal alone does not directly offer new opportunities for performance improvements.
+
+It is explicitly a **non-goal** of this proposal to improve the performance of JavaScript.
 
 ## Prior Art
 
