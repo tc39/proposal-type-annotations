@@ -714,7 +714,7 @@ That is one reason why this proposal endorses purely static types.
 
 If there is a desire to keep language open to later adding runtime-checked types, in addition to the static types proposed here, we could make an explicit syntax reservation in the grammar to support both.
 
-### Could this proposal enable runtimes to optimize performance based on type hints
+### Could this proposal enable runtimes to optimize performance based on type hints?
 
 Given that the type syntax in the type hints are opaque to the runtimes, this proposal as it stands would not allow performance improvements.
 In any case, it is a non-goal of this proposal to improve the performance of JavaScript.
