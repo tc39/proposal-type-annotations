@@ -220,8 +220,8 @@ See also
 
 ### Parameter Optionality
 
-In JavaScript, parameters are technically "optional" - when arguments are omitted, and the parameters of a function will be assigned the value `undefined` upon invocation.
-This can be a source of errors, and it is useful signal whether or not a parameter is actually optional.
+In JavaScript, parameters are technically "optional" - when arguments are omitted, the parameters of a function will be assigned the value `undefined` upon invocation.
+This can be a source of errors, and it is a useful signal whether or not a parameter is actually optional.
 
 To specify that a parameter is optional, the name of that parameter can be followed with a `?`.
 
@@ -308,7 +308,7 @@ import { type SourceFile } from "./parser";
 ### Type Assertions
 
 Type systems do not have perfect information about the runtime type of an expression.
-In some cases, they will need be informed of a more-appropriate type at a given position.
+In some cases, they will need to be informed of a more-appropriate type at a given position.
 Type assertions - sometimes called casts - are a means of asserting an expression's static type.
 
 ```ts
@@ -379,7 +379,7 @@ new Point<bigint>(4n, 5n)
 ```
 
 The above syntax is already valid JavaScript that users may rely on, so we cannot use this syntax as-is.
-We expect some form of new syntax could be used to resolve this ambiguity.
+We expect some form of new syntax that could be used to resolve this ambiguity.
 No specific solution is proposed at this point of time, but one example option is to use a syntactic prefix such as `::`
 
 ```ts
@@ -389,7 +389,7 @@ new Point::<bigint>(4n, 5n)
 ```
 
 These type arguments (`::<type>`) would be ignored by the JavaScript runtime.
-It would be reasonable for this non-ambiguous syntax to adopted in TypeScript as well.
+It would be reasonable for this non-ambiguous syntax to be adopted in TypeScript as well.
 
 ### `this` Parameters
 
@@ -463,7 +463,7 @@ At the moment, this proposal does not reserve space for ambient declarations, bu
 
 ### Function Overloads
 
-In existing type systems, functions declarations and methods may omit their body.
+In existing type systems, function/method declarations may omit their body.
 This is used for [function overloading](https://www.typescriptlang.org/docs/handbook/functions.html#overloads), which communicates that the return type of a function varies with its inputs.
 
 ```ts
@@ -672,7 +672,7 @@ Given the fact that some TypeScript features are [out of scope](#intentional-omi
 
 Some tools currently need a "plugin" or option to get TypeScript support working.
 This proposal would mean that these tools could support type syntax by default, forming a standard, versionless, always-on common base for type syntax.
-Full and prescriptive support for TypeScript, Flow, etc. could be remain an opt-in mode on top of that.
+Full and prescriptive support for TypeScript, Flow, etc. could remain an opt-in mode on top of that.
 
 ### What about compatibility with ReasonML, PureScript, and other statically typed languages that compile to JavaScript?
 
@@ -691,7 +691,7 @@ It remains a best practice to perform an ahead-of-time optimization step on code
 
 This proposal introduces type annotations that are explicitly **not** checked at runtime.
 This is intentional to minimize the runtime cost of the annotations and to provide a consistent mental model in which the types do not affect program behavior.
-A potential risk is that users might not realize they need to run an external tool to find type errors, and consequently are surprised when type-related bugs arise in their type-annotated code.
+A potential risk is that users might not realize the need to run an external tool to find type errors, and consequently are surprised when type-related bugs arise in their type-annotated code.
 
 For today's users of external type-checkers, this risk already exists.
 Users mitigate this risk today via a combination of:
@@ -703,7 +703,7 @@ In some ways it would be more of a surprise to users if the types *were* runtime
 It is common in other languages for there to be minimal runtime type-checking.
 For example, in C++ there is almost no checking at runtime except for some known cases such as when the programmer requests it, e.g. `dynamic_cast`.
 
-As has been seen with TypeScript, developers quickly learn that the types play no role at runtime.
+As seen with TypeScript, developers quickly learn that the types play no role at runtime.
 Therefore similar to the first question of "Does JavaScript need a static type system?", this question has been answered, in part, by the widespread success of external type-checkers.
 
 ### How could runtime-checked types be added in future?
