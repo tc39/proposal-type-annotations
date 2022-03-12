@@ -577,7 +577,7 @@ And for others, there will need to be work to disambiguate current code (like ar
 
 TypeScript would continue to exist alongside JavaScript's slightly more restricted type syntax.
 In other words, **all existing TypeScript projects would continue to compile, and no existing TypeScript codebase would need to change**.
-But taking any existing TypeScript code that that lives outside of JavaScript's type syntax would not run - it would still need to be compiled away.
+But taking any existing TypeScript code that lives outside of JavaScript's type syntax would not run - it would still need to be compiled away.
 
 ### Should TypeScript be standardized in TC39?
 
