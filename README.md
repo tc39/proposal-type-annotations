@@ -214,9 +214,9 @@ These rules have not yet been established, but will be explored in more detail u
 
 See also
 
-* [Allowed types](/syntax/grammar.md#allowed-types)
-* [Types under consideration](/syntax/grammar.md#types-under-consideration)
-* [Annotation type delimiters](/syntax/grammar.md#annotation-type-delimiters-and-allowed-types)
+* [Allowed types](/syntax/grammar-ideas.md#allowed-types)
+* [Types under consideration](/syntax/grammar-ideas.md#types-under-consideration)
+* [Annotation type delimiters](/syntax/grammar-ideas.md#annotation-type-delimiters-and-allowed-types)
 
 ### Parameter Optionality
 
