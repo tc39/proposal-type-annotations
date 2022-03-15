@@ -623,10 +623,9 @@ Implementing this proposal means that we can add type systems to this list of "t
 ### Can types be available via runtime reflection like [TypeScript's emitDecoratorMetadata](https://www.typescriptlang.org/tsconfig#emitDecoratorMetadata)?
 
 The proposal here differs significantly from Python's types, as the types in this proposal are entirely ignored, not evaluated as expressions or accessible at runtime as metadata.
-This difference is largely motivated by the existing community precedent, where JS type systems do not tend to use JS expression grammar for their types, so it is not possible to evaluate them as such.
 
-At most, we could expose the types as strings, but it's not clear what anyone could do with those or how they should be exposed.
-This proposal does not try and expose the types as metadata, and only specifies that they are ignored by the JS runtime.
+This proposal explicitly does not take a stance on runtime reflection leaving further work for future proposals. The main reason is that this proposal does not block further work in this space but rather enables it. This is also the route Python took when adding their types to the language.
+
 Users who rely on decorator metadata could continue to leverage a build step as desired.
 
 ### Does this proposal make all TypeScript programs valid JavaScript?
