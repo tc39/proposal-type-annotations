@@ -764,3 +764,7 @@ An evolution of this plan was [pluggable types](https://github.com/samuelgoto/pr
 This proposal is extremely similar to the pluggable types proposal, but leans a bit more heavily on the idea of viewing types as comments, and comes at a time with broader adoption of type-checking and a more mature type-checking ecosystem.
 
 The [optional types proposal repository contains links to other prior discussions around types in JavaScript](https://github.com/samuelgoto/proposal-optional-types/blob/master/FAQ.md#tc39-discussions).
+
+### Relevant discussions elsewhere
+
+[Gilad Bracha](https://en.wikipedia.org/wiki/Gilad_Bracha) has [advocated for pluggable type systems](http://bracha.org/pluggableTypesPosition.pdf).
