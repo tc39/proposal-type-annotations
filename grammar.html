@@ -1,5 +1,5 @@
 <!doctype html>
-<head><meta charset="utf-8"><title>Types as Comments Proposed Grammar</title><script>'use strict';
+<head><meta charset="utf-8"><title>Types as Comments Tentative Grammar</title><script>'use strict';
 let sdoBox = {
   init() {
     this.$alternativeId = null;
@@ -1145,7 +1145,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 let sdoMap = JSON.parse(`{}`);
-let biblio = JSON.parse(`{"refsByClause":{},"entries":[{"type":"clause","id":"grammar-conventions","titleHTML":"Organization and Notational Conventions","number":"1"},{"type":"clause","id":"modified-productions","titleHTML":"Modified Productions","number":"2"},{"type":"clause","id":"new-productions","titleHTML":"New Productions","number":"3"}]}`);
+let biblio = JSON.parse(`{"refsByClause":{"grammar-conventions":["_ref_0","_ref_1","_ref_2","_ref_3"]},"entries":[{"type":"clause","id":"grammar-conventions","titleHTML":"Organization and Notational Conventions","number":"1"},{"type":"clause","id":"modified-productions","titleHTML":"Modified Productions","number":"2","referencingIds":["_ref_0","_ref_2","_ref_3"]},{"type":"clause","id":"new-productions","titleHTML":"New Productions","number":"3","referencingIds":["_ref_1"]}]}`);
 ;let usesMultipage = false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.0.1/styles/base16/solarized-light.min.css"><style>body {
   display: flex;
   font-size: 18px;
@@ -2410,16 +2410,28 @@ li.menu-search-result-term:before {
 </ul></div><div id="menu-toggle"><svg xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%; stroke:currentColor" viewBox="0 0 120 120">
       <title>Menu</title>
       <path stroke-width="10" stroke-linecap="round" d="M30,60 h60  M30,30 m0,5 h60  M30,90 m0,-5 h60"></path>
-    </svg></div><div id="menu-spacer"></div><div id="menu"><div id="menu-search"><input type="text" id="menu-search-box" placeholder="Search..."><div id="menu-search-results" class="inactive"></div></div><div id="menu-pins"><div class="menu-pane-header">Pins</div><ul id="menu-pins-list"></ul></div><div class="menu-pane-header">Table of Contents</div><div id="menu-toc"><ol class="toc"><li><span class="item-toggle-none"></span><a href="#grammar-conventions" title="Organization and Notational Conventions"><span class="secnum">1</span> Organization and Notational Conventions</a></li><li><span class="item-toggle-none"></span><a href="#modified-productions" title="Modified Productions"><span class="secnum">2</span> Modified Productions</a></li><li><span class="item-toggle-none"></span><a href="#new-productions" title="New Productions"><span class="secnum">3</span> New Productions</a></li></ol></div></div><div id="spec-container"><h1 class="version">Stage 0 Draft / March 21, 2022</h1><h1 class="title">Types as Comments Proposed Grammar</h1>
+    </svg></div><div id="menu-spacer"></div><div id="menu"><div id="menu-search"><input type="text" id="menu-search-box" placeholder="Search..."><div id="menu-search-results" class="inactive"></div></div><div id="menu-pins"><div class="menu-pane-header">Pins</div><ul id="menu-pins-list"></ul></div><div class="menu-pane-header">Table of Contents</div><div id="menu-toc"><ol class="toc"><li><span class="item-toggle-none"></span><a href="#grammar-conventions" title="Organization and Notational Conventions"><span class="secnum">1</span> Organization and Notational Conventions</a></li><li><span class="item-toggle-none"></span><a href="#modified-productions" title="Modified Productions"><span class="secnum">2</span> Modified Productions</a></li><li><span class="item-toggle-none"></span><a href="#new-productions" title="New Productions"><span class="secnum">3</span> New Productions</a></li></ol></div></div><div id="spec-container"><h1 class="version">Stage 0 Draft / March 29, 2022</h1><h1 class="title">Types as Comments Tentative Grammar</h1>
+
+<aside>
+<p>
+This grammar is still in a tentative state, and changes are expected over time.
+It is not a comprehensive specification and it does not contain any formal semantic rules, but the intent is that all syntactic additions can be interpreted as a form of comments.
+Just as implementations typically do not provide runtime semantics for comments, the type syntax outlined here should not introduce noticeable runtime semantics.
+</p>
+<p>
+Any issues with the grammar in this document should be <a href="https://github.com/giltayar/proposal-types-as-comments/">reported on the proposal repository</a>.
+</p>
+</aside>
+
 <emu-clause id="grammar-conventions">
 <h1><span class="secnum">1</span> Organization and Notational Conventions</h1>
 
-<p>Currently this grammar is split into <a href="#modified-productions">modified productions of ECMA-262</a> and <a href="#new-productions">new productions</a> that are specific to this proposal.</p>
+<p>Currently this grammar is split into <emu-xref href="#modified-productions" id="_ref_0"><a href="#modified-productions">modified productions of ECMA-262</a></emu-xref> and <emu-xref href="#new-productions" id="_ref_1"><a href="#new-productions">new productions</a></emu-xref> that are specific to this proposal.</p>
 
 <p>This tentative grammar takes some notational liberties beyond the conventions in ECMA-262.
 This is a temporary accommodation for authors in order to avoid extensive duplication of ECMA-262's grammar.
-Within modified productions, RHS productions with <ins>insert-formatted text such as this current text</ins> indicates that these productions should be added to existing productions in ECMA-262.
-Otherwise, RHS productions in modified productions are intended to replace the original productions in ECMA-262.</p>
+Within <emu-xref href="#modified-productions" title="" id="_ref_2"><a href="#modified-productions">Modified Productions</a></emu-xref>, RHS productions with <ins>insert-formatted text (such as this text)</ins> indicates the addition of these RHS productions to existing productions in ECMA-262.
+Otherwise, RHS productions in <emu-xref href="#modified-productions" title="" id="_ref_3"><a href="#modified-productions">Modified Productions</a></emu-xref> are intended to replace the original productions in ECMA-262.</p>
 </emu-clause>
 <emu-clause id="modified-productions">
 <h1><span class="secnum">2</span> Modified Productions</h1>
