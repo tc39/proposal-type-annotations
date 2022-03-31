@@ -1,4 +1,4 @@
-# ECMAScript proposal: Types as Comments
+# ECMAScript proposal: Type Annotations
 
 This proposal aims to enable developers to add type annotations to their JavaScript code, allowing those annotations to be checked by a type checker that is _external to JavaScript_.
 At runtime, a JavaScript engine ignores them, treating the types as comments.
@@ -383,7 +383,7 @@ We expect some form of new syntax that could be used to resolve this ambiguity.
 No specific solution is proposed at this point of time, but one example option is to use a syntactic prefix such as `::`
 
 ```ts
-// Types as Comments - example syntax solution
+// Types Annotations - example syntax solution
 add::<number>(4, 5)
 new Point::<bigint>(4n, 5n)
 ```
@@ -745,7 +745,7 @@ and are not part of it.
 #### Ability to add type systems to JavaScript via comments
 
 Both TypeScript and Flow enable developers to write JavaScript code and incorporate
-types as comments that the JavaScript runtime ignores.
+types annotations that the JavaScript runtime ignores.
 
 For Flow, these are [Flow comment types](https://flow.org/en/docs/types/comments/), and
 for TypeScript these are [JSDoc comments](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html).
