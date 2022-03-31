@@ -1,3 +1,5 @@
+> ⚠️ *This document has not been updated since the March 2022 Plenary Discussion of TC39. Details will change in the coming days.*
+
 # ECMAScript proposal: Type Annotations
 
 This proposal aims to enable developers to add type annotations to their JavaScript code, allowing those annotations to be checked by a type checker that is _external to JavaScript_.
