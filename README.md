@@ -11,7 +11,7 @@ The aim of this proposal is to enable developers to run programs written in [Typ
 
 ## Status
 
-**Stage:** 1 (Not yet presented to TC39)
+**Stage:** 1
 
 **Authors:**
 
