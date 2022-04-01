@@ -194,7 +194,7 @@ const Page = () => <html lang="en">
         </Entry>
 
         <Entry title="What does the grammar look like?">
-          <p>You can read the <a href="https://giltayar.github.io/proposal-types-as-comments/grammar.html">grammar spec here</a> and <a href="https://github.com/giltayar/proposal-types-as-comments/blob/master/syntax/grammar-ideas.md">notes for implementation</a> inside the repo.</p>
+          <p>You can read the <a href="https://tc39.github.io/proposal-types-as-comments/grammar.html">grammar spec here</a> and <a href="https://github.com/tc39/proposal-types-as-comments/blob/master/syntax/grammar-ideas.md">notes for implementation</a> inside the repo.</p>
         </Entry>
       </FAQ>
 
@@ -225,17 +225,17 @@ const Page = () => <html lang="en">
       <h2>Links</h2>
       <aside>This page is a simpler overview of Types as Comments, to learn more about the proposal consult the GitHub repo.</aside>
       <Split>
-        <a className="button" href="https://github.com/giltayar/proposal-types-as-comments#motivation">
+        <a className="button" href="https://github.com/tc39/proposal-types-as-comments#motivation">
           <h5>Motivations</h5>
           <p>How does this proposal improve the JavaScript ecosystem as a whole?</p>
         </a>
 
-        <a className="button" href="https://github.com/giltayar/proposal-types-as-comments#proposal">
+        <a className="button" href="https://github.com/tc39/proposal-types-as-comments#proposal">
           <h5>Supported Syntax</h5>
           <p>From types definitions to class properties, see all the proposed supported type-level syntax.</p>
         </a>
 
-        <a className="button" href="https://github.com/giltayar/proposal-types-as-comments#FAQ">
+        <a className="button" href="https://github.com/tc39/proposal-types-as-comments#FAQ">
           <h5>Frequently Asked Questions</h5>
           <p>How does this proposal relate to TypeScript or Flow support? and many other questions.</p>
         </a>
