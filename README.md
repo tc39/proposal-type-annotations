@@ -560,12 +560,8 @@ TC39 has a tradition of programming language design which favors local, sound ch
 By contrast, TypeScript's model -- which has been highly successful for JS developers -- is around non-local, best-effort checks.
 TypeScript-style systems are expensive to check at application startup, and would be redundant every time you run your JavaScript applications.
 
-Additionally, defining a type system to run directly in the browser means that improved type analyses would become breaking changes **for the users of JavaScript applications**, rather than for developers.
-This would [violate goals around web compatibility (i.e. "don't break the web")](https://github.com/tc39/how-we-work/blob/cc47a79340a773876cb03371dc2d46b9d9ce9695/terminology.md#web-compatibilitydont-break-the-web), so type system innovation would become near-impossible.
-Allowing other type systems to analyze code separately provides developers with choice, innovation, and freedom for developers to opt-out of checking at any time.
-
-In contrast, trying to add a full type system to JavaScript would be an enormous multi-year effort that would likely never reach consensus.
-This proposal recognizes that fact, and also recognizes that the community has evolved type systems that it is already happy with.
+Adding a full type system to JavaScript would be an enormous multi-year effort that might never reach consensus.
+This proposal recognizes that fact, and also recognizes that the community has evolved type systems that have become popular.
 
 ### How does this proposal relate to TypeScript?
 
