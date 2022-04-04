@@ -758,6 +758,10 @@ Closure Compiler's type checking works entirely via JSDoc comments ([docs](https
 
 #### Relevant proposals and discussions in TC39
 
+The earliest proposal for types in JavaScript that we're aware of is [Waldemar Horwat's "Types" specification from July 2000](https://www-archive.mozilla.org/js/language/js20-2000-07/libraries/types.html).
+
+The [proposed draft of ECMAScript 4th edition in 2008](http://archives.ecma-international.org/2008/TC39/tc39-2008-040.pdf) called for types and optional type annotations; TC39 agreed to withdraw the ES4 proposal in 2008, shipping ES 3.1 as ES5 in 2010. [Auth0 has a blog post with a brief history of the saga of ECMAScript 4](https://auth0.com/blog/the-real-story-behind-es4/).
+
 TC39 has previously discussed [guards](https://web.archive.org/web/20141214075910/http://wiki.ecmascript.org/doku.php?id=strawman:guards), which form a new, stronger type system.
 
 Previously, Sam Goto led discussions around an [optional types proposal](https://github.com/samuelgoto/proposal-optional-types) which aimed to unify syntax and semantics across the type-checkers.
@@ -765,7 +769,16 @@ Trying to find agreement across type-checkers, along with defining a sufficient 
 An evolution of this plan was [pluggable types](https://github.com/samuelgoto/proposal-pluggable-types) which was [inspired by Gilad Bracha's ideas on pluggable type systems](http://bracha.org/pluggableTypesPosition.pdf).
 This proposal is extremely similar to the pluggable types proposal, but leans a bit more heavily on the idea of viewing types as comments, and comes at a time with broader adoption of type-checking and a more mature type-checking ecosystem.
 
-The [optional types proposal repository contains links to other prior discussions around types in JavaScript](https://github.com/samuelgoto/proposal-optional-types/blob/master/FAQ.md#tc39-discussions).
+In 2015, Google's V8 team experimented with a proposal to implement a new JS mode that they called "[Strong Mode](https://docs.google.com/document/d/1Qk0qC4s_XNCLemj42FqfsRLp49nDQMZ1y7fwf5YjaI4/view)," intending to use types to improve site performance. Google [canceled the experiment in failure](https://groups.google.com/g/strengthen-js/c/ojj3TDxbHpQ). "In the end we had to give up on this one."
+
+The [optional types proposal repository contains links to other prior discussions around types in JavaScript](https://github.com/samuelgoto/proposal-optional-types/blob/master/FAQ.md#tc39-discussions):
+
+> * 2002 [Javascript 2.0: Evolving a Language for Evolving Systems](http://www-archive.mozilla.org/js/language/evolvingJS.pdf)
+> * 2006 [Type parameters](http://web.archive.org/web/20160425220933/http://wiki.ecmascript.org/doku.php?id=proposals:type_parameters), [Type System](http://web.archive.org/web/20141214152853/http://wiki.ecmascript.org/doku.php?id=clarification:type_system) and [Structural Types and typing of initializers](http://web.archive.org/web/20150622061920/http://wiki.ecmascript.org/doku.php?id=proposals:structural_types_and_typing_of_initializers)
+> * 2011 [Dependent Types for Javascript](https://arxiv.org/abs/1112.4106) ([pdf](http://people.cs.uchicago.edu/~rchugh/static/papers/oopsla12-djs.pdf))
+> * 2011 [Guards](http://web.archive.org/web/20161123223114/http://wiki.ecmascript.org:80/doku.php?id=strawman:guards) and [Trademarks](http://web.archive.org/web/20141214075933/http://wiki.ecmascript.org/doku.php?id=strawman:trademarks)
+> * 2014 [TC39 Discussion on Types](https://github.com/rwaldron/tc39-notes/blob/master/meetings/2014-09/sept-25.md#types): adding syntax without semantics.
+> * 2015 [ES8 gradual typing](https://esdiscuss.org/topic/es8-proposal-optional-static-typing) and [part2](https://esdiscuss.org/topic/optional-static-typing-part-2) and [ecmascript-types](https://github.com/sirisian/ecmascript-types).
 
 ### Relevant discussions elsewhere
 
