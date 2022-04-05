@@ -19,7 +19,7 @@ The aim of this proposal is to enable developers to run programs written in [Typ
 - Daniel Rosenwasser (Microsoft)
 - Romulo Cintra (Igalia)
 - Rob Palmer (Bloomberg)
-- ...and a number of contributors, see [history](https://github.com/tc39/proposal-types-as-comments/commits/master).
+- ...and a number of contributors, see [history](https://github.com/tc39/proposal-type-annotations/commits/master).
 
 **Champions:**
 
