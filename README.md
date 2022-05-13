@@ -19,7 +19,7 @@ The aim of this proposal is to enable developers to run programs written in [Typ
 - Daniel Rosenwasser (Microsoft)
 - Romulo Cintra (Igalia)
 - Rob Palmer (Bloomberg)
-- ...and a number of contributors, see [history](https://github.com/tc39/proposal-types-as-comments/commits/master).
+- ...and a number of contributors, see [history](https://github.com/tc39/proposal-type-annotations/commits/master).
 
 **Champions:**
 
@@ -710,7 +710,7 @@ Therefore similar to the first question of "Does JavaScript need a static type s
 ### How could runtime-checked types be added in future?
 
 It seems unlikely that JavaScript would adopt a pervasive runtime-checked type system due to the runtime performance overhead that it would bring.
-While it's possible that there may have been room for improvement, past efforts such as [TS* (Swamy et al)](http://goto.ucsd.edu/~pvekris/docs/safets.pdf) have shown that runtime type-checking based on annotations adds a non-negligible slowdown.
+While it's possible that there may have been room for improvement, past efforts such as [TS* (Swamy et al)](https://goto.ucsd.edu/~pvekris/docs/safets.pdf) have shown that runtime type-checking based on annotations adds a non-negligible slowdown.
 That is one reason why this proposal endorses purely static types.
 
 If there is a desire to keep language open to later adding runtime-checked types, in addition to the static types proposed here, we could make an explicit syntax reservation in the grammar to support both.
@@ -766,7 +766,7 @@ TC39 has previously discussed [guards](https://web.archive.org/web/2014121407591
 
 Previously, Sam Goto led discussions around an [optional types proposal](https://github.com/samuelgoto/proposal-optional-types) which aimed to unify syntax and semantics across the type-checkers.
 Trying to find agreement across type-checkers, along with defining a sufficient subset in both syntax and semantics meant that there were difficulties with this approach.
-An evolution of this plan was [pluggable types](https://github.com/samuelgoto/proposal-pluggable-types) which was [inspired by Gilad Bracha's ideas on pluggable type systems](http://bracha.org/pluggableTypesPosition.pdf).
+An evolution of this plan was [pluggable types](https://github.com/samuelgoto/proposal-pluggable-types) which was [inspired by Gilad Bracha's ideas on pluggable type systems](https://bracha.org/pluggableTypesPosition.pdf).
 This proposal is extremely similar to the pluggable types proposal, but leans a bit more heavily on the idea of viewing types as comments, and comes at a time with broader adoption of type-checking and a more mature type-checking ecosystem.
 
 In 2015, Google's V8 team experimented with a proposal to implement a new JS mode that they called "[Strong Mode](https://docs.google.com/document/d/1Qk0qC4s_XNCLemj42FqfsRLp49nDQMZ1y7fwf5YjaI4/view)," intending to use types to improve site performance. Google [canceled the experiment in failure](https://groups.google.com/g/strengthen-js/c/ojj3TDxbHpQ). "In the end we had to give up on this one."
@@ -782,4 +782,4 @@ The [optional types proposal repository contains links to other prior discussion
 
 ### Relevant discussions elsewhere
 
-[Gilad Bracha](https://en.wikipedia.org/wiki/Gilad_Bracha) has [advocated for pluggable type systems](http://bracha.org/pluggableTypesPosition.pdf).
+[Gilad Bracha](https://en.wikipedia.org/wiki/Gilad_Bracha) has [advocated for pluggable type systems](https://bracha.org/pluggableTypesPosition.pdf).
