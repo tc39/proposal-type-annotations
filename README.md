@@ -1,13 +1,9 @@
-> ⚠️ *This document has not been updated since the March 2022 Plenary Discussion of TC39. Details will change in the coming days.*
-
 # ECMAScript proposal: Type Annotations
 
 This proposal aims to enable developers to add type annotations to their JavaScript code, allowing those annotations to be checked by a type checker that is _external to JavaScript_.
 At runtime, a JavaScript engine ignores them, treating the types as comments.
 
 The aim of this proposal is to enable developers to run programs written in [TypeScript](https://www.typescriptlang.org/), [Flow](https://flow.org/), and other static typing supersets of JavaScript without any need for transpilation, if they stick within a certain reasonably large subset of the language.
-
-[A *tentative* grammar for this proposal is available here.](https://tc39.es/proposal-type-annotations/grammar.html)
 
 ## Status
 
@@ -42,7 +38,6 @@ _Static Typing_ was the most requested language feature in the [_State of JS_ su
 
 ![missing-features-js](https://user-images.githubusercontent.com/6939381/143012138-96b93204-c456-4ab5-bb63-2648187ab8a7.png)
 
-Additionally, TypeScript was currently listed as the 4th most-used language in [GitHub's *State of the Octoverse*](https://octoverse.github.com/), and on [Stack Overflow's Annual Developer Survey](https://insights.stackoverflow.com/survey/) it has been listed in both the top 4 most-loved languages since 2017 and the 10 most-used languages.
 
 ### Trends in JavaScript Compilation
 
@@ -57,7 +52,7 @@ More recently, some bundlers have even started doing both.
 
 But over time, we anticipate there will be less need for developers to downlevel-compile.
 Evergreen browsers have become more of the norm, and on the back-end, Node.js and Deno use very recent versions of V8.
-Over time, for many TypeScript users, the only necessary step between writing code and running it will be to erase away type annotations.
+Over time, for many Static Type users, the only necessary step between writing code and running it will be to erase away type annotations.
 
 Build steps add another layer of concerns to writing code.
 For example, ensuring freshness of the build output, optimizing the speed of the build, and managing sourcemaps for debugging, are all concerns that JavaScript initially side-stepped.
@@ -74,7 +69,7 @@ JSDoc comments had some existing precedence in the JavaScript community for docu
 
 This comment convention is often found in build scripts, small web apps, server-side apps, and elsewhere where
 the cost/benefit tradeoff of adding a build-tool is too high.
-Even when TypeScript doesn't provide type-checking diagnostics, the comment convention is still leveraged in editor functionality because TypeScript powers the underlying JavaScript editing experience.
+Even when no type-checking diagnostics in place, the comment convention is still leveraged in editors supporting types in their underlying JavaScript editing experience.
 
 Here's an example of the JSDoc-based type syntax from [TypeScript's JSDoc Reference](https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html#param-and-returns).
 
@@ -91,7 +86,7 @@ function stringsStringStrings(p1, p2, p3, p4="test") {
 }
 ```
 
-And here's the equivalent TypeScript syntax enabled by this proposal.
+And here's the syntax proposed by this this proposal, that's compatible with TypeScript and other type-checkers.
 
 ```ts
 function stringsStringStrings(p1: string, p2?: string, p3?: string, p4 = "test"): string {
@@ -103,10 +98,9 @@ JSDoc comments are typically more verbose.
 On top of this, JSDoc comments only provide a subset of the feature set supported in TypeScript,
 in part because it's difficult to provide expressive syntax within JSDoc comments.
 
-Nevertheless, the JSDoc-based syntax remains useful, and the need for some form of type annotations in JavaScript was significant enough for the TypeScript team to invest in it.
+Nevertheless, the JSDoc-based syntax remains useful, and the need for some form of type annotations in JavaScript was significant enough for the TypeScript team to invest in it and the community to create tooling to support type-checking using JSDoc in <sup>[[1](https://www.npmjs.com/package/flow-jsdoc)], [[2](https://www.npmjs.com/package/babel-plugin-jsdoc-runtime-typecheck)]</sup>.
 
-For these reasons, the goal of this proposal is to allow a very large subset of TypeScript
-syntax to appear as-is in JavaScript source files, interpreted as comments.
+For these reasons, this proposal explores and expects to a larger syntax to appear as-is in JavaScript source files, interpreted as comments.
 
 ## Proposal
 
