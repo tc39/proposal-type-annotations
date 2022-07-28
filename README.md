@@ -98,7 +98,7 @@ JSDoc comments are typically more verbose.
 On top of this, JSDoc comments only provide a subset of the feature set supported in TypeScript,
 in part because it's difficult to provide expressive syntax within JSDoc comments.
 
-Nevertheless, the JSDoc-based syntax remains useful, and the need for some form of type annotations in JavaScript was significant enough for the TypeScript team to invest in it and the community to create tooling to support type-checking using JSDoc in <sup>[[1](https://www.npmjs.com/package/flow-jsdoc)], [[2](https://www.npmjs.com/package/babel-plugin-jsdoc-runtime-typecheck)]</sup>.
+Nevertheless, the JSDoc-based syntax remains useful, and the need for some form of type annotations in JavaScript was significant enough for the TypeScript team to invest in it and the community to create tooling to support type-checking using JSDoc<sup>[[1](https://www.npmjs.com/package/flow-jsdoc)], [[2](https://www.npmjs.com/package/babel-plugin-jsdoc-runtime-typecheck)]</sup>.
 
 For these reasons, this proposal explores and expects to a larger syntax to appear as-is in JavaScript source files, interpreted as comments.
 
