@@ -23,6 +23,9 @@ The aim of this proposal is to enable developers to run programs written in [Typ
 - Romulo Cintra (Igalia)
 - Rob Palmer (Bloomberg)
 
+
+Please leave any feedback you have in the [issues](https://github.com/tc39/proposal-type-annotations/issues)!
+
 ## Motivation
 
 Over the past decade, the case for static type-checking has been proven out fairly successfully.
@@ -104,8 +107,7 @@ For these reasons, this proposal explores and expects to a larger syntax to appe
 
 ## Proposal
 
-> The following is a _strawperson_ proposal. Please treat it as such.
-
+> The following is a Stage 1 proposal. Please treat it as such, Changes on the proposal text and examples are expected, [feedback](https://github.com/tc39/proposal-type-annotations/issues/new) it's always welcome. [Here is more information about the TC39 stage process](https://tc39.es/process-document/)
 ### Type Annotations
 
 Type annotations allow a developer to explicitly state what type a variable or expression is intended to be.
@@ -121,7 +123,7 @@ x = 100;
 ```
 
 In the example above, `x` is annotated with the type `string`.
-Tools such as TypeScript can utilize that type, and might choose to error on the statement `x = 100`;
+Tools doing static type analyses can utilize that type, and might choose to error on the statement `x = 100`;
 however, a JavaScript engine that follows this proposal would execute every line here without error.
 This is because annotations do not change the semantics of a program, and are equivalent to comments.
 
