@@ -89,7 +89,7 @@ function stringsStringStrings(p1, p2, p3, p4="test") {
 }
 ```
 
-And here's the syntax proposed by this this proposal, that's compatible with TypeScript and other type-checkers.
+And here's the proposed syntax, that's compatible with the majority of type-checkers.
 
 ```ts
 function stringsStringStrings(p1: string, p2?: string, p3?: string, p4 = "test"): string {
@@ -107,7 +107,7 @@ For these reasons, this proposal explores and expects to a larger syntax to appe
 
 ## Proposal
 
-> The following is a Stage 1 proposal. Please treat it as such, Changes on the proposal text and examples are expected, [feedback](https://github.com/tc39/proposal-type-annotations/issues/new) it's always welcome. [Here is more information about the TC39 stage process](https://tc39.es/process-document/)
+> The following is a Stage 1 proposal. Please treat it as such, updates are expected and [feedback](https://github.com/tc39/proposal-type-annotations/issues/new) it's welcome. [TC39 stage process document](https://tc39.es/process-document/)
 ### Type Annotations
 
 Type annotations allow a developer to explicitly state what type a variable or expression is intended to be.
@@ -152,8 +152,6 @@ interface Person {
 
 Anything declared between the `{` and `}` of an `interface` is entirely ignored.
 
-While `interface`s can extend other types in TypeScript, rules here are to be discussed.
-
 A type alias is another kind of declaration.
 It can declare a name for a broader set of types.
 
@@ -184,7 +182,7 @@ but like any other syntax in this proposal, these annotations do not weigh into 
 
 ### Kinds of Types
 
-The above examples use type names like `string`, `number`, and `boolean`, but TypeScript and others support types with more involved syntax than just a single identifier.
+The above examples use type names like `string`, `number`, and `boolean`, Most type-checkers support types with more involved syntax than just a single identifier.
 Some examples are given in the following table.
 
 Name                                 | Example
@@ -318,8 +316,8 @@ In contrast, type assertions have no runtime behavior.
 
 #### Non-Nullable Assertions
 
-One of the most common type-assertions in TypeScript is the non-null assertion operator.
-It convinces the type-checker that a value is neither `null` nor `undefined`.
+It's a common use case for type-assertions, the type-checker filters null out of nullable types, checking if value is neither `null` nor `undefined`.
+
 For example, one can write `x!.foo` to specify that `x` cannot be `null` nor `undefined`.
 
 ```ts
@@ -327,9 +325,9 @@ For example, one can write `x!.foo` to specify that `x` cannot be `null` nor `un
 document.getElementById("entry")!.innerText = "...";
 ```
 
-In TypeScript, the non-null assertion operator has no runtime semantics, and this proposal would specify it similarly;
-however, there is a case for adding non-nullable assertions as a runtime operator instead.
-If a runtime operator is preferred, that would likely become an independent proposal.
+>In TypeScript, the non-null assertion operator has no runtime semantics, and this proposal would specify it similarly;
+> however, there is a case for adding non-nullable assertions as a runtime operator instead.
+> If a runtime operator is preferred, that would likely become an independent proposal.
 
 ### Generics
 
