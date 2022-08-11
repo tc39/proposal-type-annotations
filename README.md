@@ -688,6 +688,12 @@ However this situation already exists.
 Today, many users omit a build step and ship large amounts of comments and other extraneous information, e.g. unminified code.
 It remains a best practice to perform an ahead-of-time optimization step on code destined for production if the use-case is performance-sensitive.
 
+Specifically, note that [the TypeScript compiler `tsc` does not have a built-in option to minify](https://github.com/microsoft/TypeScript/issues/8).  Allowing TypeScript users to skip `tsc` during development will not inherently encourage users to skip a minification step, since that would have required separate action in any case.
+
+Babel is another popular transpiler for TypeScript, Flow, and Hegel. Babel's `preset-typescript` and `preset-flow` transpilers do not minify. In Babel, minification requires a separate step. Allowing Babel users to omit `preset-typescript` will not encourage users to skip minification.
+
+In this proposal, type annotations are treated as comments. Making comments more useful and easier to use is an appropriate evolution for JavaScript, even when we expect developers to remove comments and type annotations via minification.
+
 ### Are unchecked types a footgun?
 
 This proposal introduces type annotations that are explicitly **not** checked at runtime.
