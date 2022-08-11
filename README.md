@@ -55,7 +55,7 @@ More recently, some bundlers have even started doing both.
 
 But over time, we anticipate there will be less need for developers to downlevel-compile.
 Evergreen browsers have become more of the norm, and on the back-end, Node.js and Deno use very recent versions of V8.
-Over time, for many Static Type users, the only necessary step between writing code and running it will be to erase away type annotations.
+Over time, for many static type system users, the only necessary step between writing code and running it will be to erase away type annotations.
 
 Build steps add another layer of concerns to writing code.
 For example, ensuring freshness of the build output, optimizing the speed of the build, and managing sourcemaps for debugging, are all concerns that JavaScript initially side-stepped.
