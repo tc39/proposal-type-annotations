@@ -27,7 +27,7 @@ The aim of this proposal is to enable developers to run programs written in [Typ
 - Romulo Cintra (Igalia)
 - Rob Palmer (Bloomberg)
 
-## Motivation
+## Motivation: Unfork JavaScript
 
 Over the past decade, the case for static type-checking has been proven out fairly successfully.
 Microsoft, Google, and Facebook released [TypeScript](https://www.typescriptlang.org/), [Closure Compiler](https://developers.google.com/closure/compiler/), and [Flow](https://flow.org/), respectively.
@@ -35,6 +35,8 @@ These efforts have been large investments in JavaScript to reap the productivity
 
 In the case of TypeScript, Flow, and others, these variants of JavaScript brought convenient syntax for declaring and using types in JavaScript.
 This syntax mostly does not affect runtime semantics, and in practice, most of the work of converting these variants to plain JavaScript amounts to erasing types.
+
+The strong demand for ergonomic type annotation syntax has led to forks of JavaScript with custom syntax. This has introduced developer friction and means widely-used JavaScript forks have trouble coordinating with TC39 and must risk syntax conflicts. This proposal formalizes an ergonomic syntax space for comments, to integrate the needs of type-checked forks of JavaScript.
 
 ### Community Usage and Demand
 
