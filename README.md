@@ -182,7 +182,7 @@ but like any other syntax in this proposal, these annotations do not weigh into 
 
 ### Kinds of Types
 
-The above examples use type names like `string`, `number`, and `boolean`, Most type-checkers support types with more involved syntax than just a single identifier.
+The above examples use type names like `string`, `number`, and `boolean`, the majority of static type-checkers support types with more involved syntax than just a single identifier.
 Some examples are given in the following table.
 
 Name                                 | Example
