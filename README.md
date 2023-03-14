@@ -72,7 +72,7 @@ JSDoc comments had some existing precedence in the JavaScript community for docu
 
 This comment convention is often found in build scripts, small web apps, server-side apps, and elsewhere where
 the cost/benefit tradeoff of adding a build-tool is too high.
-Even when no type-checking diagnostics in place, the comment convention is still leveraged in editors supporting types in their underlying JavaScript editing experience.
+Even when no type-checking diagnostics put in place, the comment convention is still leveraged in editors supporting types in their underlying JavaScript editing experience.
 
 Here's an example of the JSDoc-based type syntax from [TypeScript's JSDoc Reference](https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html#param-and-returns).
 
@@ -123,7 +123,7 @@ x = 100;
 ```
 
 In the example above, `x` is annotated with the type `string`.
-Tools doing static type analyses can utilize that type, and might choose to error on the statement `x = 100`;
+Tools doing static type analysis can utilize that type, and might choose to error on the statement `x = 100`;
 however, a JavaScript engine that follows this proposal would execute every line here without error.
 This is because annotations do not change the semantics of a program, and are equivalent to comments.
 
