@@ -309,7 +309,14 @@ In some cases, they will need to be informed of a more-appropriate type at a giv
 Type assertions - sometimes called casts - are a means of asserting an expression's static type.
 
 ```ts
-const point = JSON.parse(serializedPoint) as ({ x: number, y: number });
+// TypeScript
+let value = 1 as number;
+```
+
+```js
+// Flow
+let value = 1;
+(value: number);
 ```
 
 The term "type assertion" was chosen in TypeScript to distance from the idea of a "cast" which often has runtime implications.
@@ -367,10 +374,9 @@ class Box<T> {
 
 ### Generic Invocations
 
-One can explicitly specify the type arguments of a generic function invocation or generic class instantiation [in TypeScript](https://www.typescriptlang.org/docs/handbook/2/functions.html#specifying-type-arguments).
+One can explicitly specify the type arguments of a generic function invocation or generic class instantiation, [in TypeScript](https://www.typescriptlang.org/docs/handbook/2/functions.html#specifying-type-arguments) or in [Flow](https://flow.org/en/docs/types/generics/).
 
 ```ts
-// TypeScript
 add<number>(4, 5)
 new Point<bigint>(4n, 5n)
 ```
