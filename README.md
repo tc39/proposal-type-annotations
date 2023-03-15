@@ -23,10 +23,9 @@ The aim of this proposal is to enable developers to run programs written in [Typ
 - Romulo Cintra (Igalia)
 - Rob Palmer (Bloomberg)
 
-
 Please leave any feedback you have in the [issues](https://github.com/tc39/proposal-type-annotations/issues)!
 
-## Motivation
+## Motivation: Unfork JavaScript
 
 Over the past decade, the case for static type-checking has been proven out fairly successfully.
 Microsoft, Google, and Facebook released [TypeScript](https://www.typescriptlang.org/), [Closure Compiler](https://developers.google.com/closure/compiler/), and [Flow](https://flow.org/), respectively.
@@ -34,6 +33,8 @@ These efforts have been large investments in JavaScript to reap the productivity
 
 In the case of TypeScript, Flow, and others, these variants of JavaScript brought convenient syntax for declaring and using types in JavaScript.
 This syntax mostly does not affect runtime semantics, and in practice, most of the work of converting these variants to plain JavaScript amounts to erasing types.
+
+The strong demand for ergonomic type annotation syntax has led to forks of JavaScript with custom syntax. This has introduced developer friction and means widely-used JavaScript forks have trouble coordinating with TC39 and must risk syntax conflicts. This proposal formalizes an ergonomic syntax space for comments, to integrate the needs of type-checked forks of JavaScript.
 
 ### Community Usage and Demand
 
@@ -681,6 +682,12 @@ Hence larger payloads over-the-wire for remotely served apps, and more text to p
 However this situation already exists.
 Today, many users omit a build step and ship large amounts of comments and other extraneous information, e.g. unminified code.
 It remains a best practice to perform an ahead-of-time optimization step on code destined for production if the use-case is performance-sensitive.
+
+Specifically, note that [the TypeScript compiler `tsc` does not have a built-in option to minify](https://github.com/microsoft/TypeScript/issues/8).  Allowing TypeScript users to skip `tsc` during development will not inherently encourage users to skip a minification step, since minifying TypeScript would have required a separate action in any case.
+
+Babel is another popular transpiler for TypeScript, Flow, and Hegel. Babel's `preset-typescript` and `preset-flow` transpilers do not minify. In Babel, minification requires a separate step (usually performed by a bundler). Allowing Babel users to omit `preset-typescript` will not encourage users to skip minification.
+
+In this proposal, type annotations are treated as comments. Making comments more useful and easier to use is an appropriate evolution for JavaScript, even when we expect developers to remove comments and type annotations via minification.
 
 ### Are unchecked types a footgun?
 
