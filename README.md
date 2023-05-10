@@ -426,7 +426,7 @@ These constructs are not in the scope of this proposal, but could be added by se
 
 - [Enums](https://www.typescriptlang.org/docs/handbook/enums.html)
 - [Namespaces](https://www.typescriptlang.org/docs/handbook/namespaces.html)
-- [Parameter properties](https://www.typescriptlang.org/docs/handbook/classes.html#parameter-properties)
+- [Parameter properties](https://www.typescriptlang.org/docs/handbook/2/classes.html#parameter-properties)
 
 ### Omitted: JSX
 
