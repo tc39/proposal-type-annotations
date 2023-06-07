@@ -1,4 +1,4 @@
-> ⚠️ *This document has not been updated since the March 2022 Plenary Discussion of TC39. Details will change in the coming days.*
+> ⚠️ *This document has not been updated since the March 2022 Plenary Discussion of TC39.*
 
 # ECMAScript proposal: Type Annotations
 
