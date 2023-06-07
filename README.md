@@ -1,4 +1,4 @@
-> ⚠️ *This document has not been updated since the March 2022 Plenary Discussion of TC39.*
+> ⚠️ *This document has not been updated since the March 2022 Plenary Discussion of TC39. See meeting notes from 2022 ([March 29](https://github.com/tc39/notes/blob/main/meetings/2022-03/mar-29.md#types-as-comments-for-stage-1), [March 31](https://github.com/tc39/notes/blob/main/meetings/2022-03/mar-31.md#types-as-comments-continuation)) and 2023 ([March 22](https://github.com/tc39/notes/blob/main/meetings/2023-03/mar-22.md#type-annotations-proposal-update)) for the most up-to-date information.*
 
 # ECMAScript proposal: Type Annotations
 
