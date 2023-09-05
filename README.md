@@ -1,4 +1,4 @@
-> ⚠️ *This document has not been updated since the March 2022 Plenary Discussion of TC39. See meeting notes from 2022 ([March 29](https://github.com/tc39/notes/blob/main/meetings/2022-03/mar-29.md#types-as-comments-for-stage-1), [March 31](https://github.com/tc39/notes/blob/main/meetings/2022-03/mar-31.md#types-as-comments-continuation)) and 2023 ([March 22](https://github.com/tc39/notes/blob/main/meetings/2023-03/mar-22.md#type-annotations-proposal-update)) for the most up-to-date information.*
+> ⚠️ *This document has not been updated regurlarly. See TC39 meeting notes from 2022 ([March 29](https://github.com/tc39/notes/blob/main/meetings/2022-03/mar-29.md#types-as-comments-for-stage-1), [March 31](https://github.com/tc39/notes/blob/main/meetings/2022-03/mar-31.md#types-as-comments-continuation)) and 2023 ([March 22](https://github.com/tc39/notes/blob/main/meetings/2023-03/mar-22.md#type-annotations-proposal-update)) for the most up-to-date information.*
 
 # ECMAScript proposal: Type Annotations
 
@@ -6,8 +6,6 @@ This proposal aims to enable developers to add type annotations to their JavaScr
 At runtime, a JavaScript engine ignores them, treating the types as comments.
 
 The aim of this proposal is to enable developers to run programs written in [TypeScript](https://www.typescriptlang.org/), [Flow](https://flow.org/), and other static typing supersets of JavaScript without any need for transpilation, if they stick within a certain reasonably large subset of the language.
-
-[A *tentative* grammar for this proposal is available here.](https://tc39.es/proposal-type-annotations/grammar.html)
 
 ## Status
 
@@ -27,6 +25,8 @@ The aim of this proposal is to enable developers to run programs written in [Typ
 - Romulo Cintra (Igalia)
 - Rob Palmer (Bloomberg)
 
+Please leave any feedback you have in the [issues](https://github.com/tc39/proposal-type-annotations/issues)!
+
 ## Motivation: Unfork JavaScript
 
 Over the past decade, the case for static type-checking has been proven out fairly successfully.
@@ -44,7 +44,6 @@ _Static Typing_ was the most requested language feature in the [_State of JS_ su
 
 ![missing-features-js](https://user-images.githubusercontent.com/6939381/143012138-96b93204-c456-4ab5-bb63-2648187ab8a7.png)
 
-Additionally, TypeScript was currently listed as the 4th most-used language in [GitHub's *State of the Octoverse*](https://octoverse.github.com/), and on [Stack Overflow's Annual Developer Survey](https://insights.stackoverflow.com/survey/) it has been listed in both the top 4 most-loved languages since 2017 and the 10 most-used languages.
 
 ### Trends in JavaScript Compilation
 
@@ -59,7 +58,7 @@ More recently, some bundlers have even started doing both.
 
 But over time, we anticipate there will be less need for developers to downlevel-compile.
 Evergreen browsers have become more of the norm, and on the back-end, Node.js and Deno use very recent versions of V8.
-Over time, for many TypeScript users, the only necessary step between writing code and running it will be to erase away type annotations.
+Over time, for many static type system users, the only necessary step between writing code and running it will be to erase away type annotations.
 
 Build steps add another layer of concerns to writing code.
 For example, ensuring freshness of the build output, optimizing the speed of the build, and managing sourcemaps for debugging, are all concerns that JavaScript initially side-stepped.
@@ -76,7 +75,7 @@ JSDoc comments had some existing precedence in the JavaScript community for docu
 
 This comment convention is often found in build scripts, small web apps, server-side apps, and elsewhere where
 the cost/benefit tradeoff of adding a build-tool is too high.
-Even when TypeScript doesn't provide type-checking diagnostics, the comment convention is still leveraged in editor functionality because TypeScript powers the underlying JavaScript editing experience.
+Even when no type-checking diagnostics put in place, the comment convention is still leveraged in editors supporting types in their underlying JavaScript editing experience.
 
 Here's an example of the JSDoc-based type syntax from [TypeScript's JSDoc Reference](https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html#param-and-returns).
 
@@ -93,7 +92,7 @@ function stringsStringStrings(p1, p2, p3, p4="test") {
 }
 ```
 
-And here's the equivalent TypeScript syntax enabled by this proposal.
+And here's the proposed syntax, that's compatible with the majority of type-checkers.
 
 ```ts
 function stringsStringStrings(p1: string, p2?: string, p3?: string, p4 = "test"): string {
@@ -105,15 +104,13 @@ JSDoc comments are typically more verbose.
 On top of this, JSDoc comments only provide a subset of the feature set supported in TypeScript,
 in part because it's difficult to provide expressive syntax within JSDoc comments.
 
-Nevertheless, the JSDoc-based syntax remains useful, and the need for some form of type annotations in JavaScript was significant enough for the TypeScript team to invest in it.
+Nevertheless, the JSDoc-based syntax remains useful, and the need for some form of type annotations in JavaScript was significant enough for the TypeScript team to invest in it and the community to create tooling to support type-checking using JSDoc<sup>[[1](https://www.npmjs.com/package/flow-jsdoc)], [[2](https://www.npmjs.com/package/babel-plugin-jsdoc-runtime-typecheck)]</sup>.
 
-For these reasons, the goal of this proposal is to allow a very large subset of TypeScript
-syntax to appear as-is in JavaScript source files, interpreted as comments.
+For these reasons, this proposal explores and expects to a larger syntax to appear as-is in JavaScript source files, interpreted as comments.
 
 ## Proposal
 
-> The following is a _strawperson_ proposal. Please treat it as such.
-
+> The following is a Stage 1 proposal. Please treat it as such, updates are expected and [feedback](https://github.com/tc39/proposal-type-annotations/issues/new) it's welcome. [TC39 stage process document](https://tc39.es/process-document/)
 ### Type Annotations
 
 Type annotations allow a developer to explicitly state what type a variable or expression is intended to be.
@@ -129,7 +126,7 @@ x = 100;
 ```
 
 In the example above, `x` is annotated with the type `string`.
-Tools such as TypeScript can utilize that type, and might choose to error on the statement `x = 100`;
+Tools doing static type analysis can utilize that type, and might choose to error on the statement `x = 100`;
 however, a JavaScript engine that follows this proposal would execute every line here without error.
 This is because annotations do not change the semantics of a program, and are equivalent to comments.
 
@@ -157,8 +154,6 @@ interface Person {
 ```
 
 Anything declared between the `{` and `}` of an `interface` is entirely ignored.
-
-While `interface`s can extend other types in TypeScript, rules here are to be discussed.
 
 A type alias is another kind of declaration.
 It can declare a name for a broader set of types.
@@ -190,7 +185,7 @@ but like any other syntax in this proposal, these annotations do not weigh into 
 
 ### Kinds of Types
 
-The above examples use type names like `string`, `number`, and `boolean`, but TypeScript and others support types with more involved syntax than just a single identifier.
+The above examples use type names like `string`, `number`, and `boolean`, the majority of static type-checkers support types with more involved syntax than just a single identifier.
 Some examples are given in the following table.
 
 Name                                 | Example
@@ -316,7 +311,14 @@ In some cases, they will need to be informed of a more-appropriate type at a giv
 Type assertions - sometimes called casts - are a means of asserting an expression's static type.
 
 ```ts
-const point = JSON.parse(serializedPoint) as ({ x: number, y: number });
+// TypeScript
+let value = 1 as number;
+```
+
+```js
+// Flow
+let value = 1;
+(value: number);
 ```
 
 The term "type assertion" was chosen in TypeScript to distance from the idea of a "cast" which often has runtime implications.
@@ -324,8 +326,8 @@ In contrast, type assertions have no runtime behavior.
 
 #### Non-Nullable Assertions
 
-One of the most common type-assertions in TypeScript is the non-null assertion operator.
-It convinces the type-checker that a value is neither `null` nor `undefined`.
+It's a common use case for type-assertions, the type-checker filters null out of nullable types, checking if value is neither `null` nor `undefined`.
+
 For example, one can write `x!.foo` to specify that `x` cannot be `null` nor `undefined`.
 
 ```ts
@@ -333,9 +335,9 @@ For example, one can write `x!.foo` to specify that `x` cannot be `null` nor `un
 document.getElementById("entry")!.innerText = "...";
 ```
 
-In TypeScript, the non-null assertion operator has no runtime semantics, and this proposal would specify it similarly;
-however, there is a case for adding non-nullable assertions as a runtime operator instead.
-If a runtime operator is preferred, that would likely become an independent proposal.
+>In TypeScript, the non-null assertion operator has no runtime semantics, and this proposal would specify it similarly;
+> however, there is a case for adding non-nullable assertions as a runtime operator instead.
+> If a runtime operator is preferred, that would likely become an independent proposal.
 
 ### Generics
 
@@ -374,10 +376,9 @@ class Box<T> {
 
 ### Generic Invocations
 
-One can explicitly specify the type arguments of a generic function invocation or generic class instantiation [in TypeScript](https://www.typescriptlang.org/docs/handbook/2/functions.html#specifying-type-arguments).
+One can explicitly specify the type arguments of a generic function invocation or generic class instantiation, [in TypeScript](https://www.typescriptlang.org/docs/handbook/2/functions.html#specifying-type-arguments) or in [Flow](https://flow.org/en/docs/types/generics/).
 
 ```ts
-// TypeScript
 add<number>(4, 5)
 new Point<bigint>(4n, 5n)
 ```
