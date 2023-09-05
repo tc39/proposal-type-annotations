@@ -1,3 +1,5 @@
+> ⚠️ *This document has not been updated regurlarly. See TC39 meeting notes from 2022 ([March 29](https://github.com/tc39/notes/blob/main/meetings/2022-03/mar-29.md#types-as-comments-for-stage-1), [March 31](https://github.com/tc39/notes/blob/main/meetings/2022-03/mar-31.md#types-as-comments-continuation)) and 2023 ([March 22](https://github.com/tc39/notes/blob/main/meetings/2023-03/mar-22.md#type-annotations-proposal-update)) for the most up-to-date information.*
+
 # ECMAScript proposal: Type Annotations
 
 This proposal aims to enable developers to add type annotations to their JavaScript code, allowing those annotations to be checked by a type checker that is _external to JavaScript_.
@@ -425,7 +427,7 @@ These constructs are not in the scope of this proposal, but could be added by se
 
 - [Enums](https://www.typescriptlang.org/docs/handbook/enums.html)
 - [Namespaces](https://www.typescriptlang.org/docs/handbook/namespaces.html)
-- [Parameter properties](https://www.typescriptlang.org/docs/handbook/classes.html#parameter-properties)
+- [Parameter properties](https://www.typescriptlang.org/docs/handbook/2/classes.html#parameter-properties)
 
 ### Omitted: JSX
 
