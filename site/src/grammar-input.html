@@ -157,7 +157,7 @@ AsyncMethod :
     `async`  [no LineTerminator here]  ClassElementName  `?`?  TypeParameters?  `(`  UniqueFormalParameters  `)`  TypeAnnotation?  `{`  AsyncFunctionBody  `}`
 
 CoverCallExpressionAndAsyncArrowHead :
-    MemberExpression  TypeParameters?  Arguments  TypeAnnotation?
+    MemberExpression ApplicationTypeArguments?  Arguments  TypeAnnotation?
 
 AsyncArrowHead :
     `async`  [no LineTerminator here]  TypeParameters?  ArrowFormalParameters
@@ -183,6 +183,9 @@ ImportSpecifier :
 
 TypeArguments :
     AngleBracketedTokens
+
+ApplicationTypeArguments :
+    `::<` TypeArgumentList `>`
 
 TypeDeclaration :
     `type`  BindingIdentifier  TypeParameters?  `=`  Type
