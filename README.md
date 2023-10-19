@@ -753,6 +753,8 @@ and are not part of it.
 
 [TypeScript](https://www.typescriptlang.org/docs/handbook/intro.html), [Flow](https://flow.org/en/docs/), and [Hegel](https://hegel.js.org/docs) are languages that implement type systems above standard JavaScript.
 
+The proposal repository contains a [syntax comparison](syntax/syntax-comparison.md) document with a table that compares the type syntax used in these existing systems. It is not exhaustive, and we welcome corrections or contributions.
+
 #### Ability to add type systems to JavaScript via comments
 
 Both TypeScript and Flow enable developers to write JavaScript code and incorporate
