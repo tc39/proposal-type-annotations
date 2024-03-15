@@ -37,13 +37,13 @@ MemberExpression[Yield, Await] :
     <ins>
     MemberExpression[?Yield, ?Await]  `::`  TypeArguments
     MemberExpression[?Yield, ?Await]  [no LineTerminator here]  `!`
-    `new` MemberExpression[?Yield, ?Await] TypeArguments? Arguments[?Yield, ?Await]
+    `new` MemberExpression[?Yield, ?Await]  `::`  TypeArguments  Arguments[?Yield, ?Await]
     </ins>
 
 NewExpression[Yield, Await] :
     <ins>
     MemberExpression[?Yield, ?Await]
-    `new` NewExpression[?Yield, ?Await] TypeArguments?
+    `new` NewExpression[?Yield, ?Await]  `::`  TypeArguments
     </ins>
 
 CallExpression :
