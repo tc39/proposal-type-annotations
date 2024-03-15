@@ -33,17 +33,17 @@ Otherwise, RHS productions in <emu-xref href=#modified-productions title></emu-x
 <br />
 <br />
 <emu-grammar>
-MemberExpression[Yield, Await] :
+MemberExpression :
     <ins>
-    MemberExpression[?Yield, ?Await]  `::`  TypeArguments
-    MemberExpression[?Yield, ?Await]  [no LineTerminator here]  `!`
-    `new` MemberExpression[?Yield, ?Await]  `::`  TypeArguments  Arguments[?Yield, ?Await]
+    MemberExpression  `::`  TypeArguments
+    MemberExpression  [no LineTerminator here]  `!`
+    `new`  MemberExpression  `::`  TypeArguments  Arguments
     </ins>
 
-NewExpression[Yield, Await] :
+NewExpression :
     <ins>
-    MemberExpression[?Yield, ?Await]
-    `new` NewExpression[?Yield, ?Await]  `::`  TypeArguments
+    MemberExpression
+    `new`  NewExpression  `::`  TypeArguments
     </ins>
 
 CallExpression :
