@@ -110,7 +110,7 @@ For these reasons, this proposal explores and expects to a larger syntax to appe
 
 ## Proposal
 
-> The following is a Stage 1 proposal. Please treat it as such, updates are expected and [feedback](https://github.com/tc39/proposal-type-annotations/issues/new) it's welcome. [TC39 stage process document](https://tc39.es/process-document/)
+> The following is a Stage 1 proposal. Please treat it as such, updates are expected and [feedback](https://github.com/tc39/proposal-type-annotations/issues/new) is welcome. [TC39 stage process document](https://tc39.es/process-document/)
 ### Type Annotations
 
 Type annotations allow a developer to explicitly state what type a variable or expression is intended to be.
