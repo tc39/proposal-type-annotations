@@ -40,7 +40,7 @@ The strong demand for ergonomic type annotation syntax has led to forks of JavaS
 
 ### Community Usage and Demand
 
-_Static Typing_ was the most requested language feature in the [_State of JS_ survey](https://stateofjs.com) in [2020](https://2020.stateofjs.com/en-US/opinions/missing_from_js/), [2021](https://2021.stateofjs.com/en-US/opinions/#currently_missing_from_js_wins), [2022](https://2022.stateofjs.com/en-US/opinions/#top_currently_missing_from_js) and [2023](https://2023.stateofjs.com/en-US/features/#language_pain_points).
+_Static Typing_ was the most missed language feature in the [_State of JS_ survey](https://stateofjs.com) each year on record: [2020](https://2020.stateofjs.com/en-US/opinions/missing_from_js/), [2021](https://2021.stateofjs.com/en-US/opinions/#currently_missing_from_js_wins), [2022](https://2022.stateofjs.com/en-US/opinions/#top_currently_missing_from_js), [2023](https://2023.stateofjs.com/en-US/features/#language_pain_points) and [2024](https://2024.stateofjs.com/en-US/features/#language_pain_points).
 
 ![missing-features-js](https://user-images.githubusercontent.com/6939381/143012138-96b93204-c456-4ab5-bb63-2648187ab8a7.png)
 
