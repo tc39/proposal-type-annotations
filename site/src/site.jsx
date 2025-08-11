@@ -223,7 +223,7 @@ const Page = () => <html lang="en">
       </FAQ>
 
       <h2>Links</h2>
-      <aside>This page is a simpler overview of Types as Comments, to learn more about the proposal consult the GitHub repo.</aside>
+      <aside>This page is a simpler overview of Types as Comments, to learn more about the proposal consult the <a href="https://github.com/tc39/proposal-type-annotations">GitHub repo</a>.</aside>
       <Split>
         <a className="button" href="https://github.com/tc39/proposal-type-annotations#motivation">
           <h5>Motivations</h5>
