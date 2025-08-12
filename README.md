@@ -42,7 +42,11 @@ The strong demand for ergonomic type annotation syntax has led to forks of JavaS
 
 _Static Typing_ was the most missed language feature in the [_State of JS_ survey](https://stateofjs.com) each year on record: [2020](https://2020.stateofjs.com/en-US/opinions/missing_from_js/), [2021](https://2021.stateofjs.com/en-US/opinions/#currently_missing_from_js_wins), [2022](https://2022.stateofjs.com/en-US/opinions/#top_currently_missing_from_js), [2023](https://2023.stateofjs.com/en-US/features/#language_pain_points) and [2024](https://2024.stateofjs.com/en-US/features/#language_pain_points).
 
-![missing-features-js](https://user-images.githubusercontent.com/6939381/143012138-96b93204-c456-4ab5-bb63-2648187ab8a7.png)
+![missing-features-js](https://github.com/user-attachments/assets/b8b7aa92-a938-4f27-8e51-4a954e3820ff)
+
+The majority of respondents write more _TypeScript_ than _JavaScript_ in the [_State of JS_ survey](https://stateofjs.com) in [2024](https://2024.stateofjs.com/en-US/usage/#js_ts_balance)
+
+![js-ts-balance](https://github.com/user-attachments/assets/f4d97ffc-702e-470c-a265-232438225fbe)
 
 
 ### Trends in JavaScript Compilation
