@@ -81,8 +81,8 @@ const Page = () => <html lang="en">
           </Code>
         <div>
           <p>For the simplest case, the same idea could be applied to an engine which implements Type as Comments.</p>
-          <p>If the engine has just seen an variable like <code>message</code> and the next character is a colon (<code>:</code>), then treat the colon (<code>:</code>) and certain pieces of code after ('<code>: string</code>') as a comment.</p>
-          <p>In this case, once an engine would hit the <code>=</code> charater, it would stop interpreting the code as comments and read the initializer of <code>message</code>.</p>
+          <p>If the engine has just seen a variable like <code>message</code> and the next character is a colon (<code>:</code>), then treat the colon (<code>:</code>) and certain pieces of code after ('<code>: string</code>') as a comment.</p>
+          <p>In this case, once an engine would hit the <code>=</code> character, it would stop interpreting the code as comments and read the initializer of <code>message</code>.</p>
         </div>
       </Split>
 
