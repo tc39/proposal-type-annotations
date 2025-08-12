@@ -37,7 +37,7 @@ export const SplitReverse = (props) => (
 /** @param {{ name: string, body: string }} props  */
 export const TwoThirdsHeading = (props) => (
     <div className="section two-thirds">
-       <div className="one"><h4>{props.name}</h4></div>
+       <div className="one"><h2 className="h2-inline">{props.name}</h2></div>
        <p className="two">{props.body}</p>
    </div>  
 )
@@ -64,7 +64,7 @@ export const setupShikiTwoslash = async (config) => {
 export const Code = (props) => {
     if (typeof props.children !== "string") throw new Error("Code components need to be strings, not more components.")
 
-    const Title = props.title ? () => <h4 className="code-title">{props.title}</h4> : () => null
+    const Title = props.title ? () => <strong className="code-title">{props.title}</strong> : () => null
     const Subtitle = props.after ? () => <p className="code-after">{props.after}</p> : () => null
     const Suffix = props.emoji ? () => <span className="emoji" role="img" aria-label={props.emojiName}>{props.emoji}</span> : () => null
     const code = dedentString(props.children)
