@@ -8,12 +8,56 @@
   src: url("./assets/PT_Serif/PTSerif-Regular.ttf") format("ttf");
 }
 
-$sans: "PT Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+$sans: "PT Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+  Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 $serif: "PT Serif", Georgia, "Times New Roman", Times, serif;
 $one-col-width-min: 879px;
 
+:root {
+  color-scheme: light;
+
+  // Shared colors palette
+  --color-gray-dark-emphasized: #222;
+  --color-gray-dark: #444;
+  --color-gray-dark-mid: #706b67;
+  --color-gray-dark-lighter: #ada59e;
+  --color-gray-light: #ddd;
+  --color-gray-light-emphasized: #eee;
+  --color-tan-dark: #292726;
+  --color-tan-dark-emphasized: #5a504a;
+  --color-tan-light: #f9eee6;
+  --color-tan-light-emphasized: #f5dac2;
+  --color-orange-mid: #fc7c00;
+  --color-orange-dark: #a15c1b;
+
+  // Light mode palette usage (default)
+  --color-background-base: var(--color-tan-light);
+  --color-border: var(--color-gray-dark);
+  --color-comment: var(--color-gray-dark-mid);
+  --color-emphasis: var(--color-orange-mid);
+  --color-foreground-bold: black;
+  --color-foreground-emphasized: var(--color-gray-dark-emphasized);
+  --color-foreground-orange: var(--color-orange-dark);
+  --color-foreground-tan-emphasized: var(--color-tan-light-emphasized);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    // Dark mode palette usage
+    --color-background-base: var(--color-tan-dark);
+    --color-border: var(--color-gray-light);
+    --color-comment: var(--color-gray-dark-lighter);
+    --color-foreground-bold: white;
+    --color-foreground-emphasized: var(--color-gray-light-emphasized);
+    --color-foreground-orange: var(--color-orange-mid);
+    --color-foreground-tan-emphasized: var(--color-tan-dark-emphasized);
+  }
+}
+
 html {
-  background: #f9eee6;
+  background: var(--color-background-base);
 }
 
 body {
@@ -29,7 +73,7 @@ body {
 }
 
 .section {
-  margin-bottom: 2rem;  
+  margin-bottom: 2rem;
 
   ul {
     padding-left: 0.6rem;
@@ -42,7 +86,7 @@ code {
 }
 
 hr {
-  background: #fc7c00;
+  background: var(--color-orange-mid);
   border: none;
   height: 3px;
 }
@@ -90,12 +134,19 @@ hr {
 
 .two-thirds {
   font: $sans;
-  
+  padding-bottom: 1.33em;
+
   p {
     font-size: 1.2rem;
     line-height: 1.8rem;
   }
-  
+
+  .one {
+    font-family: $sans;
+    font-size: 0.66em;
+    font-weight: bold;
+  }
+
   @media (min-width: $one-col-width-min) {
     display: flex;
     .one {
@@ -116,7 +167,7 @@ hr {
 .one-column-center {
   @media (min-width: $one-col-width-min) {
     width: 50%;
-    margin: 0 auto    ;
+    margin: 0 auto;
   }
 }
 
@@ -128,7 +179,7 @@ h4 {
   text-align: center;
 }
 
-h2 {
+h2:not(.h2-inline) {
   margin-top: 120px;
 }
 
@@ -140,7 +191,7 @@ aside {
   margin-bottom: 50px;
 
   a {
-    color: black
+    color: var(--color-foreground-bold);
   }
 }
 
@@ -148,32 +199,38 @@ h1 {
   padding-top: 4px;
   font-size: 1rem;
   em {
-    color: #706b67;
+    color: var(--color-comment);
   }
 }
 
-h2::after {
+h2:not(.h2-inline)::after {
   content: "";
   margin: 20px auto;
   display: block;
   max-width: 400px;
   height: 2px;
-  background: #fc7c00;
+  background: var(--color-orange-mid);
+}
+
+h3 {
+  font-size: 1rem;
+  margin-block-start: 1.33em;
+  margin-block-end: 1.33em;
 }
 
 .question {
   font-family: $sans;
-  color: #d17924;
+  color: var(--color-foreground-orange);
 
   text-align: center;
   font-size: 1.2rem;
 }
 
 p > code {
-  background-color: #f5dac2;
+  background-color: var(--color-foreground-tan-emphasized);
   display: inline-block;
   border-radius: 4px;
-  color: #222;
+  color: var(--color-foreground-emphasized);
 }
 
 .faq {
@@ -216,39 +273,45 @@ p > code {
   }
 
   div > * {
-    margin:0;
+    margin: 0;
     text-align: left;
     font-weight: normal;
     font-size: 1.3rem;
-    font-family: $sans; 
+    font-family: $sans;
   }
 }
 
 a.button {
-  color: black;
-  background-color: #FC7C0020;
+  color: var(--color-foreground-bold);
+  background-color: #fc7c0020;
   text-decoration: none;
   padding: 10px;
-  margin-bottom:  20px;
-  border-left: 2px solid #FC7C00;
+  margin-bottom: 20px;
+  border-left: 2px solid var(--color-emphasis);
   font-size: 1rem;
-  h5 {
+  h3 {
     font-size: 1.1rem;
-    margin: 0.4rem 0 ;
+    margin: 0.4rem 0;
+    text-align: left;
   }
   p {
     margin: 0;
   }
   &:hover {
-    background-color: #FC7C0010;
+    background-color: #fc7c0010;
   }
+}
+
+.primary-code-samples {
+  padding-top: 1.33em;
 }
 
 .code-sample {
   position: relative;
 
-  h4.code-title {
-    margin-bottom: -8px;
+  strong.code-title {
+    padding-top: 1.33em;
+    font-family: $sans;
     text-align: left;
   }
 
@@ -257,12 +320,11 @@ a.button {
     bottom: -8px;
     right: 0px;
   }
-
-} 
+}
 .code-after {
+  color: var(--color-comment);
   margin-top: -2.2rem;
   text-align: right;
-  opacity: 0.5;
 }
 
 /*  Start of Shiki Twoslash CSS:
@@ -280,17 +342,15 @@ Code blocks structurally look like:
 
 pre {
   /* In theory shiki will overwrite these, but this is to make sure there are defaults regardless */
-  background-color: #F9EEE6 !important;
-  color: black;
-
-  /* Give it some space to breathe */
-  padding: 12px 0 ;
+  background-color: var(--color-background-base) !important;
+  color: var(--color-foreground-bold);
 
   /* All code samples get a grey border, twoslash ones get a different color */
-  border-left: 1px solid #444;
-  border-bottom: 1px solid #444;
+  border-left: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
 
   margin-bottom: 3rem;
+  margin-block-start: 0.5rem;
 
   /* Important to allow the code to move horizontally; */
   overflow-x: auto;
@@ -323,7 +383,6 @@ pre.shiki .language-id {
   display: none;
 }
 
-
 /** When you mouse over the pre, show the underlines */
 pre.twoslash:hover data-lsp {
   border-color: #747474;
@@ -347,7 +406,11 @@ pre.twoslash data-lsp:hover::before {
 }
 
 pre .code-container {
+  background: var(--color-tan-light);
   overflow: auto;
+
+  /* Give it some space to breathe */
+  padding: 12px 0;
 }
 
 /* Respect no animations */
@@ -389,7 +452,6 @@ pre .query {
   padding-right: 1rem;
 }
 
-
 /* In order to have the 'popped out' style design and to not break the layout
   /* we need to place a fake and un-selectable copy of the error which _isn't_ broken out
   /* behind the actual error message.
@@ -414,7 +476,7 @@ pre .error {
   /* Give the space to the error code */
   display: flex;
   align-items: center;
-  color: black;
+  color: var(--color-foreground-bold);
 }
 pre .error .code {
   display: none;
@@ -482,7 +544,7 @@ pre .inline-completions ul.dropdown li span.result-found {
 }
 pre .inline-completions ul.dropdown li span.result {
   width: 100px;
-  color: black;
+  color: var(--color-foreground-bold);
   display: inline-block;
 }
 .dark-theme .markdown pre {
@@ -515,27 +577,26 @@ pre .logger {
 }
 
 pre .logger svg {
-  margin-right:9px
+  margin-right: 9px;
 }
 
 pre .logger.error-log {
   background-color: #fee;
-  color: #ff0b0b;
-  border-left: 1px solid #bf1818
+  color: #d20000;
+  border-left: 1px solid #bf1818;
 }
 
 pre .logger.warn-log {
   background-color: #ffe;
-  border-left: 1px solid #eae662
+  border-left: 1px solid #eae662;
 }
 
 pre .logger.log-log {
   background-color: #f3f3f3;
-  border-left: 1px solid #f3f3f3
+  border-left: 1px solid #f3f3f3;
 }
 
 pre .logger.log-log svg {
   margin-left: 6px;
-  margin-right:9px
+  margin-right: 9px;
 }
-

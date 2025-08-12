@@ -3,6 +3,7 @@ import * as React from 'react';
 import * as ReactDOMServer from 'react-dom/server';
 import { writeFileSync } from "fs"
 import { DevWebSocket, Entry, FAQ, Header, setupShikiTwoslash, Split, Code, TwoThirdsHeading, CenterOneColumn } from "./components.jsx"
+import shikiTheme from './shiki-theme.json';
 
 const Page = () => <html lang="en">
     <head>
@@ -80,8 +81,8 @@ const Page = () => <html lang="en">
           </Code>
         <div>
           <p>For the simplest case, the same idea could be applied to an engine which implements Type as Comments.</p>
-          <p>If the engine has just seen an variable like <code>message</code> and the next character is a colon (<code>:</code>), then treat the colon (<code>:</code>) and certain pieces of code after ('<code>: string</code>') as a comment.</p>
-          <p>In this case, once an engine would hit the <code>=</code> charater, it would stop interpreting the code as comments and read the initializer of <code>message</code>.</p>
+          <p>If the engine has just seen a variable like <code>message</code> and the next character is a colon (<code>:</code>), then treat the colon (<code>:</code>) and certain pieces of code after ('<code>: string</code>') as a comment.</p>
+          <p>In this case, once an engine would hit the <code>=</code> character, it would stop interpreting the code as comments and read the initializer of <code>message</code>.</p>
         </div>
       </Split>
 
@@ -104,14 +105,14 @@ const Page = () => <html lang="en">
       <Split>
         
         <article>
-          <h4>JavaScript and TypeScript Users</h4>
+          <h3>JavaScript and TypeScript Users</h3>
           <p>Less need for source code transformation in modern JavaScript projects.</p>
           <p>Cleaner and more powerful syntax than JSDoc comments.</p>
           <p>Pasting typed code into consoles and REPLs just works.</p>
         </article>
 
         <article>
-          <h4>Tool Makers</h4>
+          <h3>Tool Makers</h3>
           <p>New experimental type systems can be built using the ignored syntax space.</p>
           <p>Existing JavaScript tools can:</p>
           <ul>
@@ -123,7 +124,7 @@ const Page = () => <html lang="en">
         </article>
 
         <article>
-          <h4>Engine Maintainers</h4>
+          <h3>Engine Maintainers</h3>
           <p>Browser engines do not pay any type-checking cost at runtime.</p>
           <p>Engine maintainers avoid the burden of parser upgrades as each type system evolves.</p>
         </article>
@@ -223,20 +224,20 @@ const Page = () => <html lang="en">
       </FAQ>
 
       <h2>Links</h2>
-      <aside>This page is a simpler overview of Types as Comments, to learn more about the proposal consult the GitHub repo.</aside>
+      <aside>This page is a simpler overview of Types as Comments, to learn more about the proposal consult the <a href="https://github.com/tc39/proposal-type-annotations">GitHub repo</a>.</aside>
       <Split>
         <a className="button" href="https://github.com/tc39/proposal-type-annotations#motivation">
-          <h5>Motivations</h5>
+          <h3>Motivations</h3>
           <p>How does this proposal improve the JavaScript ecosystem as a whole?</p>
         </a>
 
         <a className="button" href="https://github.com/tc39/proposal-type-annotations#proposal">
-          <h5>Supported Syntax</h5>
+          <h3>Supported Syntax</h3>
           <p>From types definitions to class properties, see all the proposed supported type-level syntax.</p>
         </a>
 
         <a className="button" href="https://github.com/tc39/proposal-type-annotations#FAQ">
-          <h5>Frequently Asked Questions</h5>
+          <h3>Frequently Asked Questions</h3>
           <p>How does this proposal relate to TypeScript or Flow support? and many other questions.</p>
         </a>
       </Split>
@@ -247,7 +248,8 @@ const Page = () => <html lang="en">
 
 // This code is evaluated during the build and triggers saving the .html
 const go = async () => {
-  await setupShikiTwoslash({ theme: "github-light"})
+  // @ts-expect-error - aligning .json types to IShikiTheme
+  await setupShikiTwoslash({ theme: shikiTheme })
   const html = ReactDOMServer.renderToStaticMarkup(<Page />)
   writeFileSync("./out/index.html", html)
 }

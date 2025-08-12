@@ -1,4 +1,4 @@
-> ⚠️ *This document has not been updated regularly. See TC39 meeting notes from 2022 ([March 29](https://github.com/tc39/notes/blob/main/meetings/2022-03/mar-29.md#types-as-comments-for-stage-1), [March 31](https://github.com/tc39/notes/blob/main/meetings/2022-03/mar-31.md#types-as-comments-continuation)) and 2023 ([March 22](https://github.com/tc39/notes/blob/main/meetings/2023-03/mar-22.md#type-annotations-proposal-update)) for the most up-to-date information.*
+> ⚠️ *This document has not been updated regularly. See TC39 meeting notes from 2022 ([March 29](https://github.com/tc39/notes/blob/main/meetings/2022-03/mar-29.md#types-as-comments-for-stage-1), [March 31](https://github.com/tc39/notes/blob/main/meetings/2022-03/mar-31.md#types-as-comments-continuation)) and 2023 ([March 22](https://github.com/tc39/notes/blob/main/meetings/2023-03/mar-22.md#type-annotations-proposal-update), [September 27](https://github.com/tc39/notes/blob/main/meetings/2023-09/september-27.md#type-annotations-stage-1-update-and-discussion)) for the most up-to-date information.*
 
 # ECMAScript proposal: Type Annotations
 
@@ -40,7 +40,7 @@ The strong demand for ergonomic type annotation syntax has led to forks of JavaS
 
 ### Community Usage and Demand
 
-_Static Typing_ was the most requested language feature in the [_State of JS_ survey](https://stateofjs.com) in [2020](https://2020.stateofjs.com/en-US/opinions/missing_from_js/), [2021](https://2021.stateofjs.com/en-US/opinions/#currently_missing_from_js_wins), [2022](https://2022.stateofjs.com/en-US/opinions/#top_currently_missing_from_js), [2023](https://2023.stateofjs.com/en-US/features/#language_pain_points) and [2024](https://2024.stateofjs.com/en-US/features/#language_pain_points).
+_Static Typing_ was the most missed language feature in the [_State of JS_ survey](https://stateofjs.com) each year on record: [2020](https://2020.stateofjs.com/en-US/opinions/missing_from_js/), [2021](https://2021.stateofjs.com/en-US/opinions/#currently_missing_from_js_wins), [2022](https://2022.stateofjs.com/en-US/opinions/#top_currently_missing_from_js), [2023](https://2023.stateofjs.com/en-US/features/#language_pain_points) and [2024](https://2024.stateofjs.com/en-US/features/#language_pain_points).
 
 ![missing-features-js](https://github.com/user-attachments/assets/b8b7aa92-a938-4f27-8e51-4a954e3820ff)
 
